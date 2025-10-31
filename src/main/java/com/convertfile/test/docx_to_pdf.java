@@ -14,7 +14,8 @@ public class docx_to_pdf {
             docx_to_pdf_service convert = new docx_to_pdf_service();
 
             convert.convertDocxtoPdf(docxPath, pdfPath);
-            
+            System.out.println("Starting convert...");
+
             File pdf = new File(pdfPath);
             if(pdf.exists() && pdf.length() > 0){
                 System.out.println("Success!");
@@ -25,7 +26,6 @@ public class docx_to_pdf {
         }
         catch(Exception ex){
             System.out.println("Error: " + ex.getMessage());
-            ex.printStackTrace();
         }
     }
 }
