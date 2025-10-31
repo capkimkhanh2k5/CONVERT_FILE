@@ -1,12 +1,10 @@
-package com.convertfile.service;
+package com.convertfile.service.microService;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.File;
 import java.io.OutputStream;
 
-
-import org.docx4j.*;
 import org.docx4j.Docx4J;
 import org.docx4j.openpackaging.packages.WordprocessingMLPackage;
 import org.docx4j.openpackaging.exceptions.Docx4JException;
@@ -30,8 +28,7 @@ public class docx_to_pdf_service {
             wordPackage.setFontMapper(font);
 
             Docx4J.toPDF(wordPackage, output);
-
-            System.out.println("End convert docx to pdf: " + pdfPath);
+            
         } catch(Docx4JException edocx){
             System.out.println("Error: " + edocx.getMessage());
             edocx.printStackTrace();
@@ -41,5 +38,7 @@ public class docx_to_pdf_service {
             ex.printStackTrace();
             throw new IOException("Not found in Process!");
         }
+
+        System.out.println("End convert docx to pdf: " + pdfPath);
     }
 }
