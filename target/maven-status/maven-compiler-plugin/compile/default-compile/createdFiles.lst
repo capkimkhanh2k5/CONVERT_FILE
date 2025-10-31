@@ -1,6 +1,7 @@
 com/convertfile/controller/ResultServlet.class
+com/convertfile/service/docx_to_pdf_service.class
 com/convertfile/model/job.class
 com/convertfile/controller/LoginServlet.class
 com/convertfile/controller/UploadServlet.class
 com/convertfile/controller/RegisterServlet.class
-com/convertfile/service/pdf_service.class
+com/convertfile/test/docx_to_pdf.class

@@ -1,0 +1,31 @@
+package com.convertfile.test;
+
+import java.io.File;
+import java.io.IOException;
+
+import com.convertfile.service.docx_to_pdf_service;
+
+public class docx_to_pdf {
+    public static void main(String[] args) throws IOException{
+        final String docxPath = "/Users/capkimkhanh/Documents/PC/Nam3.HK1/LTM/CONVERT_FILE/src/main/resources/a.docx";
+        final String pdfPath = "/Users/capkimkhanh/Documents/PC/Nam3.HK1/LTM/CONVERT_FILE/src/main/resources/a.pdf";
+
+        try{
+            docx_to_pdf_service convert = new docx_to_pdf_service();
+
+            convert.convertDocxtoPdf(docxPath, pdfPath);
+            
+            File pdf = new File(pdfPath);
+            if(pdf.exists() && pdf.length() > 0){
+                System.out.println("Success!");
+            }
+            else{
+                System.out.println("Fall!");
+            }
+        }
+        catch(Exception ex){
+            System.out.println("Error: " + ex.getMessage());
+            ex.printStackTrace();
+        }
+    }
+}
