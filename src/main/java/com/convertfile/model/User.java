@@ -1,5 +1,5 @@
 package com.convertfile.model;
 
-public class job {
-    
+public class User {
+
 }
