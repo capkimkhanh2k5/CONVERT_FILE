@@ -2,63 +2,92 @@ package com.convertfile.model;
 
 import java.time.LocalDateTime;
 
+import com.convertfile.model.EnumStatus.TaskStatus;
+import com.convertfile.model.EnumStatus.TaskType;
+
+
 public class TaskJob {
-     //TODO: Fix cho phù hợp DATABASE
-    private int id;
-    private String fileId;
-    private String jobType;
-    private String status;
+    private long task_id;
+    private String file_id;
+    private TaskType task_type;
+    private TaskStatus status;
     private String message;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+    private String worker_id;
+    private int attempt_count;
+    private LocalDateTime created_at;
+    private LocalDateTime started_at;
+    private LocalDateTime completed_at;
+
+
 
     // Constructor
     public TaskJob() {
-        this.fileId = "";
-        this.jobType = "";
-        this.status = "";
+        this.task_id = 0;
+        this.file_id = "";
+        this.task_type = null;
+        this.status = TaskStatus.WAITING;
         this.message = "";
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
+        this.worker_id = "";
+        this.attempt_count = 0;
+        this.created_at = LocalDateTime.now();
+        this.started_at = null;
+        this.completed_at = null;
     }
 
-    public TaskJob(String fileId, String jobType, String status, String message, LocalDateTime createdAt, LocalDateTime updatedAt) {
-        this.fileId = fileId;
-        this.jobType = jobType;
+    public TaskJob(long task_id, String fileId, TaskType task_type, TaskStatus status, String message, String worker_id, int attempt_count, LocalDateTime created_at, LocalDateTime started_at, LocalDateTime completed_at) {
+        this.task_id = task_id;
+        this.file_id = fileId;
+        this.task_type = task_type;
         this.status = status;
         this.message = message;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
+        this.worker_id = worker_id;
+        this.attempt_count = attempt_count;
+        this.created_at = created_at;
+        this.started_at = started_at;
+        this.completed_at = completed_at;
     }
 
     public TaskJob(TaskJob job){
-        this.fileId = job.getFileId();
-        this.jobType = job.getJobType();
+        this.task_id = job.getTask_id();
+        this.file_id = job.getFileId();
+        this.task_type = job.getTask_type();
         this.status = job.getStatus();
         this.message = job.getMessage();
-        this.createdAt = job.getCreatedAt();
-        this.updatedAt = job.getUpdatedAt();
+        this.worker_id = job.getWorker_id();
+        this.attempt_count = job.getAttempt_count();
+        this.created_at = job.getCreated_at();
+        this.started_at = job.getStarted_at();
+        this.completed_at = job.getCompleted_at();
     }
 
     // Getters & Setters
-    public int getId() { return id; }
-    public void setId(int id) { this.id = id; }
+    public long getTask_id() { return task_id; }
+    public void setTask_id(long task_id) { this.task_id = task_id; }
 
-    public String getFileId() { return fileId; }
-    public void setFileId(String fileId) { this.fileId = fileId; }
+    public String getFileId() { return file_id; }
+    public void setFileId(String fileId) { this.file_id = fileId; }
 
-    public String getJobType() { return jobType; }
-    public void setJobType(String jobType) { this.jobType = jobType; }
+    public TaskType getTask_type() { return task_type; }
+    public void setTask_type(TaskType task_type) { this.task_type = task_type; }
 
-    public String getStatus() { return status; }
-    public void setStatus(String status) { this.status = status; }
+    public TaskStatus getStatus() { return status; }
+    public void setStatus(TaskStatus status) { this.status = status; }
 
     public String getMessage() { return message; }
     public void setMessage(String message) { this.message = message; }
 
-    public LocalDateTime getCreatedAt() { return createdAt; }
-    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+    public String getWorker_id() { return worker_id; }
+    public void setWorker_id(String worker_id) { this.worker_id = worker_id; }
 
-    public LocalDateTime getUpdatedAt() { return updatedAt; }
-    public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
+    public int getAttempt_count() { return attempt_count; }
+    public void setAttempt_count(int attempt_count) { this.attempt_count = attempt_count; }
+
+    public LocalDateTime getCreated_at() { return created_at; }
+    public void setCreated_at(LocalDateTime created_at) { this.created_at = created_at; }
+
+    public LocalDateTime getStarted_at() { return started_at; }
+    public void setStarted_at(LocalDateTime started_at) { this.started_at = started_at; }
+
+    public LocalDateTime getCompleted_at() { return completed_at; }
+    public void setCompleted_at(LocalDateTime completed_at) { this.completed_at = completed_at; }
 }

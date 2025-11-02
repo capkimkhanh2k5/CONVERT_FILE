@@ -1,14 +1,16 @@
 package com.convertfile.service;
 
+import com.convertfile.worker.fileWorker;
+
 public class WockerService {
-    private final int NUMBER_OF_WORKERS = 5; // Số lượng worker threads
+    private final int NUMBER_OF_WORKERS = 1; // Số lượng worker threads
     private final Thread[] workers;
 
     public WockerService() {
         workers = new Thread[NUMBER_OF_WORKERS];
 
         for (int i = 0; i < NUMBER_OF_WORKERS; i++) {
-            workers[i] = new Thread(new com.convertfile.worker.fileWorker(), "FileWorker-" + (i + 1));
+            workers[i] = new Thread(new fileWorker(i + 1), "FileWorker-" + (i + 1));
             workers[i].setDaemon(true);
             workers[i].start();
         }

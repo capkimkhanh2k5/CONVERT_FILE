@@ -9,7 +9,7 @@
 
     <!-- Trang mặc định -->
     <welcome-file-list>
-        <welcome-file>login.jsp</welcome-file>
+        <welcome-file>upload.jsp</welcome-file>
     </welcome-file-list>
 
     <!-- GLOBAL UPLOAD PATH CONFIG -->
