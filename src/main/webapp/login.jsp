@@ -1,10 +1,12 @@
-<%@ page contentType="text/html;charset=UTF-8" %>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<meta charset="UTF-8">
+
 <!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Đăng nhập hệ thống - CONVERT_FILE</title>
+    <title>System login - CONVERT_FILE</title>
     <style>
         * {
             margin: 0;
@@ -175,6 +177,22 @@
             display: block;
         }
 
+        .success-message {
+            margin-top: 20px;
+            padding: 15px;
+            background: #e8f5e9;
+            color: #2e7d32;
+            border: 2px solid #4caf50;
+            border-radius: 12px;
+            text-align: center;
+            font-weight: 500;
+            display: none;
+        }
+
+        .success-message.show {
+            display: block;
+        }
+
         @keyframes shake {
             0%, 100% { transform: translateX(0); }
             10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
@@ -266,89 +284,129 @@
                 font-size: 24px;
             }
         }
+
+        .back-home-btn {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+            color: #667eea;
+            text-decoration: none;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            border: 2px solid #e0e0e0;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .back-home-btn:hover {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .back-home-btn::before {
+            content: '← ';
+            margin-right: 5px;
+        }
     </style>
 </head>
-<body>
-    <div class="container">
-        <div class="logo">
-            <div class="logo-icon">🔐</div>
-            <h2>Đăng nhập</h2>
-            <p class="subtitle">Chào mừng bạn quay trở lại!</p>
+    <body>
+        <div class="container">
+            <div class="logo">
+                <div class="logo-icon">🔐</div>
+                <h2>Log In</h2>
+                <p class="subtitle">Welcome Back!</p>
+            </div>
+
+            <form action="login" method="post" id="loginForm">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon">👤</span>
+                        <input type="text" name="username" id="username" placeholder="Enter username" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon">🔒</span>
+                        <input type="password" name="password" id="password" placeholder="Enter password" required>
+                        <span class="password-toggle" id="togglePassword">👁️</span>
+                    </div>
+                </div>
+
+                <div class="remember-forgot">
+                    <label class="remember-me">
+                        <input type="checkbox" name="remember">
+                        <span>Remember login</span>
+                    </label>
+                    <a href="#" class="forgot-password">Forgot your password?</a>
+                </div>
+
+                <button type="submit" class="submit-btn">Log in</button>
+            </form>
+
+            <% if (request.getAttribute("successMessage") != null) { %>
+                <div class="success-message show">
+                    ✓ <%= request.getAttribute("successMessage") %>
+                </div>
+            <% } %>
+
+            <% if (request.getAttribute("errorMessage") != null) { %>
+                <div class="error-message show">
+                    ✗ <%= request.getAttribute("errorMessage") %>
+                </div>
+            <% } %>
+
+            <div class="divider">or</div>
+
+            <div class="register-link">
+                Don't have an account? <a href="register.jsp">Sign up now</a>
+            </div>
+
+            <div style="text-align: center;">
+                <a href="upload.jsp" class="back-home-btn">
+                    Return to Home page (Guest)
+                </a>
+            </div>
         </div>
 
-        <form action="login" method="post" id="loginForm">
-            <div class="form-group">
-                <label for="username">Tên đăng nhập</label>
-                <div class="input-wrapper">
-                    <span class="input-icon">👤</span>
-                    <input type="text" name="username" id="username" placeholder="Nhập tên đăng nhập" required>
-                </div>
-            </div>
+        <script>
+            // Toggle password visibility
+            const togglePassword = document.getElementById('togglePassword');
+            const passwordInput = document.getElementById('password');
 
-            <div class="form-group">
-                <label for="password">Mật khẩu</label>
-                <div class="input-wrapper">
-                    <span class="input-icon">🔒</span>
-                    <input type="password" name="password" id="password" placeholder="Nhập mật khẩu" required>
-                    <span class="password-toggle" id="togglePassword">👁️</span>
-                </div>
-            </div>
+            togglePassword.addEventListener('click', function() {
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+                this.textContent = type === 'password' ? '👁️' : '🙈';
+            });
 
-            <div class="remember-forgot">
-                <label class="remember-me">
-                    <input type="checkbox" name="remember">
-                    <span>Ghi nhớ đăng nhập</span>
-                </label>
-                <a href="#" class="forgot-password">Quên mật khẩu?</a>
-            </div>
+            // Form submission
+            const loginForm = document.getElementById('loginForm');
+            const submitBtn = document.querySelector('.submit-btn');
 
-            <button type="submit" class="submit-btn">Đăng nhập</button>
-        </form>
+            loginForm.addEventListener('submit', function() {
+                submitBtn.textContent = 'Logging in...';
+                submitBtn.disabled = true;
+            });
 
-        <% if (request.getAttribute("errorMessage") != null) { %>
-            <div class="error-message show">
-                <%= request.getAttribute("errorMessage") %>
-            </div>
-        <% } %>
-
-        <div class="divider">hoặc</div>
-
-        <div class="register-link">
-            Chưa có tài khoản? <a href="register.jsp">Đăng ký ngay</a>
-        </div>
-    </div>
-
-    <script>
-        // Toggle password visibility
-        const togglePassword = document.getElementById('togglePassword');
-        const passwordInput = document.getElementById('password');
-
-        togglePassword.addEventListener('click', function() {
-            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-            passwordInput.setAttribute('type', type);
-            this.textContent = type === 'password' ? '👁️' : '🙈';
-        });
-
-        // Form submission
-        const loginForm = document.getElementById('loginForm');
-        const submitBtn = document.querySelector('.submit-btn');
-
-        loginForm.addEventListener('submit', function() {
-            submitBtn.textContent = 'Đang đăng nhập...';
-            submitBtn.disabled = true;
-        });
-
-        // Auto-hide error message after 5 seconds
-        const errorMessage = document.querySelector('.error-message.show');
-        if (errorMessage) {
-            setTimeout(() => {
-                errorMessage.style.opacity = '0';
-                errorMessage.style.transition = 'opacity 0.5s ease';
+            // Auto-hide error message after 5 seconds
+            const errorMessage = document.querySelector('.error-message.show');
+            if (errorMessage) {
                 setTimeout(() => {
-                    errorMessage.style.display = 'none';
-                }, 500);
-            }, 5000);
-        }
-    </script>
-</body>
+                    errorMessage.style.opacity = '0';
+                    errorMessage.style.transition = 'opacity 0.5s ease';
+                    setTimeout(() => {
+                        errorMessage.style.display = 'none';
+                    }, 500);
+                }, 5000);
+            }
+        </script>
+    </body>
 </html>

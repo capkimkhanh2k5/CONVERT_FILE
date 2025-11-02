@@ -1,10 +1,11 @@
-<%@ page contentType="text/html;charset=UTF-8" %>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<meta charset="UTF-8">
 <!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Đăng ký tài khoản - CONVERT_FILE</title>
+    <title>Register An Account - CONVERT_FILE</title>
     <style>
         * {
             margin: 0;
@@ -167,6 +168,24 @@
             margin-top: 5px;
         }
 
+        .password-match {
+            font-size: 12px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .password-match.show {
+            display: block;
+        }
+
+        .password-match.match {
+            color: #4caf50;
+        }
+
+        .password-match.no-match {
+            color: #f44336;
+        }
+
         .submit-btn {
             width: 100%;
             padding: 16px;
@@ -287,6 +306,34 @@
             color: #764ba2;
         }
 
+        .back-home-btn {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+            color: #667eea;
+            text-decoration: none;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            border: 2px solid #e0e0e0;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .back-home-btn:hover {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .back-home-btn::before {
+            content: '← ';
+            margin-right: 5px;
+        }
+
         @media (max-width: 600px) {
             .container {
                 padding: 30px 20px;
@@ -298,156 +345,216 @@
         }
     </style>
 </head>
-<body>
-    <div class="container">
-        <div class="logo">
-            <div class="logo-icon">📝</div>
-            <h2>Đăng ký tài khoản</h2>
-            <p class="subtitle">Tạo tài khoản mới để bắt đầu</p>
+    <body>
+        <div class="container">
+            <div class="logo">
+                <div class="logo-icon">📝</div>
+                <h2>Register An Account</h2>
+                <p class="subtitle">Create a new account to get started</p>
+            </div>
+
+            <form action="register" method="post" id="registerForm">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon">👤</span>
+                        <input type="text" name="username" id="username" placeholder="Select a username" required minlength="3">
+                    </div>
+                    <div class="password-hint">Minimum 3 characters</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon">📧</span>
+                        <input type="email" name="email" id="email" placeholder="email@example.com" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon">🔒</span>
+                        <input type="password" name="password" id="password" placeholder="Create strong passwords" required minlength="6">
+                        <span class="password-toggle" id="togglePassword">👁️</span>
+                    </div>
+                    <div class="password-strength" id="passwordStrength">
+                        <div class="password-strength-bar" id="strengthBar"></div>
+                    </div>
+                    <div class="password-hint">Minimum 6 characters, should have uppercase letters, numbers and special characters</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="confirmPassword">Re-enter password</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon">🔒</span>
+                        <input type="password" name="confirmPassword" id="confirmPassword" placeholder="Re-enter password" required minlength="6">
+                        <span class="password-toggle" id="toggleConfirmPassword">👁️</span>
+                    </div>
+                    <div class="password-match" id="passwordMatch"></div>
+                </div>
+
+                <button type="submit" class="submit-btn">Register</button>
+            </form>
+
+            <% if (request.getAttribute("successMessage") != null) { %>
+                <div class="message success show">
+                    ✓ <%= request.getAttribute("successMessage") %>
+                </div>
+            <% } %>
+
+            <% if (request.getAttribute("errorMessage") != null) { %>
+                <div class="message error show">
+                    ✗ <%= request.getAttribute("errorMessage") %>
+                </div>
+            <% } %>
+
+            <div class="divider">or</div>
+
+            <div class="login-link">
+                Already have an account? <a href="login.jsp">Back to login</a>
+            </div>
+
+            <div style="text-align: center;">
+                <a href="upload.jsp" class="back-home-btn">
+                    Return to Home page (Guest)
+                </a>
+            </div>
         </div>
 
-        <form action="register" method="post" id="registerForm">
-            <div class="form-group">
-                <label for="fullname">Họ và tên</label>
-                <div class="input-wrapper">
-                    <span class="input-icon">👨</span>
-                    <input type="text" name="fullname" id="fullname" placeholder="Nhập họ và tên đầy đủ" required>
-                </div>
-            </div>
+        <script>
+            // Toggle password visibility for password field
+            const togglePassword = document.getElementById('togglePassword');
+            const passwordInput = document.getElementById('password');
 
-            <div class="form-group">
-                <label for="username">Tên đăng nhập</label>
-                <div class="input-wrapper">
-                    <span class="input-icon">👤</span>
-                    <input type="text" name="username" id="username" placeholder="Chọn tên đăng nhập" required minlength="3">
-                </div>
-                <div class="password-hint">Tối thiểu 3 ký tự</div>
-            </div>
+            togglePassword.addEventListener('click', function() {
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+                this.textContent = type === 'password' ? '👁️' : '🙈';
+            });
 
-            <div class="form-group">
-                <label for="email">Email</label>
-                <div class="input-wrapper">
-                    <span class="input-icon">📧</span>
-                    <input type="email" name="email" id="email" placeholder="email@example.com" required>
-                </div>
-            </div>
+            // Toggle password visibility for confirm password field
+            const toggleConfirmPassword = document.getElementById('toggleConfirmPassword');
+            const confirmPasswordInput = document.getElementById('confirmPassword');
 
-            <div class="form-group">
-                <label for="password">Mật khẩu</label>
-                <div class="input-wrapper">
-                    <span class="input-icon">🔒</span>
-                    <input type="password" name="password" id="password" placeholder="Tạo mật khẩu mạnh" required minlength="6">
-                    <span class="password-toggle" id="togglePassword">👁️</span>
-                </div>
-                <div class="password-strength" id="passwordStrength">
-                    <div class="password-strength-bar" id="strengthBar"></div>
-                </div>
-                <div class="password-hint">Tối thiểu 6 ký tự, nên có chữ hoa, số và ký tự đặc biệt</div>
-            </div>
+            toggleConfirmPassword.addEventListener('click', function() {
+                const type = confirmPasswordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                confirmPasswordInput.setAttribute('type', type);
+                this.textContent = type === 'password' ? '👁️' : '🙈';
+            });
 
-            <button type="submit" class="submit-btn">Đăng ký tài khoản</button>
-        </form>
+            // Password strength checker
+            const strengthIndicator = document.getElementById('passwordStrength');
+            const strengthBar = document.getElementById('strengthBar');
 
-        <% if (request.getAttribute("successMessage") != null) { %>
-            <div class="message success show">
-                ✓ <%= request.getAttribute("successMessage") %>
-            </div>
-        <% } %>
+            passwordInput.addEventListener('input', function() {
+                const password = this.value;
+                
+                if (password.length === 0) {
+                    strengthIndicator.classList.remove('show');
+                    return;
+                }
 
-        <% if (request.getAttribute("errorMessage") != null) { %>
-            <div class="message error show">
-                ✗ <%= request.getAttribute("errorMessage") %>
-            </div>
-        <% } %>
+                strengthIndicator.classList.add('show');
+                
+                let strength = 0;
+                if (password.length >= 6) strength++;
+                if (password.length >= 10) strength++;
+                if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength++;
+                if (/\d/.test(password)) strength++;
+                if (/[^a-zA-Z\d]/.test(password)) strength++;
 
-        <div class="divider">hoặc</div>
+                strengthBar.className = 'password-strength-bar';
+                
+                if (strength <= 2) {
+                    strengthBar.classList.add('strength-weak');
+                } else if (strength <= 3) {
+                    strengthBar.classList.add('strength-medium');
+                } else {
+                    strengthBar.classList.add('strength-strong');
+                }
 
-        <div class="login-link">
-            Đã có tài khoản? <a href="login.jsp">← Quay lại đăng nhập</a>
-        </div>
-    </div>
+                // Check password match when password changes
+                checkPasswordMatch();
+            });
 
-    <script>
-        // Toggle password visibility
-        const togglePassword = document.getElementById('togglePassword');
-        const passwordInput = document.getElementById('password');
+            // Password match checker
+            const passwordMatchIndicator = document.getElementById('passwordMatch');
 
-        togglePassword.addEventListener('click', function() {
-            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-            passwordInput.setAttribute('type', type);
-            this.textContent = type === 'password' ? '👁️' : '🙈';
-        });
+            function checkPasswordMatch() {
+                const password = passwordInput.value;
+                const confirmPassword = confirmPasswordInput.value;
 
-        // Password strength checker
-        const strengthIndicator = document.getElementById('passwordStrength');
-        const strengthBar = document.getElementById('strengthBar');
+                if (confirmPassword.length === 0) {
+                    passwordMatchIndicator.classList.remove('show');
+                    return;
+                }
 
-        passwordInput.addEventListener('input', function() {
-            const password = this.value;
-            
-            if (password.length === 0) {
-                strengthIndicator.classList.remove('show');
-                return;
+                passwordMatchIndicator.classList.add('show');
+
+                if (password === confirmPassword) {
+                    passwordMatchIndicator.textContent = '✓ Password matches';
+                    passwordMatchIndicator.className = 'password-match show match';
+                } else {
+                    passwordMatchIndicator.textContent = '✗ Password no-matches';
+                    passwordMatchIndicator.className = 'password-match show no-match';
+                }
             }
 
-            strengthIndicator.classList.add('show');
-            
-            let strength = 0;
-            if (password.length >= 6) strength++;
-            if (password.length >= 10) strength++;
-            if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength++;
-            if (/\d/.test(password)) strength++;
-            if (/[^a-zA-Z\d]/.test(password)) strength++;
+            confirmPasswordInput.addEventListener('input', checkPasswordMatch);
 
-            strengthBar.className = 'password-strength-bar';
-            
-            if (strength <= 2) {
-                strengthBar.classList.add('strength-weak');
-            } else if (strength <= 3) {
-                strengthBar.classList.add('strength-medium');
-            } else {
-                strengthBar.classList.add('strength-strong');
-            }
-        });
+            // Form validation
+            const registerForm = document.getElementById('registerForm');
+            const submitBtn = document.querySelector('.submit-btn');
 
-        // Form validation
-        const registerForm = document.getElementById('registerForm');
-        const submitBtn = document.querySelector('.submit-btn');
+            registerForm.addEventListener('submit', function(e) {
+                const username = document.getElementById('username').value;
+                const email = document.getElementById('email').value;
+                const password = passwordInput.value;
+                const confirmPassword = confirmPasswordInput.value;
 
-        registerForm.addEventListener('submit', function(e) {
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
+                if (username.length < 5) {
+                    e.preventDefault();
+                    alert('Username must be at least 5 characters!');
+                    return;
+                }
 
-            if (username.length < 3) {
-                e.preventDefault();
-                alert('Tên đăng nhập phải có ít nhất 3 ký tự!');
-                return;
-            }
+                if (!email.includes('@')) {
+                    e.preventDefault();
+                    alert('Invalid email!');
+                    return;
+                }
 
-            if (password.length < 6) {
-                e.preventDefault();
-                alert('Mật khẩu phải có ít nhất 6 ký tự!');
-                return;
-            }
+                if (password.length < 6) {
+                    e.preventDefault();
+                    alert('Password must be at least 6 characters!');
+                    return;
+                }
 
-            submitBtn.textContent = 'Đang đăng ký...';
-            submitBtn.disabled = true;
-        });
+                if (password !== confirmPassword) {
+                    e.preventDefault();
+                    alert('Passwords do not match! Please check again.');
+                    return;
+                }
 
-        // Auto-hide messages after 5 seconds
-        const messages = document.querySelectorAll('.message.show');
-        messages.forEach(message => {
-            setTimeout(() => {
-                message.style.opacity = '0';
-                message.style.transition = 'opacity 0.5s ease';
+                submitBtn.textContent = 'Registering...';
+                submitBtn.disabled = true;
+            });
+
+            // Auto-hide messages after 5 seconds
+            const messages = document.querySelectorAll('.message.show');
+            messages.forEach(message => {
                 setTimeout(() => {
-                    message.style.display = 'none';
-                }, 500);
-            }, 5000);
-        });
+                    message.style.opacity = '0';
+                    message.style.transition = 'opacity 0.5s ease';
+                    setTimeout(() => {
+                        message.style.display = 'none';
+                    }, 500);
+                }, 5000);
+            });
 
-        // Auto-focus first input
-        document.getElementById('fullname').focus();
-    </script>
-</body>
+            // Auto-focus first input
+            document.getElementById('username').focus();
+        </script>
+    </body>
 </html>

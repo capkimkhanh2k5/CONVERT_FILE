@@ -3,6 +3,7 @@ com/convertfile/model/User.class
 com/convertfile/service/microService/docx_to_pdf_service.class
 com/convertfile/service/TaskQueueService.class
 com/convertfile/worker/fileWorker.class
+com/convertfile/controller/LogOutServlet.class
 com/convertfile/service/passwordService.class
 com/convertfile/service/microService/docx_merge_service.class
 com/convertfile/dao/FileDAO.class
