@@ -1,3 +1,11 @@
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<meta charset="UTF-8">
+
+<%
+    String username = (String) session.getAttribute("username");
+    boolean isLoggedIn = (username != null);
+%>
+
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -18,7 +26,58 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 20px;
+            padding: 80px 20px 20px;
+        }
+
+        /* Thanh Profile Bar */
+        .user-profile-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 15px;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .user-profile-bar .welcome-text {
+            color: #fff;
+            font-size: 14px;
+            font-weight: 500;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+
+        .user-profile-bar .profile-btn {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 8px 16px;
+            border-radius: 20px;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .user-profile-bar .profile-btn:hover {
+            background: rgba(255, 255, 255, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .user-profile-bar .profile-btn.register {
+            background: #fff;
+            color: #667eea;
+            border-color: #fff;
+        }
+
+        .user-profile-bar .profile-btn.register:hover {
+            background: #f0f0f0;
         }
 
         .container {
@@ -486,6 +545,24 @@
         }
 
         @media (max-width: 768px) {
+            body {
+                padding: 70px 15px 15px;
+            }
+
+            .user-profile-bar {
+                padding: 12px 15px;
+                gap: 10px;
+            }
+
+            .user-profile-bar .welcome-text {
+                font-size: 12px;
+            }
+
+            .user-profile-bar .profile-btn {
+                padding: 6px 12px;
+                font-size: 12px;
+            }
+
             .container {
                 padding: 30px 20px;
             }
@@ -512,301 +589,314 @@
         }
     </style>
 </head>
-<body>
-    <div class="container">
-        <h2>📁 Upload File</h2>
-        <p class="subtitle">Tải lên PDF hoặc ZIP để chuyển đổi</p>
+    <body>
+        <div class="user-profile-bar">
+            <% if (isLoggedIn) { %>
+                <span class="welcome-text">Welcome, <strong><%= username %></strong></span>
+                <a href="logout" class="profile-btn logout">Log Out</a>
+            <% } else { %>
+                <a href="upload.jsp" class="profile-btn">Welcome Guest</a>
+                <a href="login.jsp" class="profile-btn login">Log In</a>
+                <a href="register.jsp" class="profile-btn register">Sign Up</a>
+            <% } %>
+        </div>
 
-        <form id="uploadForm">
-            <div class="upload-area" id="uploadArea">
-                <div class="upload-icon">☁️</div>
-                <div class="upload-text">Kéo thả file vào đây</div>
-                <div class="upload-text">hoặc nhấn để chọn file</div>
-                <div class="file-types">Hỗ trợ: PDF, ZIP (Tối đa 50MB)</div>
-                <input type="file" name="file" id="fileInput" accept=".pdf,.zip" />
-            </div>
+        <!-- Container Upload File -->
+        <div class="container">
+            <h2>📁 Upload File</h2>
+            <p class="subtitle">Upload file or ZIP to convert</p>
 
-            <div class="file-info" id="fileInfo">
-                <div class="file-icon">📄</div>
-                <div class="file-details">
-                    <div class="file-name" id="fileName"></div>
-                    <div class="file-size" id="fileSize"></div>
-                </div>
-                <button type="button" class="remove-file" id="removeFile">×</button>
-            </div>
-
-            <button type="submit" class="submit-btn" id="submitBtn" disabled>
-                Tải lên và Chuyển đổi
-            </button>
-        </form>
-
-        <div class="message" id="message"></div>
-
-        <!-- Results Section -->
-        <div class="results-section" id="resultsSection">
-            <div class="results-header">
-                <div class="results-icon">✅</div>
-                <div class="results-title">Kết quả chuyển đổi</div>
-                <div class="results-subtitle">Quá trình xử lý đã hoàn tất</div>
-            </div>
-
-            <div class="stats-container">
-                <div class="stat-card">
-                    <div class="stat-card-icon">📊</div>
-                    <div class="stat-card-label">Trạng thái</div>
-                    <div class="stat-card-value" id="statusValue">Đang xử lý</div>
+            <form id="uploadForm">
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-icon">☁️</div>
+                    <div class="upload-text">Drag and drop files here</div>
+                    <div class="upload-text">or click to select file</div>
+                    <div class="file-types">Support: All File, ZIP (Max 50MB)</div>
+                    <input type="file" name="file" id="fileInput" accept=".pdf,.zip" />
                 </div>
 
-                <div class="stat-card">
-                    <div class="stat-card-icon">📁</div>
-                    <div class="stat-card-label">Tổng số file</div>
-                    <div class="stat-card-value" id="totalFiles">5</div>
+                <div class="file-info" id="fileInfo">
+                    <div class="file-icon">📄</div>
+                    <div class="file-details">
+                        <div class="file-name" id="fileName"></div>
+                        <div class="file-size" id="fileSize"></div>
+                    </div>
+                    <button type="button" class="remove-file" id="removeFile">×</button>
                 </div>
 
-                <div class="stat-card">
-                    <div class="stat-card-icon">⏳</div>
-                    <div class="stat-card-label">Hoàn thành</div>
-                    <div class="stat-card-value"><span id="completedFiles">0</span>/<span id="totalFilesProgress">5</span></div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="progressFill"></div>
+                <button type="submit" class="submit-btn" id="submitBtn" disabled>
+                    Upload and Convert
+                </button>
+            </form>
+
+            <div class="message" id="message"></div>
+
+            <!-- Results Section -->
+            <div class="results-section" id="resultsSection">
+                <div class="results-header">
+                    <div class="results-icon">✅</div>
+                    <div class="results-title">Conversion results</div>
+                    <div class="results-subtitle">Processing is complete!</div>
+                </div>
+
+                <div class="stats-container">
+                    <div class="stat-card">
+                        <div class="stat-card-icon">📊</div>
+                        <div class="stat-card-label">Status</div>
+                        <div class="stat-card-value" id="statusValue">PROCESSING/div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-card-icon">📁</div>
+                        <div class="stat-card-label">Total file</div>
+                        <div class="stat-card-value" id="totalFiles">5</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-card-icon">⏳</div>
+                        <div class="stat-card-label">CONVERTED</div>
+                        <div class="stat-card-value"><span id="completedFiles">0</span>/<span id="totalFilesProgress">5</span></div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progressFill"></div>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="results-table-container">
-                <table class="results-table">
-                    <thead>
-                        <tr>
-                            <th>Tên file</th>
-                            <th>Kích thước</th>
-                            <th>Trạng thái</th>
-                            <th style="text-align: center;">Tải xuống</th>
-                        </tr>
-                    </thead>
-                    <tbody id="resultsTableBody">
-                        <tr>
-                            <td>
-                                <div class="file-name-cell">
-                                    <span class="file-name-icon">📄</span>
-                                    <span>document_001.pdf</span>
-                                </div>
-                            </td>
-                            <td>2.5 MB</td>
-                            <td><span class="status-badge processing">Đang xử lý</span></td>
-                            <td class="download-cell">
-                                <button class="download-btn-small" disabled>⏳ Đang xử lý...</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <div class="file-name-cell">
-                                    <span class="file-name-icon">📄</span>
-                                    <span>report_2024.pdf</span>
-                                </div>
-                            </td>
-                            <td>1.8 MB</td>
-                            <td><span class="status-badge processing">Đang xử lý</span></td>
-                            <td class="download-cell">
-                                <button class="download-btn-small" disabled>⏳ Đang xử lý...</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <div class="file-name-cell">
-                                    <span class="file-name-icon">📄</span>
-                                    <span>presentation.pdf</span>
-                                </div>
-                            </td>
-                            <td>4.2 MB</td>
-                            <td><span class="status-badge processing">Đang xử lý</span></td>
-                            <td class="download-cell">
-                                <button class="download-btn-small" disabled>⏳ Đang xử lý...</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <div class="file-name-cell">
-                                    <span class="file-name-icon">📄</span>
-                                    <span>invoice_march.pdf</span>
-                                </div>
-                            </td>
-                            <td>0.8 MB</td>
-                            <td><span class="status-badge processing">Đang xử lý</span></td>
-                            <td class="download-cell">
-                                <button class="download-btn-small" disabled>⏳ Đang xử lý...</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <div class="file-name-cell">
-                                    <span class="file-name-icon">📄</span>
-                                    <span>contract_final.pdf</span>
-                                </div>
-                            </td>
-                            <td>3.1 MB</td>
-                            <td><span class="status-badge processing">Đang xử lý</span></td>
-                            <td class="download-cell">
-                                <button class="download-btn-small" disabled>⏳ Đang xử lý...</button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+                <div class="results-table-container">
+                    <table class="results-table">
+                        <thead>
+                            <tr>
+                                <th>Name file</th>
+                                <th>Size</th>
+                                <th>Status</th>
+                                <th style="text-align: center;">Download</th>
+                            </tr>
+                        </thead>
+                        <tbody id="resultsTableBody">
+                            <tr>
+                                <td>
+                                    <div class="file-name-cell">
+                                        <span class="file-name-icon">📄</span>
+                                        <span>document_001.pdf</span>
+                                    </div>
+                                </td>
+                                <td>2.5 MB</td>
+                                <td><span class="status-badge processing">PROCESSING</span></td>
+                                <td class="download-cell">
+                                    <button class="download-btn-small" disabled>⏳ Processing...</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="file-name-cell">
+                                        <span class="file-name-icon">📄</span>
+                                        <span>report_2024.pdf</span>
+                                    </div>
+                                </td>
+                                <td>1.8 MB</td>
+                                <td><span class="status-badge processing">PROCESSING</span></td>
+                                <td class="download-cell">
+                                    <button class="download-btn-small" disabled>⏳ Processing...</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="file-name-cell">
+                                        <span class="file-name-icon">📄</span>
+                                        <span>presentation.pdf</span>
+                                    </div>
+                                </td>
+                                <td>4.2 MB</td>
+                                <td><span class="status-badge processing">PROCESSING</span></td>
+                                <td class="download-cell">
+                                    <button class="download-btn-small" disabled>⏳ Processing...</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="file-name-cell">
+                                        <span class="file-name-icon">📄</span>
+                                        <span>invoice_march.pdf</span>
+                                    </div>
+                                </td>
+                                <td>0.8 MB</td>
+                                <td><span class="status-badge processing">PROCESSING</span></td>
+                                <td class="download-cell">
+                                    <button class="download-btn-small" disabled>⏳ Processing...</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="file-name-cell">
+                                        <span class="file-name-icon">📄</span>
+                                        <span>contract_final.pdf</span>
+                                    </div>
+                                </td>
+                                <td>3.1 MB</td>
+                                <td><span class="status-badge processing">PROCESSING</span></td>
+                                <td class="download-cell">
+                                    <button class="download-btn-small" disabled>⏳ Processing...</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
 
-            <button class="download-all-btn" id="downloadAllBtn" disabled>
-                <span>⏳</span>
-                <span>Đang xử lý...</span>
-            </button>
+                <button class="download-all-btn" id="downloadAllBtn" disabled>
+                    <span>⏳</span>
+                    <span>Processing...</span>
+                </button>
+            </div>
         </div>
-    </div>
 
-    <script>
-        const uploadArea = document.getElementById('uploadArea');
-        const fileInput = document.getElementById('fileInput');
-        const fileInfo = document.getElementById('fileInfo');
-        const fileName = document.getElementById('fileName');
-        const fileSize = document.getElementById('fileSize');
-        const removeFile = document.getElementById('removeFile');
-        const submitBtn = document.getElementById('submitBtn');
-        const uploadForm = document.getElementById('uploadForm');
-        const messageDiv = document.getElementById('message');
-        const resultsSection = document.getElementById('resultsSection');
-        const progressFill = document.getElementById('progressFill');
+        <script>
+            const uploadArea = document.getElementById('uploadArea');
+            const fileInput = document.getElementById('fileInput');
+            const fileInfo = document.getElementById('fileInfo');
+            const fileName = document.getElementById('fileName');
+            const fileSize = document.getElementById('fileSize');
+            const removeFile = document.getElementById('removeFile');
+            const submitBtn = document.getElementById('submitBtn');
+            const uploadForm = document.getElementById('uploadForm');
+            const messageDiv = document.getElementById('message');
+            const resultsSection = document.getElementById('resultsSection');
+            const progressFill = document.getElementById('progressFill');
 
-        uploadArea.addEventListener('click', () => {
-            fileInput.click();
-        });
+            uploadArea.addEventListener('click', () => {
+                fileInput.click();
+            });
 
-        uploadArea.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            uploadArea.classList.add('dragover');
-        });
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadArea.classList.add('dragover');
+            });
 
-        uploadArea.addEventListener('dragleave', () => {
-            uploadArea.classList.remove('dragover');
-        });
+            uploadArea.addEventListener('dragleave', () => {
+                uploadArea.classList.remove('dragover');
+            });
 
-        uploadArea.addEventListener('drop', (e) => {
-            e.preventDefault();
-            uploadArea.classList.remove('dragover');
-            const files = e.dataTransfer.files;
-            if (files.length > 0) {
-                const dt = new DataTransfer();
-                dt.items.add(files[0]);
-                fileInput.files = dt.files;
-                handleFileSelect();
-            }
-        });
-
-        fileInput.addEventListener('change', handleFileSelect);
-
-        function handleFileSelect() {
-            const file = fileInput.files[0];
-            if (file) {
-                const validTypes = ['application/pdf', 'application/zip', 'application/x-zip-compressed'];
-                if (!validTypes.includes(file.type) && !file.name.match(/\.(pdf|zip)$/i)) {
-                    showMessage('Vui lòng chọn file PDF hoặc ZIP!', 'error');
-                    fileInput.value = '';
-                    return;
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadArea.classList.remove('dragover');
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    const dt = new DataTransfer();
+                    dt.items.add(files[0]);
+                    fileInput.files = dt.files;
+                    handleFileSelect();
                 }
+            });
 
-                if (file.size > 50 * 1024 * 1024) {
-                    showMessage('File không được vượt quá 50MB!', 'error');
-                    fileInput.value = '';
-                    return;
+            fileInput.addEventListener('change', handleFileSelect);
+
+            function handleFileSelect() {
+                const file = fileInput.files[0];
+                if (file) {
+                    //TODO: Fix cho mọi file
+                    const validTypes = ['application/pdf', 'application/zip', 'application/x-zip-compressed'];
+                    if (!validTypes.includes(file.type) && !file.name.match(/\.(pdf|zip)$/i)) {
+                        showMessage('Please select file or ZIP!', 'error');
+                        fileInput.value = '';
+                        return;
+                    }
+
+                    if (file.size > 50 * 1024 * 1024) {
+                        showMessage('File must not exceed 50MB!', 'error');
+                        fileInput.value = '';
+                        return;
+                    }
+
+                    fileName.textContent = file.name;
+                    fileSize.textContent = formatFileSize(file.size);
+                    fileInfo.classList.add('show');
+                    submitBtn.disabled = false;
+                    hideMessage();
                 }
-
-                fileName.textContent = file.name;
-                fileSize.textContent = formatFileSize(file.size);
-                fileInfo.classList.add('show');
-                submitBtn.disabled = false;
-                hideMessage();
             }
-        }
 
-        removeFile.addEventListener('click', () => {
-            fileInput.value = '';
-            fileInfo.classList.remove('show');
-            submitBtn.disabled = true;
-        });
+            removeFile.addEventListener('click', () => {
+                fileInput.value = '';
+                fileInfo.classList.remove('show');
+                submitBtn.disabled = true;
+            });
 
-        function formatFileSize(bytes) {
-            if (bytes === 0) return '0 Bytes';
-            const k = 1024;
-            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-            const i = Math.floor(Math.log(bytes) / Math.log(k));
-            return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
-        }
+            function formatFileSize(bytes) {
+                if (bytes === 0) return '0 Bytes';
+                const k = 1024;
+                const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+                const i = Math.floor(Math.log(bytes) / Math.log(k));
+                return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+            }
 
-        function showMessage(text, type) {
-            messageDiv.textContent = text;
-            messageDiv.className = 'message show ' + type;
-        }
+            function showMessage(text, type) {
+                messageDiv.textContent = text;
+                messageDiv.className = 'message show ' + type;
+            }
 
-        function hideMessage() {
-            messageDiv.classList.remove('show');
-        }
+            function hideMessage() {
+                messageDiv.classList.remove('show');
+            }
 
-        uploadForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const formData = new FormData(uploadForm);
-            
-            try {
-                // Upload file
-                const uploadResponse = await fetch('upload', {
-                    method: 'POST',
-                    body: formData
-                });
+            uploadForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
                 
-                const uploadResult = await uploadResponse.json();
+                const formData = new FormData(uploadForm);
                 
-                if(uploadResult.statusProgress === 'PROCESSING') {
-                    resultsSection.classList.add('show');
-                    
-                    startPolling();
-                }
-            } catch(error) {
-                showMessage('Lỗi: ' + error.message, 'error');
-            }
-        });
-
-        function startPolling() {
-            const pollingInterval = setInterval(async () => {
                 try {
-                    const response = await fetch('upload'); // GET request
-                    const data = await response.json();
+                    // Upload file
+                    const uploadResponse = await fetch('upload', {
+                        method: 'POST',
+                        body: formData
+                    });
                     
-                    if(data.statusProgress === 'SUCCESS') {
-                        // Cập nhật UI với data.files
-                        updateResultsTable(data.files);
-                        updateStats(data.totalFiles, data.completedFiles);
+                    const uploadResult = await uploadResponse.json();
+                    
+                    if(uploadResult.statusProgress === 'PROCESSING') {
+                        resultsSection.classList.add('show');
                         
-                        // Nếu tất cả đã xong, dừng polling
-                        if(data.completedFiles === data.totalFiles) {
-                            clearInterval(pollingInterval);
-                            enableDownloadButtons();
-                        }
+                        startPolling();
                     }
                 } catch(error) {
-                    console.error('Polling error:', error);
+                    showMessage('Error uploading file: ' + error.message, 'error');
                 }
-            }, 1000); // Poll mỗi giây
-        }
+            });
 
-        // Download button handlers
-        document.addEventListener('click', (e) => {
-            if (e.target.classList.contains('download-btn-small') && !e.target.disabled) {
-                const fileName = e.target.closest('tr').querySelector('.file-name-cell span:last-child').textContent;
-                showMessage(`📥 Đang tải xuống: ${fileName}`, 'success');
+            function startPolling() {
+                const pollingInterval = setInterval(async () => {
+                    try {
+                        const response = await fetch('upload'); // GET request
+                        const data = await response.json();
+                        
+                        if(data.statusProgress === 'SUCCESS') {
+                            // Cập nhật UI với data.files
+                            updateResultsTable(data.files);
+                            updateStats(data.totalFiles, data.completedFiles);
+                            
+                            // Nếu tất cả đã xong, dừng polling
+                            if(data.completedFiles === data.totalFiles) {
+                                clearInterval(pollingInterval);
+                                enableDownloadButtons();
+                            }
+                        }
+                    } catch(error) {
+                        console.error('Polling error:', error);
+                    }
+                }, 1000); // Poll mỗi giây
             }
-        });
 
-        document.getElementById('downloadAllBtn').addEventListener('click', () => {
-            if (!document.getElementById('downloadAllBtn').disabled) {
-                showMessage('📦 Đang chuẩn bị tải xuống tất cả file...', 'success');
-            }
-        });
-    </script>
-</body>
+            // Download button handlers
+            document.addEventListener('click', (e) => {
+                if (e.target.classList.contains('download-btn-small') && !e.target.disabled) {
+                    const fileName = e.target.closest('tr').querySelector('.file-name-cell span:last-child').textContent;
+                    showMessage(`📥 Downloading: ${fileName}`, 'success');
+                }
+            });
+
+            document.getElementById('downloadAllBtn').addEventListener('click', () => {
+                if (!document.getElementById('downloadAllBtn').disabled) {
+                    showMessage('📦 Preparing to download all files...', 'success');
+                }
+            });
+        </script>
+    </body>
 </html>
