@@ -1,4 +1,3 @@
-<%@ page contentType="text/html;charset=UTF-8" %>
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -28,7 +27,7 @@
             border-radius: 24px;
             padding: 50px;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            max-width: 500px;
+            max-width: 900px;
             width: 100%;
             animation: slideUp 0.5s ease-out;
         }
@@ -184,12 +183,12 @@
             box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
         }
 
-        .submit-btn:hover {
+        .submit-btn:hover:not(:disabled) {
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
         }
 
-        .submit-btn:active {
+        .submit-btn:active:not(:disabled) {
             transform: translateY(0);
         }
 
@@ -236,7 +235,257 @@
             border: 2px solid #f44336;
         }
 
-        @media (max-width: 600px) {
+        /* Results Section */
+        .results-section {
+            margin-top: 40px;
+            padding-top: 40px;
+            border-top: 3px solid #e0e0e0;
+            display: none;
+            animation: fadeInUp 0.5s ease;
+        }
+
+        .results-section.show {
+            display: block;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .results-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .results-icon {
+            font-size: 50px;
+            margin-bottom: 10px;
+            animation: bounce 1s ease infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .results-title {
+            font-size: 24px;
+            color: #333;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .results-subtitle {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 25px;
+            border-radius: 16px;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .stat-card:hover {
+            border-color: #667eea;
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .stat-card-icon {
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+
+        .stat-card-label {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .stat-card-value {
+            font-size: 32px;
+            color: #333;
+            font-weight: 700;
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 3px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            border-radius: 3px;
+            transition: width 1s ease;
+        }
+
+        .results-table-container {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .results-table thead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .results-table th {
+            padding: 18px 20px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .results-table td {
+            padding: 16px 20px;
+            border-bottom: 1px solid #f0f0f0;
+            color: #333;
+        }
+
+        .results-table tbody tr {
+            transition: background 0.2s ease;
+        }
+
+        .results-table tbody tr:hover {
+            background: #f5f7fa;
+        }
+
+        .results-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .file-name-cell {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .file-name-icon {
+            font-size: 24px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-badge.success {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .status-badge.processing {
+            background: #fff3e0;
+            color: #ef6c00;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        .status-badge.error {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .download-cell {
+            text-align: center;
+        }
+
+        .download-btn-small {
+            background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .download-btn-small:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
+        }
+
+        .download-btn-small:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background: #ccc;
+        }
+
+        .download-all-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .download-all-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.6);
+        }
+
+        .download-all-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background: #ccc;
+        }
+
+        @media (max-width: 768px) {
             .container {
                 padding: 30px 20px;
             }
@@ -248,6 +497,18 @@
             .upload-area {
                 padding: 40px 20px;
             }
+
+            .stats-container {
+                grid-template-columns: 1fr;
+            }
+
+            .results-table-container {
+                overflow-x: auto;
+            }
+
+            .results-table {
+                min-width: 600px;
+            }
         }
     </style>
 </head>
@@ -256,13 +517,13 @@
         <h2>📁 Upload File</h2>
         <p class="subtitle">Tải lên PDF hoặc ZIP để chuyển đổi</p>
 
-        <form method="post" action="upload" enctype="multipart/form-data" id="uploadForm">
+        <form id="uploadForm">
             <div class="upload-area" id="uploadArea">
                 <div class="upload-icon">☁️</div>
                 <div class="upload-text">Kéo thả file vào đây</div>
                 <div class="upload-text">hoặc nhấn để chọn file</div>
                 <div class="file-types">Hỗ trợ: PDF, ZIP (Tối đa 50MB)</div>
-                <input type="file" name="file" id="fileInput" accept=".pdf,.zip" required />
+                <input type="file" name="file" id="fileInput" accept=".pdf,.zip" />
             </div>
 
             <div class="file-info" id="fileInfo">
@@ -280,6 +541,123 @@
         </form>
 
         <div class="message" id="message"></div>
+
+        <!-- Results Section -->
+        <div class="results-section" id="resultsSection">
+            <div class="results-header">
+                <div class="results-icon">✅</div>
+                <div class="results-title">Kết quả chuyển đổi</div>
+                <div class="results-subtitle">Quá trình xử lý đã hoàn tất</div>
+            </div>
+
+            <div class="stats-container">
+                <div class="stat-card">
+                    <div class="stat-card-icon">📊</div>
+                    <div class="stat-card-label">Trạng thái</div>
+                    <div class="stat-card-value" id="statusValue">Đang xử lý</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-card-icon">📁</div>
+                    <div class="stat-card-label">Tổng số file</div>
+                    <div class="stat-card-value" id="totalFiles">5</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-card-icon">⏳</div>
+                    <div class="stat-card-label">Hoàn thành</div>
+                    <div class="stat-card-value"><span id="completedFiles">0</span>/<span id="totalFilesProgress">5</span></div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="results-table-container">
+                <table class="results-table">
+                    <thead>
+                        <tr>
+                            <th>Tên file</th>
+                            <th>Kích thước</th>
+                            <th>Trạng thái</th>
+                            <th style="text-align: center;">Tải xuống</th>
+                        </tr>
+                    </thead>
+                    <tbody id="resultsTableBody">
+                        <tr>
+                            <td>
+                                <div class="file-name-cell">
+                                    <span class="file-name-icon">📄</span>
+                                    <span>document_001.pdf</span>
+                                </div>
+                            </td>
+                            <td>2.5 MB</td>
+                            <td><span class="status-badge processing">Đang xử lý</span></td>
+                            <td class="download-cell">
+                                <button class="download-btn-small" disabled>⏳ Đang xử lý...</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="file-name-cell">
+                                    <span class="file-name-icon">📄</span>
+                                    <span>report_2024.pdf</span>
+                                </div>
+                            </td>
+                            <td>1.8 MB</td>
+                            <td><span class="status-badge processing">Đang xử lý</span></td>
+                            <td class="download-cell">
+                                <button class="download-btn-small" disabled>⏳ Đang xử lý...</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="file-name-cell">
+                                    <span class="file-name-icon">📄</span>
+                                    <span>presentation.pdf</span>
+                                </div>
+                            </td>
+                            <td>4.2 MB</td>
+                            <td><span class="status-badge processing">Đang xử lý</span></td>
+                            <td class="download-cell">
+                                <button class="download-btn-small" disabled>⏳ Đang xử lý...</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="file-name-cell">
+                                    <span class="file-name-icon">📄</span>
+                                    <span>invoice_march.pdf</span>
+                                </div>
+                            </td>
+                            <td>0.8 MB</td>
+                            <td><span class="status-badge processing">Đang xử lý</span></td>
+                            <td class="download-cell">
+                                <button class="download-btn-small" disabled>⏳ Đang xử lý...</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="file-name-cell">
+                                    <span class="file-name-icon">📄</span>
+                                    <span>contract_final.pdf</span>
+                                </div>
+                            </td>
+                            <td>3.1 MB</td>
+                            <td><span class="status-badge processing">Đang xử lý</span></td>
+                            <td class="download-cell">
+                                <button class="download-btn-small" disabled>⏳ Đang xử lý...</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <button class="download-all-btn" id="downloadAllBtn" disabled>
+                <span>⏳</span>
+                <span>Đang xử lý...</span>
+            </button>
+        </div>
     </div>
 
     <script>
@@ -292,13 +670,13 @@
         const submitBtn = document.getElementById('submitBtn');
         const uploadForm = document.getElementById('uploadForm');
         const messageDiv = document.getElementById('message');
+        const resultsSection = document.getElementById('resultsSection');
+        const progressFill = document.getElementById('progressFill');
 
-        // Click to upload
         uploadArea.addEventListener('click', () => {
             fileInput.click();
         });
 
-        // Drag and drop
         uploadArea.addEventListener('dragover', (e) => {
             e.preventDefault();
             uploadArea.classList.add('dragover');
@@ -313,18 +691,18 @@
             uploadArea.classList.remove('dragover');
             const files = e.dataTransfer.files;
             if (files.length > 0) {
-                fileInput.files = files;
+                const dt = new DataTransfer();
+                dt.items.add(files[0]);
+                fileInput.files = dt.files;
                 handleFileSelect();
             }
         });
 
-        // File input change
         fileInput.addEventListener('change', handleFileSelect);
 
         function handleFileSelect() {
             const file = fileInput.files[0];
             if (file) {
-                // Validate file type
                 const validTypes = ['application/pdf', 'application/zip', 'application/x-zip-compressed'];
                 if (!validTypes.includes(file.type) && !file.name.match(/\.(pdf|zip)$/i)) {
                     showMessage('Vui lòng chọn file PDF hoặc ZIP!', 'error');
@@ -332,7 +710,6 @@
                     return;
                 }
 
-                // Validate file size (50MB)
                 if (file.size > 50 * 1024 * 1024) {
                     showMessage('File không được vượt quá 50MB!', 'error');
                     fileInput.value = '';
@@ -347,14 +724,12 @@
             }
         }
 
-        // Remove file
         removeFile.addEventListener('click', () => {
             fileInput.value = '';
             fileInfo.classList.remove('show');
             submitBtn.disabled = true;
         });
 
-        // Format file size
         function formatFileSize(bytes) {
             if (bytes === 0) return '0 Bytes';
             const k = 1024;
@@ -363,31 +738,73 @@
             return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
         }
 
-        // Show message
         function showMessage(text, type) {
             messageDiv.textContent = text;
             messageDiv.className = 'message show ' + type;
         }
 
-        // Hide message
         function hideMessage() {
             messageDiv.classList.remove('show');
         }
 
-        // Form submit
-        uploadForm.addEventListener('submit', (e) => {
-            submitBtn.textContent = 'Đang tải lên...';
-            submitBtn.disabled = true;
+        uploadForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(uploadForm);
+            
+            try {
+                // Upload file
+                const uploadResponse = await fetch('upload', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const uploadResult = await uploadResponse.json();
+                
+                if(uploadResult.statusProgress === 'PROCESSING') {
+                    resultsSection.classList.add('show');
+                    
+                    startPolling();
+                }
+            } catch(error) {
+                showMessage('Lỗi: ' + error.message, 'error');
+            }
         });
 
-        // Check for server message (from JSP)
-        window.addEventListener('load', () => {
-            const urlParams = new URLSearchParams(window.location.search);
-            const msg = urlParams.get('message');
-            const status = urlParams.get('status');
-            
-            if (msg) {
-                showMessage(decodeURIComponent(msg), status || 'success');
+        function startPolling() {
+            const pollingInterval = setInterval(async () => {
+                try {
+                    const response = await fetch('upload'); // GET request
+                    const data = await response.json();
+                    
+                    if(data.statusProgress === 'SUCCESS') {
+                        // Cập nhật UI với data.files
+                        updateResultsTable(data.files);
+                        updateStats(data.totalFiles, data.completedFiles);
+                        
+                        // Nếu tất cả đã xong, dừng polling
+                        if(data.completedFiles === data.totalFiles) {
+                            clearInterval(pollingInterval);
+                            enableDownloadButtons();
+                        }
+                    }
+                } catch(error) {
+                    console.error('Polling error:', error);
+                }
+            }, 1000); // Poll mỗi giây
+        }
+
+        // Download button handlers
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('download-btn-small') && !e.target.disabled) {
+                const fileName = e.target.closest('tr').querySelector('.file-name-cell span:last-child').textContent;
+                showMessage(`📥 Đang tải xuống: ${fileName}`, 'success');
+            }
+        });
+
+        document.getElementById('downloadAllBtn').addEventListener('click', () => {
+            if (!document.getElementById('downloadAllBtn').disabled) {
+                showMessage('📦 Đang chuẩn bị tải xuống tất cả file...', 'success');
             }
         });
     </script>
