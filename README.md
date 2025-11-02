@@ -1,556 +1,447 @@
 <div align="center">
 
-# 🚀 PDF Processing Engine
+# 🚀 CONVERT_FILE - Hệ thống Chuyển đổi Tập tin
 
-### Enterprise-Grade Asynchronous File Processing System
+### Hệ thống Chuyển đổi Tài liệu JSP/Servlet
 
-[![Java](https://img.shields.io/badge/Java-17+-orange.svg)](https://openjdk.java.net/)
-[![Servlet](https://img.shields.io/badge/Servlet-4.0-blue.svg)](https://javaee.github.io/servlet-spec/)
+[![Java](https://img.shields.io/badge/Java-21+-orange.svg)](https://openjdk.java.net/)
+[![Servlet](https://img.shields.io/badge/Servlet-6.0-blue.svg)](https://jakarta.ee/specifications/servlet/6.0/)
 [![MySQL](https://img.shields.io/badge/MySQL-8.0-blue.svg)](https://www.mysql.com/)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
-*A production-ready, scalable document processing platform built on Java EE architecture*
+*Một nền tảng xử lý và chuyển đổi tài liệu có khả năng mở rộng được xây dựng trên kiến trúc Java EE*
 
-[Features](#-features) • [Architecture](#-architecture) • [Quick Start](#-quick-start) • [Documentation](#-documentation)
+[Tính năng](#-tính-năng) • [Kiến trúc](#-kiến-trúc) • [Bắt đầu nhanh](#-bắt-đầu-nhanh) • [Tài liệu](#-tài-liệu)
 
 </div>
 
 ---
 
-## 📋 Table of Contents
+## 📋 Mục lục
 
-- [Overview](#-overview)
-- [Features](#-features)
-- [Architecture](#-architecture)
-- [Technology Stack](#-technology-stack)
-- [Getting Started](#-getting-started)
-- [System Design](#-system-design)
-- [API Reference](#-api-reference)
-- [Performance](#-performance)
-- [Security](#-security)
-- [Contributing](#-contributing)
-
----
-
-## 🎯 Overview
-
-**PDF Processing Engine** is an enterprise-grade, asynchronous file processing system engineered for high-throughput document transformation workflows. Built on proven Java EE patterns, it provides reliable, scalable processing of PDF documents with real-time progress tracking and fault-tolerant execution.
-
-### Key Capabilities
-
-- ⚡ **Asynchronous Processing** — Non-blocking request handling with background job execution
-- 📊 **Real-time Progress Tracking** — Live job status updates with granular progress metrics
-- 🔄 **Batch Processing** — Efficient handling of multi-file ZIP archives
-- 🛡️ **Enterprise Security** — Session-based authentication with role-based access control
-- 📈 **Horizontal Scalability** — Worker thread pool architecture ready for distributed deployment
+- [Tổng quan](#-tổng-quan)
+- [Tính năng](#-tính-năng)
+- [Kiến trúc](#-kiến-trúc)
+- [Công nghệ](#-công-nghệ)
+- [Bắt đầu nhanh](#-bắt-đầu-nhanh)
+- [Thiết kế Hệ thống](#-thiết-kế-hệ-thống)
+- [Tham khảo API](#-tham-khảo-api)
+- [Bảo mật](#-bảo-mật)
+- [Cấu trúc Dự án](#-cấu-trúc-dự-án)
+- [Đóng góp](#-đóng-góp)
 
 ---
 
-## ✨ Features
+## 🎯 Tổng quan
 
-### Core Functionality
+**CONVERT_FILE** là một hệ thống chuyển đổi tập tin dựa trên web, được thiết kế để xử lý và chuyển đổi các định dạng tài liệu văn phòng phổ biến. Được xây dựng trên nền tảng Java EE (Servlet/JSP) và MySQL, hệ thống này cung cấp một kiến trúc dựa trên hàng đợi (queue) để quản lý các tác vụ chuyển đổi một cách hiệu quả.
 
-| Feature | Description | Status |
-|---------|-------------|--------|
-| **PDF → Text Extraction** | High-fidelity text extraction with UTF-8 encoding | ✅ Production |
-| **PDF → Image Conversion** | Multi-page rendering with configurable DPI (72-300) | ✅ Production |
-| **ZIP Batch Processing** | Automated extraction and queuing of archived PDFs | ✅ Production |
-| **Progress Monitoring** | Page-level progress with percentage completion | ✅ Production |
-| **Download Management** | Secure result retrieval with automatic cleanup | ✅ Production |
+### Các khả năng chính
 
-### Technical Features
-
-- 🔐 **Authentication System** — SHA-256 password hashing with secure session management
-- 📦 **Job Queue System** — Thread-safe BlockingQueue with configurable capacity
-- 💾 **Persistent Storage** — MySQL-backed state management with ACID compliance
-- 🎨 **Responsive UI** — Modern JSP/JSTL templates with Bootstrap integration
-- 🧪 **Error Handling** — Comprehensive exception management with detailed logging
+- ⚡ **Chuyển đổi Đa định dạng** — Hỗ trợ các định dạng DOCX, PDF, HTML, và XML.
+- 🔄 **Hệ thống Tác vụ Bất đồng bộ** — Quản lý các yêu cầu chuyển đổi thông qua một hàng đợi tác vụ (task queue) trong cơ sở dữ liệu.
+- 🔐 **Quản lý Người dùng** — Hệ thống đăng ký và đăng nhập an toàn sử dụng băm mật khẩu jbcrypt.
+- 💾 **Lưu trữ Bền bỉ** — Quản lý trạng thái tập tin, người dùng và tác vụ bằng MySQL.
 
 ---
 
-## 🏗️ Architecture
+## ✨ Tính năng
 
-### System Overview
+### Chức năng Cốt lõi
+
+Hệ thống hỗ trợ nhiều tác vụ chuyển đổi, được định nghĩa trong cơ sở dữ liệu.
+
+| Tính năng | Mô tả | Trạng thái (Bảng `tasks` - `task_type`) |
+|---|---|---|
+| **DOCX → PDF** | Chuyển đổi file DOCX sang PDF | ✅ `DOCX_TO_PDF` |
+| **PDF → DOCX** | Chuyển đổi file PDF sang DOCX | ✅ `PDF_TO_DOCX` |
+| **DOCX → XML** | Chuyển đổi file DOCX sang XML | ✅ `DOCX_TO_XML` |
+| **XML → DOCX** | Chuyển đổi file XML sang DOCX | ✅ `XML_TO_DOCX` |
+| **DOCX → HTML** | Chuyển đổi file DOCX sang HTML | ✅ `DOCX_TO_HTML` |
+| **DOCX Merge** | Gộp nhiều file DOCX | ✅ `DOCX_MERGE` |
+
+### Tính năng Kỹ thuật
+
+- 🔐 **Hệ thống Xác thực** — Băm mật khẩu (jbcrypt) và quản lý phiên (session).
+- 📦 **Hệ thống Hàng đợi Tác vụ** — Dựa trên bảng `tasks` của CSDL, được xử lý bởi các `worker`.
+- 💾 **Lưu trữ Quan hệ** — Thiết kế CSDL với MySQL (InnoDB) hỗ trợ ACID.
+- 🎨 **Giao diện Người dùng** — Giao diện web được render phía máy chủ (SSR) bằng JSP/JSTL.
+- 📤 **Upload File** — Xử lý upload file đa-phần (multipart) với `commons-fileupload`.
+
+---
+
+## 🏗️ Kiến trúc
+
+### Tổng quan Hệ thống
+
+Kiến trúc hệ thống tuân theo mô hình Layered Architecture và MVC, phù hợp với các ứng dụng Servlet/JSP.
+
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                          Client Layer                            │
-│                     (Browser / HTTP Client)                      │
+│                        Lớp Client                               │
+│                      (Trình duyệt web)                          │
 └────────────────────────────────┬────────────────────────────────┘
                                  │
                     ┌────────────▼────────────┐
-                    │   Presentation Layer    │
+                    │    Lớp Trình diễn       │
+                    │    (Presentation)       │
                     │   ┌──────────────────┐  │
-                    │   │  AuthFilter      │  │
-                    │   │  (Security)      │  │
+                    │   │     Servlets     │  │
+                    │   │ (Upload/Login...)│  │
                     │   └────────┬─────────┘  │
                     │   ┌────────▼─────────┐  │
-                    │   │   Servlets       │  │
-                    │   │  (Controllers)   │  │
+                    │   │       JSP        │  │
+                    │   │      (Views)     │  │
                     │   └──────────────────┘  │
                     └────────────┬────────────┘
                                  │
                     ┌────────────▼────────────┐
-                    │    Business Layer       │
+                    │  Lớp Nghiệp vụ Business │
                     │   ┌──────────────────┐  │
-                    │   │  PdfService      │  │
-                    │   │  QueueService    │  │
+                    │   │ FileService      │  │
+                    │   │ TaskQueueService │  │
                     │   └────────┬─────────┘  │
                     │   ┌────────▼─────────┐  │
-                    │   │  Worker Thread   │  │
-                    │   │      Pool        │  │
+                    │   │   fileWorker     │  │
+                    │   │ (Xử lý tác vụ)   │  │
                     │   └──────────────────┘  │
                     └────────────┬────────────┘
                                  │
                     ┌────────────▼────────────┐
-                    │   Persistence Layer     │
+                    │ Lớp Truy cập Dữ liệu DAO│
                     │   ┌──────────────────┐  │
-                    │   │  DAO Pattern     │  │
-                    │   │  (Data Access)   │  │
+                    │   │ UserDAO, FileDAO │  │
+                    │   │  TaskQueueDAO    │  │
                     │   └────────┬─────────┘  │
                     │   ┌────────▼─────────┐  │
                     │   │  MySQL Database  │  │
-                    │   │  (ACID Storage)  │  │
+                    │   │ (file_converter) │  │
                     │   └──────────────────┘  │
                     └─────────────────────────┘
 ```
 
-### Architectural Patterns
+### Các Mẫu thiết kế (Patterns)
 
-- **MVC (Model-View-Controller)** — Clear separation of concerns
-- **DAO (Data Access Object)** — Abstracted database operations
-- **Producer-Consumer** — Asynchronous job queue processing
-- **Front Controller** — Centralized request handling via AuthFilter
-- **Service Layer** — Business logic encapsulation
+- **MVC (Model-View-Controller)** — Tách biệt logic nghiệp vụ, hiển thị và điều khiển.
+- **DAO (Data Access Object)** — Trừu tượng hóa các hoạt động truy cập cơ sở dữ liệu.
+- **Producer-Consumer** — `UploadServlet` (Producer) tạo tác vụ, `fileWorker` (Consumer) xử lý tác vụ.
+- **Front Controller** — Các Servlet (`UploadServlet`, `LoginServlet`) đóng vai trò là điểm vào trung tâm.
 
 ---
 
-## 🛠️ Technology Stack
+## 🛠️ Công nghệ
 
 ### Backend
 ```yaml
 Core:
-  - Java SE: 17+ (LTS)
-  - Jakarta Servlet: 4.0
-  - JSP/JSTL: 2.3
+  - Java SE: 21+
+  - Jakarta Servlet: 6.0
+  - Jakarta JSP/JSTL: 3.1/3.0
 
-Libraries:
-  - Apache PDFBox: 2.0.27   # PDF manipulation
-  - Commons FileUpload: 1.5  # Multipart handling
-  - Commons IO: 2.11.0       # File operations
-  - MySQL Connector/J: 8.0   # JDBC driver
+Thư viện chính:
+  - org.docx4j: 11.5.6      # Xử lý DOCX, PDF, HTML
+  - commons-fileupload: 1.5  # Xử lý upload file
+  - commons-io: 2.15.1       # Thao tác file
+  - mysql-connector-j: 8.0.33 # Trình điều khiển JDBC
+  - org.mindrot.jbcrypt: 0.4 # Băm mật khẩu
+  - org.slf4j: 2.0.13        # Logging
+  - org.apache.xmlgraphics: fop: 2.8 # Tạo PDF từ FO
 
 Build:
   - Apache Maven: 3.8+
-  - Tomcat Maven Plugin: 2.2
 ```
 
 ### Infrastructure
+
 ```yaml
 Server:
-  - Apache Tomcat: 9.0.x
-  - JVM Heap: 1GB-2GB recommended
+  - Apache Tomcat: 9.0+ (Hoặc bất kỳ Servlet Container 6.0 nào)
 
 Database:
   - MySQL: 8.0+
-  - InnoDB Engine (ACID)
-  - UTF-8mb4 encoding
-
-Frontend:
-  - JSP/JSTL: Server-side rendering
-  - Bootstrap: 4.6+ (optional)
-  - Vanilla JavaScript: AJAX polling
+  - InnoDB Engine
+  - Mã hóa UTF-8mb4
 ```
 
 ---
 
-## 🚀 Getting Started
+## 🚀 Bắt đầu nhanh
 
-### Prerequisites
+### Điều kiện tiên quyết
+
 ```bash
-# Required software
-- JDK 17 or higher
+# Phần mềm yêu cầu
+- JDK 21 hoặc cao hơn
 - Apache Maven 3.8+
 - MySQL 8.0+
-- Apache Tomcat 9.0+
+- Apache Tomcat 9.0+ (hoặc tương đương)
 ```
 
-### Installation
+### Cài đặt
 
-1. **Clone the repository**
+1. **Clone dự án**
+
 ```bash
-git clone https://github.com/your-org/pdf-processing-engine.git
-cd pdf-processing-engine
+git clone [URL_DỰ_ÁN_CỦA_BẠN]
+cd CONVERT_FILE
 ```
 
-2. **Configure database**
+2. **Cấu hình cơ sở dữ liệu**
+
 ```bash
-# Create database
+# Đăng nhập vào MySQL
 mysql -u root -p
-mysql> CREATE DATABASE pdf_processor CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-mysql> CREATE USER 'pdfuser'@'localhost' IDENTIFIED BY 'secure_password';
-mysql> GRANT ALL PRIVILEGES ON pdf_processor.* TO 'pdfuser'@'localhost';
-mysql> FLUSH PRIVILEGES;
 
-# Import schema
-mysql -u pdfuser -p pdf_processor < schema.sql
+# Chạy script để tạo database, tables, và user mẫu
+# (Đảm bảo script BD_Query.sql không có lệnh DROP ở cuối khi chạy lần đầu)
+mysql -u root -p < src/main/java/com/convertfile/model/BD_Query.sql
 ```
 
-3. **Configure application**
+*Lưu ý: Script `BD_Query.sql` tạo CSDL `file_converter` và các bảng `users`, `files`, `tasks`. Nó cũng chèn 2 người dùng mẫu (`user01`, `admin`) với mật khẩu là `123456`.*
+
+3. **Cấu hình ứng dụng**
+
 ```bash
-# Edit src/main/resources/db.properties
-db.url=jdbc:mysql://localhost:3306/pdf_processor
-db.username=pdfuser
-db.password=secure_password
-db.driver=com.mysql.cj.jdbc.Driver
+# Cập nhật thông tin kết nối CSDL trong
+# src/main/java/com/convertfile/dao/ConnectDB.java
+# (Hiện tại có thể đang hard-code, cần kiểm tra lại)
 ```
 
-4. **Build the project**
+4. **Build dự án**
+
 ```bash
 mvn clean package
 ```
 
-5. **Deploy to Tomcat**
+5. **Deploy lên Tomcat**
+
 ```bash
-# Copy WAR to Tomcat
-cp target/pdf-processor.war $TOMCAT_HOME/webapps/
+# Sao chép file .war đã build vào thư mục webapps của Tomcat
+cp target/CONVERT_FILE.war $TOMCAT_HOME/webapps/
 
-# Or use Maven plugin
-mvn tomcat7:deploy
+# Khởi động Tomcat
+$TOMCAT_HOME/bin/startup.sh
 ```
 
-6. **Access the application**
+6. **Truy cập ứng dụng**
+
 ```
-http://localhost:8080/pdf-processor
+http://localhost:8080/CONVERT_FILE/
+(Trang mặc định là upload.jsp)
 ```
 
 ---
 
-## 🔬 System Design
+## 🔬 Thiết kế Hệ thống
 
-### Database Schema
-```sql
+### Lược đồ CSDL
+
+Lược đồ CSDL được thiết kế để quản lý người dùng, các tệp tin đã tải lên, và các tác vụ chuyển đổi liên quan.
+
+```
 ┌─────────────────────┐
 │       users         │
 ├─────────────────────┤
-│ id (PK)             │
+│ user_id (PK)        │
 │ username (UNIQUE)   │
-│ password_hash       │
-│ created_at          │
+│ password (CHAR(60)) │
+│ email (UNIQUE)      │
 └──────────┬──────────┘
            │
-           │ 1:N
+           │ 1:N (Hoặc Null)
            │
 ┌──────────▼──────────┐
-│        jobs         │
+│        files        │
 ├─────────────────────┤
-│ id (PK)             │
+│ file_id (PK, UUID)  │
 │ user_id (FK)        │
-│ filename            │
-│ status              │◄───┐
-│ created_at          │    │
+│ original_name       │
+│ saved_name (UNIQUE) │
+│ current_status      │◄──┐
 └──────────┬──────────┘    │
            │               │
-           │ 1:N           │ Reference
+           │ 1:N           │
            │               │
 ┌──────────▼──────────┐    │
-│     job_items       │    │
+│        tasks        │    │
 ├─────────────────────┤    │
-│ id (PK)             │    │
-│ job_id (FK)         │────┘
-│ task_type           │
-│ progress_total      │
-│ progress_done       │
-│ result_path         │
-│ status              │
+│ task_id (PK)        │    │
+│ file_id (FK)        │────┘
+│ task_type (ENUM)    │
+│ status (ENUM)       │
+│ message             │
 └─────────────────────┘
 ```
 
-### Job State Machine
+### Luồng Trạng thái Tác vụ (`tasks.status`)
+
 ```
-    QUEUED
+    WAITING (Đang chờ)
        │
        ▼
-   PROCESSING ──────┐
-       │            │
-       ▼            ▼
-   COMPLETED     ERROR
+   PROCESSING (Đang xử lý) ───┐
+       │                      │
+       ▼                      ▼
+   COMPLETED (Hoàn thành)   FAILED (Thất bại)
+                              │
+                              ▼
+                          CANCELED (Bị hủy)
 ```
 
-### Worker Thread Workflow
+### Luồng xử lý của Worker
+
 ```
 ┌─────────────────────────────────────────────┐
 │                                             │
 │  while (running) {                          │
-│    1. Poll queue (blocking)                 │
-│    2. Update status → PROCESSING            │
-│    3. Execute task:                         │
-│       • Load PDF document                   │
-│       • For each page:                      │
-│         - Process page                      │
-│         - Update progress                   │
-│         - Commit to database                │
-│    4. Save result                           │
-│    5. Update status → COMPLETED/ERROR       │
+│    1. Lấy tác vụ (task) từ CSDL (status='WAITING')│
+│    2. Cập nhật status → 'PROCESSING'          │
+│    3. Thực thi tác vụ (dùng docx4j):          │
+│       • Tải file từ input_path               │
+│       • Chuyển đổi...                        │
+│       • Ghi file vào output_path             │
+│    4. Cập nhật CSDL:                         │
+│       • Cập nhật status → 'COMPLETED'/'FAILED'│
+│       • Cập nhật files.output_path           │
 │  }                                          │
-│                                             │
 └─────────────────────────────────────────────┘
 ```
 
 ---
 
-## 📡 API Reference
+## 📡 Tham khảo API
 
-### Servlet Endpoints
+Các endpoint được xử lý bởi các Servlet.
 
-| Endpoint | Method | Description | Auth Required |
-|----------|--------|-------------|---------------|
-| `/auth/login` | POST | User authentication | ❌ |
-| `/auth/register` | POST | User registration | ❌ |
-| `/auth/logout` | GET | Session termination | ✅ |
-| `/upload` | POST | File upload & job creation | ✅ |
-| `/jobs` | GET | Job list & status | ✅ |
-| `/result` | GET | Download processed file | ✅ |
+| Endpoint (Dự đoán) | Method | Class | Mô tả |
+|---|---|---|---|
+| `/login` | POST | `LoginServlet` | Xác thực thông tin đăng nhập của người dùng |
+| `/register` | POST | `RegisterServlet` | Đăng ký tài khoản người dùng mới |
+| `/logout` | GET | `LogOutServlet` | Đăng xuất và hủy phiên làm việc |
+| `/upload` | POST | `UploadServlet` | Tải file lên và tạo một tác vụ chuyển đổi mới |
 
-### Request Examples
+### Ví dụ Request Upload
 
-**File Upload**
+`UploadServlet` xử lý `multipart/form-data`, được gửi từ `upload.jsp`.
+
 ```http
-POST /upload HTTP/1.1
+POST /CONVERT_FILE/upload HTTP/1.1
 Content-Type: multipart/form-data; boundary=----WebKitFormBoundary
 
 ------WebKitFormBoundary
-Content-Disposition: form-data; name="file"; filename="document.pdf"
-Content-Type: application/pdf
+Content-Disposition: form-data; name="file"; filename="document.docx"
+Content-Type: application/vnd.openxmlformats-officedocument.wordprocessingml.document
 
 [binary data]
 ------WebKitFormBoundary
 Content-Disposition: form-data; name="taskType"
 
-PDF_TO_TEXT
+DOCX_TO_PDF
 ------WebKitFormBoundary--
 ```
 
-**Job Status Response**
-```json
-{
-  "id": 123,
-  "filename": "document.pdf",
-  "status": "PROCESSING",
-  "items": [
-    {
-      "taskType": "PDF_TO_TEXT",
-      "progress": {
-        "total": 50,
-        "done": 23,
-        "percentage": 46
-      }
-    }
-  ]
-}
+---
+
+## 🔒 Bảo mật
+
+### Các biện pháp đã triển khai
+
+- ✅ **Bảo mật Mật khẩu** — Sử dụng **jBCrypt** để băm và xác minh mật khẩu (thay vì SHA-256).
+- ✅ **Quản lý Phiên (Session)** — Sử dụng `HttpSession` của Servlet.
+- ✅ **Ngăn chặn Path Traversal** — Cần được thực hiện trong `FileService` khi xử lý tên tệp và đường dẫn.
+- ✅ **Xác thực Đầu vào** — Giới hạn kích thước tệp và loại tệp (được cấu hình trong `web.xml`).
+- ✅ **Bảo vệ Chống SQL Injection** — Sử dụng `PreparedStatement` trong các lớp DAO.
+
+### Cấu hình Bảo mật (`web.xml`)
+
+Cấu hình `multipart-config` giúp giới hạn tài nguyên và ngăn chặn các cuộc tấn công DoS cơ bản qua việc upload file.
+
+```xml
+<servlet>
+    <servlet-name>UploadServlet</servlet-name>
+    <servlet-class>com.convertfile.controller.UploadServlet</servlet-class>
+    <multipart-config>
+        <location>${catalina.base}/temp</location>
+        <max-file-size>52428800</max-file-size>
+        <max-request-size>104857600</max-request-size>
+        <file-size-threshold>1048576</file-size-threshold>
+    </multipart-config>
+</servlet>
 ```
 
 ---
 
-## ⚡ Performance
+## 📊 Cấu trúc Dự án
 
-### Benchmarks
-
-| Metric | Value | Configuration |
-|--------|-------|---------------|
-| **Throughput** | 50-100 pages/min | Single worker thread |
-| **Memory Usage** | ~200MB per 100-page PDF | 150 DPI rendering |
-| **Latency** | <100ms | Request → Queue insertion |
-| **Concurrent Jobs** | 10-50 | Depends on worker pool size |
-
-### Optimization Strategies
-```java
-// Configurable worker pool size
-int WORKER_COUNT = Runtime.getRuntime().availableProcessors();
-
-// Bounded queue prevents memory overflow
-BlockingQueue<JobItem> queue = new ArrayBlockingQueue<>(1000);
-
-// Resource cleanup
-try (PDDocument document = PDDocument.load(file)) {
-    // Process
-} // Auto-close releases memory
 ```
-
----
-
-## 🔒 Security
-
-### Implemented Measures
-
-- ✅ **Password Security** — SHA-256 hashing with per-user salts
-- ✅ **Session Management** — HttpOnly cookies, configurable timeout
-- ✅ **Path Traversal Prevention** — Sanitized file names and paths
-- ✅ **Input Validation** — File type and size restrictions
-- ✅ **SQL Injection Protection** — Parameterized queries via PreparedStatement
-
-### Security Configuration
-```java
-// File upload limits (web.xml)
-<multipart-config>
-    <max-file-size>52428800</max-file-size>      <!-- 50MB -->
-    <max-request-size>104857600</max-request-size> <!-- 100MB -->
-</multipart-config>
-
-// Session timeout
-<session-config>
-    <session-timeout>30</session-timeout> <!-- 30 minutes -->
-</session-config>
-```
-
----
-
-## 📊 Project Structure
-```
-pdf-processor/
+CONVERT_FILE/
 ├── src/main/
-│   ├── java/com/pdfprocessor/
-│   │   ├── controller/          # Servlet layer
-│   │   │   ├── AuthServlet.java
+│   ├── java/com/convertfile/
+│   │   ├── controller/          # Lớp Servlet (Controllers)
+│   │   │   ├── LoginServlet.java
+│   │   │   ├── RegisterServlet.java
 │   │   │   ├── UploadServlet.java
-│   │   │   └── JobsServlet.java
-│   │   ├── service/             # Business logic
-│   │   │   ├── PdfService.java
-│   │   │   └── QueueService.java
-│   │   ├── dao/                 # Data access
+│   │   │   └── LogOutServlet.java
+│   │   ├── dao/                 # Data Access Objects
+│   │   │   ├── ConnectDB.java
 │   │   │   ├── UserDAO.java
-│   │   │   ├── JobDAO.java
-│   │   │   └── JobItemDAO.java
-│   │   ├── model/               # Domain entities
+│   │   │   ├── FileDAO.java
+│   │   │   └── TaskQueueDAO.java
+│   │   ├── model/               # Các đối tượng (Entities)
 │   │   │   ├── User.java
-│   │   │   ├── Job.java
-│   │   │   └── JobItem.java
-│   │   ├── filter/              # Security
-│   │   │   └── AuthFilter.java
-│   │   └── worker/              # Background processing
-│   │       └── JobWorker.java
+│   │   │   ├── FileInfo.java
+│   │   │   ├── TaskJob.java
+│   │   │   └── BD_Query.sql
+│   │   ├── service/             # Logic nghiệp vụ (Business Logic)
+│   │   │   ├── FileService.java
+│   │   │   ├── TaskQueueService.java
+│   │   │   ├── passwordService.java
+│   │   │   └── microService/   # Các dịch vụ chuyển đổi cụ thể
+│   │   │       └── (docx_to_pdf_service, etc...).java
+│   │   └── worker/
+│   │       └── fileWorker.java   # Worker xử lý hàng đợi
 │   ├── webapp/
 │   │   ├── WEB-INF/
-│   │   │   ├── web.xml
-│   │   │   └── views/           # JSP templates
-│   │   └── resources/           # Static assets
-│   └── resources/
-│       └── db.properties
-├── pom.xml
+│   │   │   └── web.xml          # Bộ mô tả triển khai
+│   │   ├── login.jsp
+│   │   ├── register.jsp
+│   │   ├── upload.jsp
+│   │   └── resources/ (inputSRC, outputSRC - theo web.xml)
+├── pom.xml                   # Cấu hình Maven
 └── README.md
 ```
 
 ---
 
-## 🧪 Testing
+## 👥 Đóng góp
 
-### Test Coverage
-```bash
-# Unit tests
-mvn test
+Chúng tôi hoan nghênh các đóng góp! Vui lòng tuân theo các nguyên tắc sau:
 
-# Integration tests
-mvn verify
-
-# Test with coverage report
-mvn clean test jacoco:report
-```
-
-### Example Test Cases
-
-- ✅ PDF text extraction accuracy (>95%)
-- ✅ Image conversion quality (visual inspection)
-- ✅ Queue thread safety (concurrent access)
-- ✅ Database transaction rollback
-- ✅ Authentication filter access control
+1. Fork dự án
+2. Tạo một nhánh tính năng (`git checkout -b feature/TinhNangMoi`)
+3. Commit các thay đổi (`git commit -m 'Thêm TinhNangMoi'`)
+4. Push lên nhánh (`git push origin feature/TinhNangMoi`)
+5. Mở một Pull Request
 
 ---
 
-## 🐛 Troubleshooting
+## 📄 Giấy phép
 
-### Common Issues
-
-**Issue: OutOfMemoryError during image conversion**
-```bash
-# Solution: Increase JVM heap size
-export CATALINA_OPTS="-Xms512m -Xmx2048m"
-```
-
-**Issue: Database connection pool exhausted**
-```properties
-# Solution: Tune connection pool (db.properties)
-db.pool.maxActive=50
-db.pool.maxIdle=10
-db.pool.minIdle=5
-```
-
-**Issue: Slow processing on large PDFs**
-```java
-// Solution: Reduce image DPI in PdfService
-private static final float IMAGE_DPI = 72; // Instead of 300
-```
+Dự án này được cấp phép theo Giấy phép MIT - xem tệp [LICENSE](LICENSE) để biết chi tiết.
 
 ---
 
-## 🗺️ Roadmap
+## 🙏 Lời cảm ơn
 
-- [ ] **v2.0** — Docker containerization
-- [ ] **v2.1** — Redis-based distributed queue
-- [ ] **v2.2** — RESTful API with JWT authentication
-- [ ] **v2.3** — WebSocket real-time updates
-- [ ] **v3.0** — Kubernetes deployment manifests
-- [ ] **v3.1** — OCR integration (Tesseract)
-- [ ] **v3.2** — DOCX/XLSX support
-
----
-
-## 👥 Contributing
-
-We welcome contributions! Please follow these guidelines:
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-### Development Guidelines
-
-- Follow Java Code Conventions
-- Write unit tests for new features
-- Update documentation as needed
-- Ensure all tests pass before submitting
-
----
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
-
-## 👨‍💻 Authors
-
-| Role | Responsibilities | Contact |
-|------|------------------|---------|
-| **Backend Architect** | Database design, worker architecture | backend@example.com |
-| **Service Engineer** | PDFBox integration, business logic | service@example.com |
-| **Frontend Developer** | Servlet controllers, JSP/UI | frontend@example.com |
-
----
-
-## 🙏 Acknowledgments
-
-- [Apache PDFBox](https://pdfbox.apache.org/) — PDF processing library
-- [Apache Commons](https://commons.apache.org/) — Utility libraries
-- [MySQL](https://www.mysql.com/) — Database system
-- University of Science and Technology, The University of Danang
+- [docx4j](https://www.docx4java.org/trac/docx4j) — Thư viện xử lý tài liệu cốt lõi.
+- [Apache Commons](https://commons.apache.org/) — Cung cấp các thư viện tiện ích (FileUpload, IO).
+- [MySQL](https://www.mysql.com/) — Hệ quản trị CSDL.
+- Đại học Bách khoa, Đại học Đà Nẵng.
 
 ---
 
 <div align="center">
 
-**Built with ❤️ using Java EE**
+**Xây dựng bằng ❤️ với Java EE**
 
-[⬆ Back to Top](#-pdf-processing-engine)
-
-</div>
+[⬆ Quay lại đầu trang](#-convert_file---hệ-thống-chuyển-đổi-tập-tin)
