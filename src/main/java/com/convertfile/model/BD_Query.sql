@@ -62,6 +62,27 @@ CREATE TABLE IF NOT EXISTS `tasks` (
 CREATE INDEX `idx_status` ON `tasks` (`status`);
 CREATE INDEX `idx_file_id` ON `tasks` (`file_id`);
 
+INSERT INTO users (user_id, username, password, email, created_at) 
+VALUES (0, 'guest', 'N/A', 'guest@system.local', NOW());
+
+-- Mật khẩu cho cả 2 user này là '123456'
+INSERT INTO users (username, password, email, created_at) 
+VALUES (
+    'user01', 
+    '$2a$12$apGfQptjppS0PgqPNIa9PuRNaCnwq7bgifN1fXn7M8CFxcAnbf7ny', 
+    'user01@example.com', 
+    NOW()
+);
+
+INSERT INTO users (username, password, email, created_at) 
+VALUES (
+    'admin', 
+    '$2a$12$apGfQptjppS0PgqPNIa9PuRNaCnwq7bgifN1fXn7M8CFxcAnbf7ny', 
+    'admin@example.com', 
+    NOW()
+);
+
+
 DROP TABLE IF EXISTS `tasks`;
 DROP TABLE IF EXISTS `files`;
 DROP TABLE IF EXISTS `users`;
