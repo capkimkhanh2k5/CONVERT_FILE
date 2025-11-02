@@ -182,7 +182,7 @@ Database:
 1. **Clone dự án**
 
 ```bash
-git clone [URL_DỰ_ÁN_CỦA_BẠN]
+git clone [https://github.com/capkimkhanh2k5/CONVERT_FILE]
 cd CONVERT_FILE
 ```
 
@@ -257,7 +257,7 @@ Lược đồ CSDL được thiết kế để quản lý người dùng, các t
 │ user_id (FK)        │
 │ original_name       │
 │ saved_name (UNIQUE) │
-│ current_status      │◄──┐
+│ current_status      │◄───┐
 └──────────┬──────────┘    │
            │               │
            │ 1:N           │
@@ -291,20 +291,20 @@ Lược đồ CSDL được thiết kế để quản lý người dùng, các t
 ### Luồng xử lý của Worker
 
 ```
-┌─────────────────────────────────────────────┐
-│                                             │
-│  while (running) {                          │
+┌───────────────────────────────────────────────────┐
+│                                                   │
+│  while (running) {                                │
 │    1. Lấy tác vụ (task) từ CSDL (status='WAITING')│
-│    2. Cập nhật status → 'PROCESSING'          │
-│    3. Thực thi tác vụ (dùng docx4j):          │
-│       • Tải file từ input_path               │
-│       • Chuyển đổi...                        │
-│       • Ghi file vào output_path             │
-│    4. Cập nhật CSDL:                         │
-│       • Cập nhật status → 'COMPLETED'/'FAILED'│
-│       • Cập nhật files.output_path           │
-│  }                                          │
-└─────────────────────────────────────────────┘
+│    2. Cập nhật status → 'PROCESSING'              │
+│    3. Thực thi tác vụ (dùng docx4j):              │
+│       • Tải file từ input_path                    │
+│       • Chuyển đổi...                             │
+│       • Ghi file vào output_path                  │
+│    4. Cập nhật CSDL:                              │
+│       • Cập nhật status → 'COMPLETED'/'FAILED'    │
+│       • Cập nhật files.output_path                │
+│  }                                                │
+└───────────────────────────────────────────────────┘
 ```
 
 ---
