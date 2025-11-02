@@ -10,15 +10,28 @@ import java.util.Arrays;
 
 public class FileService {
     private FileDAO fileDAO = new FileDAO();
+    //TODO: Bổ sung khi có DATABASE
+    private final List<String> typeFile = Arrays.asList("doc", "docx", "xml", "pdf", "txt");
 
     public boolean saveFileMetaData(FileInfo file) throws SQLException {
-        return fileDAO.insertFileMetaData(file);
+        return fileDAO.insertFile(file);
     }
 
     public boolean allowed_extension(String ext){
-        //TODO: Fix khi có DATABASE
-        List<String> ALLOWED_EXT = Arrays.asList("doc", "docx", "xml", "pdf", "txt"); // Example allowed extensions
-        return ALLOWED_EXT.contains(ext);
+        return typeFile.contains(ext);
+    }
+
+
+    public boolean isSupportedConversion(String inputFormat, String outputFormat){
+        if (inputFormat == null || outputFormat == null) return false;
+
+        String inF = inputFormat.trim().toLowerCase();
+        String outF = outputFormat.trim().toLowerCase();
+
+        boolean inOk = typeFile.contains(inF);
+        boolean outOk = typeFile.contains(outF);
+
+        return inOk && outOk && !inF.equals(outF);
     }
 
     //Check định dạng
@@ -35,16 +48,13 @@ public class FileService {
         }
     }
 
-    public FileInfo getFileByID(String fileID){
-        return fileDAO.getFileByID(fileID);
-    }
-
-    public List<FileInfo> getAllFiles(){
-        return fileDAO.getAllFiles();
-    }
-
-    private String getFileExtension(String fileName) {
+    public static String getFileExtension(String fileName) {
         int i = fileName.lastIndexOf('.');
         return (i > 0) ? fileName.substring(i + 1).toLowerCase() : "";
+    }
+
+    public void convertFile(String file_id) {
+        // TODO: sử dụng microService
+        throw new UnsupportedOperationException("Unimplemented method 'convertFile'");
     }
 }
