@@ -36,6 +36,7 @@
 
 **CONVERT_FILE** là một hệ thống chuyển đổi tập tin dựa trên web, được thiết kế để xử lý và chuyển đổi các định dạng tài liệu văn phòng phổ biến. Được xây dựng trên nền tảng Java EE (Servlet/JSP) và MySQL, hệ thống này cung cấp một kiến trúc dựa trên hàng đợi (queue) để quản lý các tác vụ chuyển đổi một cách hiệu quả.
 
+
 ### Các khả năng chính
 
 - ⚡ **Chuyển đổi Đa định dạng** — Hỗ trợ các định dạng DOCX, PDF, HTML, và XML.
@@ -73,6 +74,11 @@ Hệ thống hỗ trợ nhiều tác vụ chuyển đổi, được định ngh�
 ## 🏗️ Kiến trúc
 
 ### Tổng quan Hệ thống
+
+<div align="center">
+  <img src="./MoTaHeThong/TongQuan.png" alt="Sơ đồ tổng quan hệ thống" width="800"/>
+  <p><em>Sơ đồ kiến trúc tổng quan hệ thống</em></p>
+</div>
 
 Kiến trúc hệ thống tuân theo mô hình Layered Architecture và MVC, phù hợp với các ứng dụng Servlet/JSP.
 
@@ -235,6 +241,11 @@ http://localhost:8080/CONVERT_FILE/
 ## 🔬 Thiết kế Hệ thống
 
 ### Lược đồ CSDL
+
+<div align="center">
+  <img src="./MoTaHeThong/DataBase.png" alt="Lược đồ cơ sở dữ liệu" width="700"/>
+  <p><em>Lược đồ quan hệ cơ sở dữ liệu</em></p>
+</div>
 
 Lược đồ CSDL được thiết kế để quản lý người dùng, các tệp tin đã tải lên, và các tác vụ chuyển đổi liên quan.
 
