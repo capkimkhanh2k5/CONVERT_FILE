@@ -8,7 +8,7 @@ public class ConnectDB {
     //TODO: Chỉnh lại cho đúng khi có DB
     private static final String JDBC_URL = "jdbc:mysql://localhost:3306/file_converter";
     private static final String USER = "root";
-    private static final String PASSWORD = "admin";
+    private static final String PASSWORD = "123";
 
     public static Connection getConnection() throws SQLException {
         Connection conn = null;

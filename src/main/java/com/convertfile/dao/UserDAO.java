@@ -6,6 +6,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 
+import org.mindrot.jbcrypt.BCrypt;
+
 import com.convertfile.model.User;
 import com.convertfile.service.passwordService;
 

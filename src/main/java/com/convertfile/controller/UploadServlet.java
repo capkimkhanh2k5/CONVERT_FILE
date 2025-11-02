@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 import jakarta.servlet.ServletException;
@@ -46,12 +47,35 @@ public class UploadServlet extends HttpServlet{
         JSONObject jsonResponse = new JSONObject();
         
         HttpSession session = request.getSession(false);
+
+        // Nếu không có session, không thể là khách hoặc người dùng
+        if(session == null){
+            jsonResponse.put("statusProgress", "FAILED");
+            jsonResponse.put("message", "No session found");
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().write(jsonResponse.toString());
+            return;
+        }
+
         String username = (String) session.getAttribute("username");
-        long user_id = userDAO.getUserByUsername(username);
         
         try {
             // Lấy tất cả file của user
-            String[] file_ids = fileDAO.getAllFile_idsByUser_id(user_id);
+            String[] file_ids;
+
+            if(username != null){
+                long user_id = userDAO.getUserByUsername(username);
+                file_ids = fileDAO.getAllFile_idsByUser_id(user_id);
+            } else {
+                @SuppressWarnings("unchecked")
+                List<String> guestFile_ids = (List<String>) session.getAttribute("guestFile_ids");
+                if(guestFile_ids == null){
+                    file_ids = new String[0];
+                } else {
+                    file_ids = guestFile_ids.toArray(new String[0]);
+                }
+            }
+
             JSONArray filesArray = new JSONArray();
             
             int totalFiles = 0;
@@ -59,6 +83,8 @@ public class UploadServlet extends HttpServlet{
             
             for(String file_id : file_ids) {
                 FileInfo file = fileDAO.getFileByID(file_id);
+
+                if (file == null) continue;
                 
                 JSONObject fileJson = new JSONObject();
                 fileJson.put("file_id", file.getFile_id());
@@ -98,14 +124,19 @@ public class UploadServlet extends HttpServlet{
         
         JSONObject jsonResponse = new JSONObject();
 
-        HttpSession session = request.getSession(false);
+        HttpSession session = request.getSession();
         String username = (String) session.getAttribute("username");
 
-        if(session == null || username == null){
-            response.sendRedirect("login.jsp");
+        long user_id;
+        boolean isGuest = false;
+
+        if(username == null){
+            user_id = 0;
+            isGuest = true;
+        } else {
+            user_id = userDAO.getUserByUsername(username);
         }
 
-        long user_id = userDAO.getUserByUsername(username);
 
         try {
             Part filePart = request.getPart("file");
@@ -120,9 +151,15 @@ public class UploadServlet extends HttpServlet{
             String file_id = UUID.randomUUID().toString();
             String saved_name = file_id + "_" + original_name;
 
-            // Đọc đường dẫn từ web.xml
+            // Đọc đường dẫn từ web.xml -> đường dẫn và ghi file
             String inputDir = getServletContext().getInitParameter("UPLOAD_INPUT_PATH");
             String uploadPath = getServletContext().getInitParameter("UPLOAD_OUTPUT_PATH");
+
+            //Đường dẫn tuyệt đối
+            String appPath = getServletContext().getRealPath("");
+
+            inputDir = appPath + File.separator + inputDir;
+            uploadPath = appPath + File.separator + uploadPath;
 
             String savedFilePath = uploadPath + File.separator + saved_name;
             filePart.write(savedFilePath);
@@ -131,7 +168,6 @@ public class UploadServlet extends HttpServlet{
             FileInfo info = new FileInfo();
             
             info.setFile_id(file_id);
-
             LocalDateTime now = LocalDateTime.now();
 
             info.setOriginal_name(original_name);
@@ -149,6 +185,17 @@ public class UploadServlet extends HttpServlet{
             fileService.saveFileMetaData(info);
 
             fileService.convertFile(file_id); 
+
+            //Nếu là khách, lưu file_id vào session
+            if(isGuest){
+                @SuppressWarnings("unchecked")
+                List<String> guestFile_ids = (List<String>) session.getAttribute("guestFile_ids");
+                if(guestFile_ids == null){
+                    guestFile_ids = List.of(file_id);
+                    session.setAttribute("guestFile_ids", guestFile_ids);
+                }
+                guestFile_ids.add(file_id);
+            }
             
             // Tạo phản hồi JSON
             jsonResponse.put("statusProgress", "PROCESSING");
