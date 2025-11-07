@@ -3,7 +3,7 @@ package com.convertfile.controller;
 import java.io.IOException;
 import java.time.LocalDateTime;
 
-import com.convertfile.dao.UserDAO;
+import com.convertfile.bo.UserBO;
 import com.convertfile.model.User;
 
 import jakarta.servlet.ServletException;
@@ -15,7 +15,7 @@ import jakarta.servlet.http.HttpServletResponse;
 @WebServlet("/register")
 public class RegisterServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
-    private final UserDAO userDAO = new UserDAO();
+    private final UserBO userBO = new UserBO();
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -41,7 +41,7 @@ public class RegisterServlet extends HttpServlet {
         user.setEmail(email);
         user.setCreated_at(LocalDateTime.now());
 
-        userDAO.insertUser(user);
+        userBO.registerUser(user);
 
         // Nếu OK
         request.setAttribute("successMessage", "Resigter successfully! Please login!");

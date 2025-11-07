@@ -19,8 +19,8 @@ import jakarta.servlet.http.Part;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import com.convertfile.dao.FileDAO;
-import com.convertfile.dao.UserDAO;
+import com.convertfile.bo.FileBO;
+import com.convertfile.bo.UserBO;
 import com.convertfile.model.EnumStatus;
 import com.convertfile.model.FileInfo;
 import com.convertfile.service.FileService;
@@ -35,8 +35,8 @@ public class UploadServlet extends HttpServlet{
     private static final long serialVersionUID = 1L;
 
     private final FileService fileService = new FileService();
-    private final UserDAO userDAO = new UserDAO();
-    private final FileDAO fileDAO = new FileDAO();
+    private final UserBO userBO = new UserBO();
+    private final FileBO fileBO = new FileBO();
 
 
     @Override
@@ -64,8 +64,8 @@ public class UploadServlet extends HttpServlet{
             String[] file_ids;
 
             if(username != null){
-                long user_id = userDAO.getUserByUsername(username);
-                file_ids = fileDAO.getAllFile_idsByUser_id(user_id);
+                long user_id = userBO.getUserByUsername(username);
+                file_ids = fileBO.getAllFile_idsByUser_id(user_id);
             } else {
                 @SuppressWarnings("unchecked")
                 List<String> guestFile_ids = (List<String>) session.getAttribute("guestFile_ids");
@@ -82,7 +82,7 @@ public class UploadServlet extends HttpServlet{
             int completedFiles = 0;
             
             for(String file_id : file_ids) {
-                FileInfo file = fileDAO.getFileByID(file_id);
+                FileInfo file = fileBO.getFileByID(file_id);
 
                 if (file == null) continue;
                 
@@ -134,7 +134,7 @@ public class UploadServlet extends HttpServlet{
             user_id = 0;
             isGuest = true;
         } else {
-            user_id = userDAO.getUserByUsername(username);
+            user_id = userBO.getUserByUsername(username);
         }
 
 
