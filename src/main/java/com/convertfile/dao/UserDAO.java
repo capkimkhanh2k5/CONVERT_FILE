@@ -6,8 +6,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 
-import org.mindrot.jbcrypt.BCrypt;
-
 import com.convertfile.model.User;
 import com.convertfile.service.passwordService;
 
@@ -47,17 +45,6 @@ public class UserDAO {
         }
 
         return null;
-    }
-
-    public boolean checkUser(String username, String password){
-        User user = getUser(username);
-        if(user == null) return false;
-
-        return passwordService.checkPassword(password, user.getPassword());
-    }
-
-    public long getUserByUsername(String username){
-        return Long.valueOf(this.getUser(username).getId());
     }
 
     private User mapRow(ResultSet rs) throws SQLException {
