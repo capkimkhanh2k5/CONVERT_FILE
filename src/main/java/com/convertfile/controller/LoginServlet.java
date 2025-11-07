@@ -2,7 +2,7 @@ package com.convertfile.controller;
 
 import java.io.IOException;
 
-import com.convertfile.dao.UserDAO;
+import com.convertfile.bo.UserBO;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -13,7 +13,7 @@ import jakarta.servlet.http.HttpServletResponse;
 @WebServlet("/login")
 public class LoginServlet extends HttpServlet {
     private final static long serialVersionUID = 1L;
-    private final UserDAO userDAO = new UserDAO();
+    private final UserBO userBO = new UserBO();
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -28,7 +28,7 @@ public class LoginServlet extends HttpServlet {
             return;
         }
 
-        if (userDAO.checkUser(username, password)) {
+        if (userBO.checkloginUser(username, password)) {
             request.getSession().setAttribute("username", username);
             response.sendRedirect("upload.jsp");
         } else {
