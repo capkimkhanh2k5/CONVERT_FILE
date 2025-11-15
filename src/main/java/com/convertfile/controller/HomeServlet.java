@@ -25,13 +25,13 @@ import com.convertfile.model.EnumStatus;
 import com.convertfile.model.FileInfo;
 import com.convertfile.service.FileService;
 
-@WebServlet("/upload")
+@WebServlet("/home")
 @MultipartConfig(
     fileSizeThreshold = 1024 * 1024 * 5, // 5 MB
     maxFileSize = 1024 * 1024 * 50,      // 50 MB
     maxRequestSize = 1024 * 1024 * 100   // 100 MB
 )
-public class UploadServlet extends HttpServlet{
+public class HomeServlet extends HttpServlet{
     private static final long serialVersionUID = 1L;
 
     private final FileService fileService = new FileService();

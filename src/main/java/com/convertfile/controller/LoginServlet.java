@@ -30,7 +30,11 @@ public class LoginServlet extends HttpServlet {
 
         if (userBO.checkloginUser(username, password)) {
             request.getSession().setAttribute("username", username);
-            response.sendRedirect("upload.jsp");
+
+            String userEmail = userBO.getUserEmailByUsername(username);
+            request.getSession().setAttribute("userEmail", userEmail);
+
+            response.sendRedirect("home.jsp");
         } else {
             request.setAttribute("errorMessage", "Username or password is invalid!");
             request.getRequestDispatcher("login.jsp").forward(request, response);

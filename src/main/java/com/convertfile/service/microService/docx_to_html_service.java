@@ -27,7 +27,6 @@ public class docx_to_html_service {
                 imageDir.mkdirs();
             }
 
-
             HTMLSettings htmlSettings = Docx4J.createHTMLSettings();
 
             htmlSettings.setWmlPackage(wordMLPackage);

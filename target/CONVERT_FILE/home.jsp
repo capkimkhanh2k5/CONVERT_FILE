@@ -109,6 +109,16 @@
             border-top: 1px solid #e2e8f0;
         }
 
+        .nav-item a.nav-link {
+            text-decoration: none;
+            color: inherit;
+            cursor: pointer;
+        }
+
+        .nav-item a.nav-link:hover {
+            opacity: 0.8;
+        }
+
         /* Main content */
         .main-content {
             padding: 32px 48px;
@@ -313,6 +323,25 @@
             border-left: 1px solid #e2e8f0;
             padding: 24px 16px;
             overflow-y: auto;
+            width: 320px;
+            box-sizing: border-box;
+            transition: opacity 0.32s ease, transform 0.32s ease, width 0.32s ease, padding 0.32s ease;
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        /* When history is hidden, collapse the right column and expand main area */
+        .app-container.no-history {
+            grid-template-columns: 240px 1fr;
+        }
+
+        .app-container.no-history .history-panel {
+            width: 0;
+            padding: 0 0;
+            opacity: 0;
+            transform: translateX(12px);
+            pointer-events: none;
+            overflow: hidden;
         }
 
         .history-header {
@@ -412,6 +441,19 @@
             color: #1a202c;
         }
 
+        .file-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .file-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1a202c;
+        }
+
         .tools-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -463,6 +505,79 @@
             line-height: 1.4;
         }
 
+        /* Modal for All Tools */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.45);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1200;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.24s ease;
+        }
+
+        .modal-overlay.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .tools-modal {
+            background: white;
+            width: 520px;
+            max-width: calc(100% - 40px);
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(2,6,23,0.2);
+            transform: translateY(8px) scale(0.99);
+            transition: transform 0.28s cubic-bezier(.2,.9,.38,1), opacity 0.28s ease;
+            opacity: 0;
+            overflow: hidden;
+        }
+
+        .modal-overlay.visible .tools-modal {
+            transform: translateY(0) scale(1);
+            opacity: 1;
+        }
+
+        .tools-modal header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            border-bottom: 1px solid #edf2f7;
+        }
+
+        .tools-modal .modal-body {
+            padding: 16px 20px 20px;
+            max-height: 60vh;
+            overflow: auto;
+        }
+
+        .tool-entry {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            padding: 12px;
+            border-radius: 8px;
+            transition: background 0.12s;
+            cursor: default;
+        }
+
+        .tool-entry:hover { background: #f7fafc; }
+
+        .tool-entry .tool-thumb { width: 44px; height: 44px; border-radius: 8px; display:flex; align-items:center; justify-content:center; font-size:20px; }
+
+        .tool-entry .tool-meta { flex:1; min-width:0; }
+
+        .tool-entry .tool-meta .name { font-weight:600; color:#1a202c; font-size:14px; }
+        
+        .tool-entry .tool-meta .desc { font-size:13px; color:#718096; }
+
+        .tool-entry .tool-action { margin-left: 8px; }
+
+
         @media (max-width: 1200px) {
             .app-container {
                 grid-template-columns: 240px 1fr;
@@ -494,13 +609,41 @@
         <aside class="sidebar">
             <div class="user-profile">
                 <div class="avatar">👤</div>
-                <div class="user-name">Guest</div>
-                <div class="user-email">guest@gmail.com</div>
+                <div class="user-name">
+                    <%
+                        String username = (String) session.getAttribute("username");
+
+                        if(username != null && !username.isEmpty()){
+                            %>
+                                <%= username %>
+                            <%
+                        }else{
+                            %>
+                                GUEST
+                            <%
+                        }   
+                    %>
+                </div>
+                <div class="user-email">
+                    <%
+                        String userEmail = (String) session.getAttribute("userEmail");
+
+                        if(userEmail != null && !userEmail.isEmpty()){
+                            %>
+                                <%= userEmail %>
+                            <%
+                        }else{
+                            %>
+                                guest_example@gmail.com
+                            <%
+                        }   
+                    %>
+                </div>
             </div>
 
             <nav class="nav-menu">
                 <div class="nav-item active" data-view="home">
-                    <span class="nav-icon">📚</span>
+                    <span class="nav-icon">🏠</span>
                     <span>Home</span>
                 </div>
                 <div class="nav-item" data-view="tools">
@@ -508,7 +651,7 @@
                     <span>All Tools</span>
                 </div>
                 <div class="nav-item" data-view="history">
-                    <span class="nav-icon">🕒</span>
+                    <span class="nav-icon">⌛</span>
                     <span>History</span>
                 </div>
             </nav>
@@ -523,8 +666,24 @@
                     <span>Help Center</span>
                 </div>
                 <div class="nav-item">
-                    <span class="nav-icon">🚪</span>
-                    <span>Logout</span>
+                    <%
+                        if (username != null && !username.isEmpty()){
+                            %>
+                                <a href="logout" class ="nav-link">
+                                    <span class="nav-icon">⬅️</span>
+                                    <span>Logout</span>
+                                </a>
+                            <%
+                        }
+                        else{
+                            %>
+                                <a href="login.jsp" class ="nav-link">
+                                    <span class="nav-icon">➡️</span>
+                                    <span>Login</span>
+                                </a>
+                            <%
+                        }
+                    %>
                 </div>
             </div>
         </aside>
@@ -534,7 +693,7 @@
             <div class="header">
                 <h1 class="page-title">PDF to Word</h1>
                 <div class="header-actions">
-                    <button class="icon-btn">⋯</button>
+                    <!-- <button class="icon-btn">⋯</button> -->
                 </div>
             </div>
 
@@ -551,6 +710,11 @@
 
             <!-- Converted Files -->
             <div class="converted-files">
+                <div class="file-header">
+                    <h2 class="file-title">Uploaded Files</h2>
+                    <!-- <button class="icon-btn">⋯</button> -->
+                </div>
+
                 <div class="file-item">
                     <div class="file-icon-wrapper">📄</div>
                     <div class="file-info">
@@ -586,7 +750,7 @@
             <div class="recommended-tools">
                 <div class="tools-header">
                     <h2 class="tools-title">Recommended Tools</h2>
-                    <button class="icon-btn">⋯</button>
+                    <!-- <button class="icon-btn">⋯</button> -->
                 </div>
 
                 <div class="tools-grid">
@@ -633,7 +797,7 @@
         <aside class="history-panel">
             <div class="history-header">
                 <h2 class="history-title">History</h2>
-                <button class="icon-btn">⋯</button>
+                <!-- <button class="icon-btn">⋯</button> -->
             </div>
 
             <div class="history-section">
@@ -700,6 +864,48 @@
                 </div>
             </div>
         </aside>
+        <!-- All Tools Modal (hidden by default) -->
+        <div id="toolsModalOverlay" class="modal-overlay" aria-hidden="true">
+            <div class="tools-modal" role="dialog" aria-modal="true" aria-labelledby="toolsModalTitle">
+                <header>
+                    <h3 id="toolsModalTitle" style="margin:0; font-size:16px;">All Tools</h3>
+                    <div>
+                        <button id="toolsModalClose" class="icon-btn" aria-label="Close tools">✕</button>
+                    </div>
+                </header>
+                <div class="modal-body">
+                    <!-- Example 3 tools template - edit as needed -->
+                    <div id="toolGeneratedContainer" style="margin-bottom:12px;"></div>
+
+                    <div class="tool-entry">
+                        <div class="tool-thumb blue">📄</div>
+                        <div class="tool-meta">
+                            <div class="name">PDF to Word</div>
+                            <div class="desc">Convert PDF files to editable Word documents</div>
+                        </div>
+                        <div class="tool-action"><button class="browse-btn" input="PDF" output="Word">Use</button></div>
+                    </div>
+
+                    <div class="tool-entry">
+                        <div class="tool-thumb green">🖼️</div>
+                        <div class="tool-meta">
+                            <div class="name">PNG to PDF</div>
+                            <div class="desc">Convert PNG images into a single PDF</div>
+                        </div>
+                        <div class="tool-action"><button class="browse-btn" input="PNG" output="PDF">Use</button></div>
+                    </div>
+
+                    <div class="tool-entry">
+                        <div class="tool-thumb purple">🔗</div>
+                        <div class="tool-meta">
+                            <div class="name">Word to Excel</div>
+                            <div class="desc">Extract tables from Word into Excel files</div>
+                        </div>
+                        <div class="tool-action"><button class="browse-btn" input="Word" output="Excel">Use</button></div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -739,6 +945,89 @@
                 // Add your file handling logic here
             }
         }
+
+        // --- View toggling: hide/show History panel based on left nav clicks ---
+        (function(){
+            const navItems = document.querySelectorAll('.nav-item[data-view]');
+            const appContainer = document.querySelector('.app-container');
+
+            function clearActive() {
+                navItems.forEach(i => i.classList.remove('active'));
+            }
+
+            function setActiveByName(name) {
+                navItems.forEach(item => {
+                    const v = item.dataset.view || '';
+                    item.classList.toggle('active', v === name);
+                });
+            }
+
+            // Toggle logic: clicking History toggles panel; clicking All Tools opens modal; clicking other views hides History
+            const toolsOverlay = document.getElementById('toolsModalOverlay');
+            const toolsCloseBtn = document.getElementById('toolsModalClose');
+
+            function showToolsModal() {
+                if (!toolsOverlay) return;
+                toolsOverlay.classList.add('visible');
+                toolsOverlay.setAttribute('aria-hidden','false');
+            }
+
+            function hideToolsModal() {
+                if (!toolsOverlay) return;
+                toolsOverlay.classList.remove('visible');
+                toolsOverlay.setAttribute('aria-hidden','true');
+            }
+
+            navItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    const view = item.dataset.view || 'home';
+
+                    if (view === 'history') {
+                        const isHidden = appContainer.classList.contains('no-history');
+                        if (isHidden) {
+                            appContainer.classList.remove('no-history');
+                            setActiveByName('history');
+                        } else {
+                            appContainer.classList.add('no-history');
+                            setActiveByName('home');
+                        }
+                        // ensure modal closed when switching
+                        hideToolsModal();
+                    } else if (view === 'tools') {
+                        // Toggle modal when clicking All Tools
+                        const isOpen = toolsOverlay && toolsOverlay.classList.contains('visible');
+                        if (isOpen) {
+                            hideToolsModal();
+                            // keep All Tools active state toggled off when closing
+                            setActiveByName('home');
+                        } else {
+                            showToolsModal();
+                            setActiveByName('tools');
+                        }
+                        // hide history while modal is up
+                        appContainer.classList.add('no-history');
+                    } else {
+                        appContainer.classList.add('no-history');
+                        setActiveByName(view);
+                        hideToolsModal();
+                    }
+                });
+            });
+
+            // Close modal on overlay click or on close button
+            if (toolsOverlay) {
+                toolsOverlay.addEventListener('click', (e) => {
+                    if (e.target === toolsOverlay) hideToolsModal();
+                });
+            }
+            if (toolsCloseBtn) {
+                toolsCloseBtn.addEventListener('click', hideToolsModal);
+            }
+
+            // Initialize: Home active and history hidden
+            appContainer.classList.add('no-history');
+            setActiveByName('home');
+        })();
     </script>
 </body>
 </html>

@@ -1,4 +1,5 @@
 com/convertfile/dao/ConnectDB.class
+com/convertfile/controller/HomeServlet.class
 com/convertfile/model/User.class
 com/convertfile/service/microService/docx_to_pdf_service.class
 com/convertfile/service/TaskQueueService.class
@@ -21,7 +22,6 @@ com/convertfile/bo/TaskQueueBO.class
 com/convertfile/model/EnumStatus.class
 com/convertfile/service/microService/docx_to_html_service.class
 com/convertfile/service/microService/xml_to_docx_service.class
-com/convertfile/controller/UploadServlet.class
 com/convertfile/model/TaskJob.class
 com/convertfile/model/EnumStatus$FileStatus.class
 com/convertfile/model/EnumStatus$TaskStatus.class
