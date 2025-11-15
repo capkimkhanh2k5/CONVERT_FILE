@@ -26,4 +26,12 @@ public class UserBO {
         return Long.valueOf(this.userDAO.getUser(username).getId());
     }
 
+    public String getUserEmailByUsername(String username) {
+        User user = userDAO.getUser(username);
+        if(user != null){
+            return user.getEmail();
+        }
+        return null;
+    }
+
 }

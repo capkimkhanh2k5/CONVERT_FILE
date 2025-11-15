@@ -523,7 +523,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="confirmPassword">Re-enter password</label>
+                    <label for="confirmPassword">Re-Enter password</label>
                     <div class="input-wrapper">
                         <input type="password" name="confirmPassword" id="confirmPassword" placeholder="Re-enter password" required minlength="6">
                         <span class="password-toggle" id="toggleConfirmPassword">👁️</span>
@@ -561,7 +561,7 @@
             </div>
 
             <div class="login-link">
-                Already have an account? <a href="login.jsp">Back to login</a>
+                Already have an account? <a href="login.jsp">Back to Login</a>
             </div>
         </div>
     </div>
