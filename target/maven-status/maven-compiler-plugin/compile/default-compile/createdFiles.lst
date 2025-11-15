@@ -4,7 +4,9 @@ com/convertfile/service/microService/docx_to_pdf_service.class
 com/convertfile/service/TaskQueueService.class
 com/convertfile/worker/fileWorker.class
 com/convertfile/controller/LogOutServlet.class
+com/convertfile/bo/UserBO.class
 com/convertfile/service/passwordService.class
+com/convertfile/bo/FileBO.class
 com/convertfile/service/microService/docx_merge_service.class
 com/convertfile/dao/FileDAO.class
 com/convertfile/service/WockerService.class
@@ -15,6 +17,7 @@ com/convertfile/model/EnumStatus$TaskType.class
 com/convertfile/model/FileInfo.class
 com/convertfile/service/FileService.class
 com/convertfile/controller/RegisterServlet.class
+com/convertfile/bo/TaskQueueBO.class
 com/convertfile/model/EnumStatus.class
 com/convertfile/service/microService/docx_to_html_service.class
 com/convertfile/service/microService/xml_to_docx_service.class
