@@ -1,0 +1,25 @@
+# Maven / Java Build
+
+# Bỏ qua các file .war
+*.war
+
+
+# IntelliJ
+.idea/
+*.iml
+/shelf/
+/workspace.xml
+/httpRequests/
+/dataSources/
+/dataSources.local.xml
+
+# Eclipse
+/.classpath
+/.project
+/.settings/
+
+# OS
+.DS_Store
+
+# Secrets
+src/main/java/com/convertfile/model/*.json
