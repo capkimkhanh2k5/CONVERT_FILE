@@ -1,4 +1,5 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
 <!DOCTYPE html>
 <html lang="vi">
@@ -6,6 +7,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
+
+    <!-- Google Sign-In Library -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+
     <style>
         * {
             margin: 0;
@@ -484,6 +489,7 @@
             background: #ff4d88;
         }
     </style>
+
 </head>
 <body>
     <!-- Back Arrow - Fixed Position -->
@@ -516,19 +522,21 @@
                 </div>
             <% } %>
 
+            <!-- Login Form -->
             <form action="login" method="post" id="loginForm">
-                <!-- CSRF Token dùng bảo mật -->
                 <input type="hidden" name="csrfToken" value="${sessionScope.csrfToken}">
 
                 <div class="form-group">
                     <label for="username">Username</label>
-                    <input type="text" name="username" id="username" placeholder="Enter your username" required>
+                    <input type="text" name="username" id="username" 
+                        placeholder="Enter your username" required>
                 </div>
 
                 <div class="form-group">
                     <label for="password">Password</label>
                     <div class="input-wrapper">
-                        <input type="password" name="password" id="password" placeholder="Enter your password" required>
+                        <input type="password" name="password" id="password" 
+                            placeholder="Enter your password" required>
                         <span class="password-toggle" id="togglePassword">👁️</span>
                     </div>
                 </div>
@@ -541,22 +549,33 @@
                     <a href="forgot-password.jsp" class="forgot-link">Forgot Password?</a>
                 </div>
 
-                <button type="submit" class="login-btn" name="action" value="loginBtn">Login</button>
-
-            <div class="divider">or Sign with Email</div>
-
-                <div class="social-login">
-                    <a href="/oauth2/authorization/google" class="social-btn">
-                        <svg class="google-icon" viewBox="0 0 24 24">
-                            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-                        </svg>
-                        Sign in with Google
-                    </a>
-                </div>
+                <button type="submit" class="login-btn" name="action" value="loginBtn">
+                    Login
+                </button>
             </form>
+
+            <div class="divider">or Sign with Google</div>
+
+            <!-- Google Sign-In Button -->
+            <div class="social-login">
+                <div id="g_id_onload"
+                    data-client_id="YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com"
+                    data-context="signin"
+                    data-ux_mode="popup"
+                    data-callback="handleCredentialResponse"
+                    data-auto_prompt="false">
+                </div>
+                
+                <div class="g_id_signin"
+                    data-type="standard"
+                    data-shape="rectangular"
+                    data-theme="outline"
+                    data-text="signin_with"
+                    data-size="large"
+                    data-logo_alignment="left"
+                    data-width="100%">
+                </div>
+            </div>
 
             <div class="signup-link">
                 Not registered yet? <a href="register.jsp">Create an Account</a>
@@ -565,7 +584,7 @@
     </div>
 
     <script>
-        // Toggle password visibility
+        //PASSWORD TOGGLE
         const togglePassword = document.getElementById('togglePassword');
         const passwordInput = document.getElementById('password');
 
@@ -575,12 +594,12 @@
             this.textContent = type === 'password' ? '👁️' : '🙈';
         });
 
-        // Form submission
+        //FORM SUBMISSION
         const loginForm = document.getElementById('loginForm');
         const loginBtn = document.querySelector('.login-btn');
 
         loginForm.addEventListener('submit', function(e) {
-            const username = document.getElementById('username').value;
+            const username = document.getElementById('username').value.trim();
             const password = passwordInput.value;
 
             if (!username || !password) {
@@ -593,19 +612,79 @@
             loginBtn.disabled = true;
         });
 
-        // Auto-hide messages after 5 seconds
+        //GOOGLE SIGN-IN CALLBACK
+        function handleCredentialResponse(response) {
+            console.log("Encoded JWT ID token: " + response.credential);
+            
+            // Hiển thị loading
+            const googleBtn = document.querySelector('.g_id_signin');
+            if (googleBtn) {
+                googleBtn.style.opacity = '0.5';
+                googleBtn.style.pointerEvents = 'none';
+            }
+
+            // Gửi token đến server
+            fetch('google-login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'credential=' + encodeURIComponent(response.credential)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Đăng nhập thành công
+                    showMessage('success', 'Welcome ' + data.user.name + '! Redirecting...');
+                    setTimeout(() => {
+                        window.location.href = 'home.jsp';
+                    }, 1500);
+                } else {
+                    // Đăng nhập thất bại
+                    showMessage('error', data.error || 'Login failed');
+                    if (googleBtn) {
+                        googleBtn.style.opacity = '1';
+                        googleBtn.style.pointerEvents = 'auto';
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showMessage('error', 'Network error. Please try again.');
+                if (googleBtn) {
+                    googleBtn.style.opacity = '1';
+                    googleBtn.style.pointerEvents = 'auto';
+                }
+            });
+        }
+
+        //SHOW MESSAGES
+        function showMessage(type, message) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = type === 'error' ? 'error-message show' : 'success-message show';
+            messageDiv.textContent = (type === 'error' ? '✗ ' : '✓ ') + message;
+            
+            const formHeader = document.querySelector('.form-header');
+            formHeader.after(messageDiv);
+            
+            setTimeout(() => {
+                messageDiv.style.opacity = '0';
+                messageDiv.style.transition = 'opacity 0.5s ease';
+                setTimeout(() => messageDiv.remove(), 500);
+            }, 5000);
+        }
+
+        //AUTO-HIDE MESSAGES
         const messages = document.querySelectorAll('.error-message.show, .success-message.show');
         messages.forEach(message => {
             setTimeout(() => {
                 message.style.opacity = '0';
                 message.style.transition = 'opacity 0.5s ease';
-                setTimeout(() => {
-                    message.style.display = 'none';
-                }, 500);
+                setTimeout(() => message.style.display = 'none', 500);
             }, 5000);
         });
 
-        // Auto-focus username input
+        //AUTO-FOCUS
         document.getElementById('username').focus();
     </script>
 </body>

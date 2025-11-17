@@ -1,0 +1,6 @@
+# Copy file này thành application.properties và điền giá trị thực
+google.client.id=YOUR_CLIENT_ID_HERE
+google.client.secret=YOUR_CLIENT_SECRET_HERE
+database.url=jdbc:mysql://localhost:3306/yourdb
+database.username=root
+database.password=YOUR_PASSWORD

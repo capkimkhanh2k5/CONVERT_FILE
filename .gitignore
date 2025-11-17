@@ -1,25 +1,32 @@
-# Maven / Java Build
+# JAVA BUILD - War files
 
-# Bỏ qua các file .war
 *.war
 
 
-# IntelliJ
-.idea/
-*.iml
-/shelf/
-/workspace.xml
-/httpRequests/
-/dataSources/
-/dataSources.local.xml
-
-# Eclipse
-/.classpath
-/.project
-/.settings/
-
-# OS
+# macOS
 .DS_Store
+.AppleDouble
+.LSOverride
 
-# Secrets
+
+# SENSITIVE DATA / SECRETS
+# Properties files với credentials
+application.properties
+config.properties
+database.properties
+
+# JSON credentials (Google OAuth, Firebase, etc.)
+*-credentials.json
+service-account.json
+client_secret*.json
 src/main/java/com/convertfile/model/*.json
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# SSH keys
+*.pem
+*.key
+id_rsa
