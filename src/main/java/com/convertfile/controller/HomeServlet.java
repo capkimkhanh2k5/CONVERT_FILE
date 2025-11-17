@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -15,9 +16,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.Part;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import com.convertfile.bo.FileBO;
 import com.convertfile.bo.UserBO;
@@ -43,17 +41,16 @@ public class HomeServlet extends HttpServlet{
     protected void doGet(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
         
-        response.setContentType("application/json; charset=UTF-8");
-        JSONObject jsonResponse = new JSONObject();
-        
         HttpSession session = request.getSession(false);
 
-        // Nếu không có session, không thể là khách hoặc người dùng
+        // Nếu không có session -> Guest
         if(session == null){
-            jsonResponse.put("statusProgress", "FAILED");
-            jsonResponse.put("message", "No session found");
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().write(jsonResponse.toString());
+            request.setAttribute("username", "GUEST");
+            request.setAttribute("files", new ArrayList<FileInfo>());
+            request.setAttribute("totalFiles", 0);
+            request.setAttribute("completedFiles", 0);
+            
+            request.getRequestDispatcher("home.jsp").forward(request, response);
             return;
         }
 
@@ -76,24 +73,15 @@ public class HomeServlet extends HttpServlet{
                 }
             }
 
-            JSONArray filesArray = new JSONArray();
-            
+            List<FileInfo> filesList = new ArrayList<>();
             int totalFiles = 0;
             int completedFiles = 0;
             
             for(String file_id : file_ids) {
                 FileInfo file = fileBO.getFileByID(file_id);
-
                 if (file == null) continue;
                 
-                JSONObject fileJson = new JSONObject();
-                fileJson.put("file_id", file.getFile_id());
-                fileJson.put("original_name", file.getOriginal_name());
-                fileJson.put("file_size", file.getFile_size());
-                fileJson.put("current_status", file.getCurrent_status().toString());
-                fileJson.put("output_format", file.getOutput_format());
-                
-                filesArray.put(fileJson);
+                filesList.add(file);
                 totalFiles++;
                 
                 if(file.getCurrent_status() == EnumStatus.FileStatus.CONVERTED) {
@@ -101,28 +89,24 @@ public class HomeServlet extends HttpServlet{
                 }
             }
             
-            jsonResponse.put("statusProgress", "SUCCESS");
-            jsonResponse.put("files", filesArray);
-            jsonResponse.put("totalFiles", totalFiles);
-            jsonResponse.put("completedFiles", completedFiles);
+            request.setAttribute("username", username);
+            request.setAttribute("files", filesList);
+            request.setAttribute("totalFiles", totalFiles);
+            request.setAttribute("completedFiles", completedFiles);
             
-            response.setStatus(HttpServletResponse.SC_OK);
+            request.getRequestDispatcher("home.jsp").forward(request, response);
             
         } catch (Exception e) {
-            jsonResponse.put("statusProgress", "FAILED");
-            jsonResponse.put("message", e.getMessage());
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-        } finally {
-            response.getWriter().write(jsonResponse.toString());
+            request.setAttribute("errorMessage", e.getMessage());
+            request.getRequestDispatcher("error.jsp").forward(request, response);
         }
     }
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        response.setContentType("application/json; charset=UTF-8");
-        request.setCharacterEncoding("UTF-8");
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) 
+            throws ServletException, IOException {
         
-        JSONObject jsonResponse = new JSONObject();
+        request.setCharacterEncoding("UTF-8");
 
         HttpSession session = request.getSession();
         String username = (String) session.getAttribute("username");
@@ -136,7 +120,6 @@ public class HomeServlet extends HttpServlet{
         } else {
             user_id = userBO.getUserByUsername(username);
         }
-
 
         try {
             Part filePart = request.getPart("file");
@@ -191,37 +174,23 @@ public class HomeServlet extends HttpServlet{
                 @SuppressWarnings("unchecked")
                 List<String> guestFile_ids = (List<String>) session.getAttribute("guestFile_ids");
                 if(guestFile_ids == null){
-                    guestFile_ids = List.of(file_id);
+                    guestFile_ids = new ArrayList<>();
                     session.setAttribute("guestFile_ids", guestFile_ids);
                 }
                 guestFile_ids.add(file_id);
             }
             
-            // Tạo phản hồi JSON
-            jsonResponse.put("statusProgress", "PROCESSING");
-            jsonResponse.put("file_id", info.getFile_id());
-            jsonResponse.put("original_name", info.getOriginal_name());
-            jsonResponse.put("saved_name", info.getSaved_name());
-            jsonResponse.put("file_size", String.format("%.2f", info.getFile_size()));
-            jsonResponse.put("input_path", inputDir);
-            jsonResponse.put("output_path", uploadPath);
-            jsonResponse.put("input_format", info.getInput_format());
-            jsonResponse.put("output_format", info.getOutput_format());
-            jsonResponse.put("current_status", info.getCurrent_status());
-            jsonResponse.put("created_at", info.getCreated_at());
-            jsonResponse.put("message", "File uploaded, conversion started!");
+            // Set attributes cho JSP
+            request.setAttribute("statusProgress", "PROCESSING");
+            request.setAttribute("fileInfo", info);
+            request.setAttribute("message", "File uploaded, conversion started!");
 
-            response.setStatus(HttpServletResponse.SC_OK);
+            request.getRequestDispatcher("upload-success.jsp").forward(request, response);
 
         } catch (Exception e) {
-            jsonResponse.put("statusProgress", "FAILED");
-            jsonResponse.put("message", e.getMessage());
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-        } finally {
-            response.getWriter().write(jsonResponse.toString());
-            response.getWriter().flush();
-
-            System.out.println(jsonResponse.toString());
+            request.setAttribute("statusProgress", "FAILED");
+            request.setAttribute("errorMessage", e.getMessage());
+            request.getRequestDispatcher("upload-error.jsp").forward(request, response);
         }
     }
 }

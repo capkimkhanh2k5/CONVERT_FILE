@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 
 import com.convertfile.bo.UserBO;
 import com.convertfile.model.User;
+import com.convertfile.service.PropertiesService;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -46,6 +47,16 @@ public class RegisterServlet extends HttpServlet {
         // Nếu OK
         request.setAttribute("successMessage", "Resigter successfully! Please login!");
         request.getRequestDispatcher("login.jsp").forward(request, response);
+    }
+
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        
+        String googleClientId = PropertiesService.getGoogleClientId();
+        request.setAttribute("googleClientId", googleClientId);
+
+        request.getRequestDispatcher("register.jsp").forward(request, response);
     }
 
     private boolean checkFormatEmail(String email) {
