@@ -92,6 +92,6 @@ public class LoginServlet extends HttpServlet {
         String googleClientId = PropertiesService.getGoogleClientId();
         request.setAttribute("googleClientId", googleClientId);
 
-        request.getRequestDispatcher("login.jsp").forward(request, response);
+        request.getRequestDispatcher("auth.jsp").forward(request, response);
     }
 }

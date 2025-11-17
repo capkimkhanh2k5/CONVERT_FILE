@@ -32,7 +32,7 @@ public class RegisterServlet extends HttpServlet {
             } else{
                 request.setAttribute("errorMessage", "Please fill in all information!");
             }
-            request.getRequestDispatcher("register.jsp").forward(request, response);
+            request.getRequestDispatcher("auth.jsp").forward(request, response);
             return;
         }
 
@@ -46,7 +46,7 @@ public class RegisterServlet extends HttpServlet {
 
         // Nếu OK
         request.setAttribute("successMessage", "Resigter successfully! Please login!");
-        request.getRequestDispatcher("login.jsp").forward(request, response);
+        request.getRequestDispatcher("auth.jsp").forward(request, response);
     }
 
     @Override
@@ -56,7 +56,7 @@ public class RegisterServlet extends HttpServlet {
         String googleClientId = PropertiesService.getGoogleClientId();
         request.setAttribute("googleClientId", googleClientId);
 
-        request.getRequestDispatcher("register.jsp").forward(request, response);
+        request.getRequestDispatcher("auth.jsp").forward(request, response);
     }
 
     private boolean checkFormatEmail(String email) {
