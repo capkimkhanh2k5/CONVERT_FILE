@@ -11,7 +11,13 @@ public class UserBO {
         this.userDAO = new UserDAO();
     }
 
-    public boolean registerUser(User user) {
+    public boolean insertUser(User user) {
+        //User login with GoogleAuthentication, set default password
+        String password = user.getPassword();
+        if(password == null || password.isEmpty()){
+            user.setPassword(passwordService.hassPassword("GoogleAuthentication2"));
+        }
+        
         return userDAO.insertUser(user);
     }
 
@@ -22,7 +28,7 @@ public class UserBO {
         return passwordService.checkPassword(password, user.getPassword());
     }
 
-    public long getUserByUsername(String username){
+    public long getUserIdByUsername(String username){
         return Long.valueOf(this.userDAO.getUser(username).getId());
     }
 
@@ -32,6 +38,14 @@ public class UserBO {
             return user.getEmail();
         }
         return null;
+    }
+
+    public static User getUserByEmail(String userEmail) {
+        return UserDAO.getUserByEmail(userEmail);
+    }
+
+    public void updateUserInfo(User user) {
+        userDAO.updateUserInfo(user);
     }
 
 }

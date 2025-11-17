@@ -67,6 +67,13 @@
             justify-content: center;
             font-size: 28px;
             color: white;
+            overflow: hidden;
+        }
+
+        .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
         .user-name {
@@ -666,7 +673,7 @@
 
                         if(userpicture != null && !userpicture.isEmpty()){
                             %>
-                                <img src="<%= userpicture %>" alt="User Avatar" class="avatar">
+                                <img src="<%= userpicture %>" alt="User Avatar">
                             <%
                         }else{
                             %>

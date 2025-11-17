@@ -42,7 +42,7 @@ public class RegisterServlet extends HttpServlet {
         user.setEmail(email);
         user.setCreated_at(LocalDateTime.now());
 
-        userBO.registerUser(user);
+        userBO.insertUser(user);
 
         // Nếu OK
         request.setAttribute("successMessage", "Resigter successfully! Please login!");

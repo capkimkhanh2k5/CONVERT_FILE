@@ -36,37 +36,39 @@ public class LoginServlet extends HttpServlet {
             return;
         }
 
+        // Xóa token 
         session.removeAttribute("csrfToken");
 
         String username = request.getParameter("username");
         String password = request.getParameter("password");
-
         String remember = request.getParameter("remember");
-        if ("on".equals(remember)) {
-            // Tạo cookie dài hạn
-            Cookie userCookie = new Cookie("rememberedUser", username);
-            userCookie.setMaxAge(30 * 24 * 60 * 60);
-            userCookie.setHttpOnly(true);
-            userCookie.setSecure(true);
-            response.addCookie(userCookie);
-        }
 
         if (username == null || username.isEmpty() || password == null || password.isEmpty()) {
-            request.setAttribute("errorMessage", "Please fill in all information!");
-            request.getRequestDispatcher("login.jsp").forward(request, response);
+            session.setAttribute("errorMessage", "Please fill in all information!");
+            response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
 
         if (userBO.checkloginUser(username, password)) {
-            request.getSession().setAttribute("username", username);
+            if ("on".equals(remember)) {
+                Cookie userCookie = new Cookie("rememberedUser", username);
+                userCookie.setMaxAge(30 * 24 * 60 * 60); // 30 ngày
+                userCookie.setHttpOnly(true);
+                userCookie.setSecure(request.isSecure());
+                response.addCookie(userCookie);
+            }
 
+            session.setAttribute("username", username);
             String userEmail = userBO.getUserEmailByUsername(username);
-            request.getSession().setAttribute("useremail", userEmail);
+            session.setAttribute("useremail", userEmail);
+            session.setMaxInactiveInterval(30 * 60); // 30 phút
 
-            request.getRequestDispatcher("home.jsp").forward(request, response);
+            session.removeAttribute("errorMessage");
+
+            response.sendRedirect(request.getContextPath() + "/home");
         } else {
-            request.setAttribute("errorMessage", "Username or password is invalid!");
-            request.getRequestDispatcher("login.jsp").forward(request, response);
+            session.setAttribute("errorMessage", "Username or password is invalid!");
+            response.sendRedirect(request.getContextPath() + "/login");
         }
     }
 
@@ -74,9 +76,17 @@ public class LoginServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        String csrfToken = UUID.randomUUID().toString();
-        
         HttpSession session = request.getSession();
+
+        //Lấy lỗi từ session và đặt vào request ---
+        String errorMessage = (String) session.getAttribute("errorMessage");
+        if (errorMessage != null) {
+            request.setAttribute("errorMessage", errorMessage);
+            session.removeAttribute("errorMessage");
+        }
+
+        // Tạo và đặt CSRF token mới cho mỗi lần tải trang login
+        String csrfToken = UUID.randomUUID().toString();
         session.setAttribute("csrfToken", csrfToken);
 
         String googleClientId = PropertiesService.getGoogleClientId();

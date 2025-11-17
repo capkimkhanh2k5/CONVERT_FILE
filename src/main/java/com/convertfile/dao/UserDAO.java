@@ -11,14 +11,15 @@ import com.convertfile.service.passwordService;
 
 public class UserDAO {
     public boolean insertUser(User user) {
-        String sql = "INSERT INTO users (username, password, email, created_at) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO users (username, password, email, picture_url, created_at) VALUES (?, ?, ?, ?, ?)";
         try (Connection conn = ConnectDB.getConnection();
             PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, user.getUsername());
             ps.setString(2, passwordService.hassPassword(user.getPassword()));
             ps.setString(3, user.getEmail());
-            ps.setTimestamp(4, Timestamp.valueOf(user.getCreated_at()));
+            ps.setString(4, user.getPicture_url());
+            ps.setTimestamp(5, Timestamp.valueOf(user.getCreated_at()));
             
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
@@ -53,7 +54,44 @@ public class UserDAO {
         user.setUsername(rs.getString("username"));
         user.setPassword(rs.getString("password"));
         user.setEmail(rs.getString("email"));
+        user.setPicture_url(rs.getString("picture_url"));
         user.setCreated_at(rs.getTimestamp("created_at").toLocalDateTime());
         return user;
+    }
+
+    public static User getUserByEmail(String userEmail) {
+        String sql = "SELECT * FROM users WHERE email = ?";
+        try (Connection conn = ConnectDB.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, userEmail);
+
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                UserDAO userDAO = new UserDAO();
+                return userDAO.mapRow(rs);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    public void updateUserInfo(User user) {
+        String sql = "UPDATE users SET username = ?, picture_url = ? WHERE user_id = ?";
+        try (Connection conn = ConnectDB.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, user.getUsername());
+            ps.setString(2, user.getPicture_url());
+            ps.setLong(3, user.getId());
+
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 }

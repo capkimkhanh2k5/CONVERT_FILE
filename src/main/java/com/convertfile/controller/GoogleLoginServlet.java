@@ -1,5 +1,7 @@
 package com.convertfile.controller;
 
+import com.convertfile.bo.UserBO;
+import com.convertfile.model.User;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.javanet.NetHttpTransport;
@@ -11,6 +13,7 @@ import jakarta.servlet.http.*;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Properties;
 
@@ -70,12 +73,12 @@ public class GoogleLoginServlet extends HttpServlet {
                 
                 // Lấy thông tin người dùng
                 String userId = payload.getSubject();
-                String email = payload.getEmail();
+                String userEmail = payload.getEmail();
                 boolean emailVerified = payload.getEmailVerified();
-                String name = (String) payload.get("name");
-                String pictureUrl = (String) payload.get("picture");
-                String givenName = (String) payload.get("given_name");
-                String familyName = (String) payload.get("family_name");
+                String userName = (String) payload.get("name");
+                String userPicture = (String) payload.get("picture");
+                String userGivenName = (String) payload.get("given_name");
+                String userFamilyName = (String) payload.get("family_name");
                 
                 // Kiểm tra email đã được xác thực
                 if (!emailVerified) {
@@ -83,18 +86,39 @@ public class GoogleLoginServlet extends HttpServlet {
                     return;
                 }
                 
-                // TODO: Kiểm tra user đã tồn tại trong database chưa
-                // TODO: Nếu chưa có thì tạo user mới
-                // TODO: Nếu có rồi thì cập nhật thông tin (nếu cần)
+                // Check User trong database
+                User user = UserBO.getUserByEmail(userEmail);
+
+                if (user == null) {
+                    user = new User();
+                    user.setEmail(userEmail);
+                    user.setUsername(userEmail);
+                    user.setPassword("");
+                    user.setPicture_url(userPicture);
+                    user.setCreated_at(LocalDateTime.now());
+
+                    UserBO userBO = new UserBO();
+                    userBO.insertUser(user);
+                }
+
+                //Cập nhật thông tin người dùng nếu cần thiết
+                if(!user.getPicture_url().equals(userPicture) || 
+                    !user.getUsername().equals(userEmail)) {
+                        user.setUsername(userEmail);
+                        user.setPicture_url(userPicture);
+
+                        UserBO userBO = new UserBO();
+                        userBO.updateUserInfo(user);
+                }
                 
                 // Tạo session cho user
                 HttpSession session = req.getSession(true);
                 session.setAttribute("userId", userId);
-                session.setAttribute("email", email);
-                session.setAttribute("name", name);
-                session.setAttribute("pictureUrl", pictureUrl);
-                session.setAttribute("givenName", givenName);
-                session.setAttribute("familyName", familyName);
+                session.setAttribute("useremail", userEmail);
+                session.setAttribute("username", userName);
+                session.setAttribute("userpicture", userPicture);
+                session.setAttribute("givenName", userGivenName);
+                session.setAttribute("familyName", userFamilyName);
                 session.setAttribute("loginMethod", "GOOGLE");
                 
                 // Set session timeout (30 phút)
@@ -105,7 +129,7 @@ public class GoogleLoginServlet extends HttpServlet {
                 resp.getWriter().write(String.format(
                     "{\"success\": true, \"message\": \"Login successful\", " +
                     "\"user\": {\"name\": \"%s\", \"email\": \"%s\"}}", 
-                    name, email
+                    userName, userEmail
                 ));
                 
             } else {
