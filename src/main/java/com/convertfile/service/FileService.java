@@ -1,7 +1,7 @@
 package com.convertfile.service;
 
-import com.convertfile.dao.FileDAO;
-import com.convertfile.model.FileInfo;
+import com.convertfile.model.bean.FileInfo;
+import com.convertfile.model.dao.FileDAO;
 
 import java.sql.SQLException;
 import java.util.List;

@@ -1,10 +1,10 @@
 package com.convertfile.worker;
 
-import com.convertfile.dao.FileDAO;
-import com.convertfile.dao.TaskQueueDAO;
-import com.convertfile.model.EnumStatus.TaskStatus;
+import com.convertfile.model.bean.TaskJob;
+import com.convertfile.model.bean.EnumStatus.TaskStatus;
+import com.convertfile.model.dao.FileDAO;
+import com.convertfile.model.dao.TaskQueueDAO;
 import com.convertfile.service.FileService;
-import com.convertfile.model.TaskJob;
 
 public class fileWorker implements Runnable{
     private final TaskQueueDAO taskDAO = new TaskQueueDAO();

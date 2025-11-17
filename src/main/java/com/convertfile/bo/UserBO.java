@@ -1,7 +1,7 @@
 package com.convertfile.bo;
 
-import com.convertfile.dao.UserDAO;
-import com.convertfile.model.User;
+import com.convertfile.model.bean.User;
+import com.convertfile.model.dao.UserDAO;
 import com.convertfile.service.passwordService;
 
 public class UserBO {

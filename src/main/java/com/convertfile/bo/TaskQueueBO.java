@@ -1,8 +1,8 @@
 package com.convertfile.bo;
 
-import com.convertfile.dao.TaskQueueDAO;
-import com.convertfile.model.TaskJob;
-import com.convertfile.model.EnumStatus.TaskStatus;
+import com.convertfile.model.bean.TaskJob;
+import com.convertfile.model.bean.EnumStatus.TaskStatus;
+import com.convertfile.model.dao.TaskQueueDAO;
 
 public class TaskQueueBO {
     private final TaskQueueDAO taskQueueDAO = new TaskQueueDAO();

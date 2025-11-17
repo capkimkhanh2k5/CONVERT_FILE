@@ -1,9 +1,9 @@
-package com.convertfile.model;
+package com.convertfile.model.bean;
 
 import java.time.LocalDateTime;
 
-import com.convertfile.model.EnumStatus.TaskStatus;
-import com.convertfile.model.EnumStatus.TaskType;
+import com.convertfile.model.bean.EnumStatus.TaskStatus;
+import com.convertfile.model.bean.EnumStatus.TaskType;
 
 
 public class TaskJob {

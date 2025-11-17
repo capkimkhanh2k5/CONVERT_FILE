@@ -19,8 +19,8 @@ import jakarta.servlet.http.Part;
 
 import com.convertfile.bo.FileBO;
 import com.convertfile.bo.UserBO;
-import com.convertfile.model.EnumStatus;
-import com.convertfile.model.FileInfo;
+import com.convertfile.model.bean.EnumStatus;
+import com.convertfile.model.bean.FileInfo;
 import com.convertfile.service.FileService;
 
 @WebServlet("/home")

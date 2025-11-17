@@ -1,7 +1,7 @@
 package com.convertfile.controller;
 
 import com.convertfile.bo.UserBO;
-import com.convertfile.model.User;
+import com.convertfile.model.bean.User;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.javanet.NetHttpTransport;

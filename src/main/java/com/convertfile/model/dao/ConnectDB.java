@@ -1,11 +1,11 @@
-package com.convertfile.dao;
+package com.convertfile.model.dao;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class ConnectDB {
-    //TODO: Chỉnh lại cho đúng khi có DB
+    
     private static final String JDBC_URL = "jdbc:mysql://localhost:3306/file_converter";
     private static final String USER = "root";
     private static final String PASSWORD = "123";
