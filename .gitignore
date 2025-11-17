@@ -1,19 +1,24 @@
-# JAVA BUILD - War files
+# ==================================
+# MAVEN / GRADLE / JAVA BUILDS
+# ==================================
+/target/
+/build/
+.settings/
+.project
+.classpath
+*.iml
+*.ipr
+*.iws
+/out/
 
-*.war
-
-
-# macOS
-.DS_Store
-.AppleDouble
-.LSOverride
-
-
+# ==================================
 # SENSITIVE DATA / SECRETS
+# ==================================
 # Properties files với credentials
 application.properties
 config.properties
 database.properties
+src/main/resources/application.properties
 
 # JSON credentials (Google OAuth, Firebase, etc.)
 *-credentials.json
@@ -30,3 +35,17 @@ src/main/java/com/convertfile/model/*.json
 *.pem
 *.key
 id_rsa
+
+# ==================================
+# JAVA BUILD - War/Jar files
+# ==================================
+*.war
+*.jar
+*.ear
+
+# ==================================
+# macOS
+# ==================================
+.DS_Store
+.AppleDouble
+.LSOverride

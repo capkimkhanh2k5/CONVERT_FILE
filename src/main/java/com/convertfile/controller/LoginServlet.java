@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.UUID;
 
 import com.convertfile.bo.UserBO;
+import com.convertfile.service.PropertiesService;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -77,6 +78,9 @@ public class LoginServlet extends HttpServlet {
         
         HttpSession session = request.getSession();
         session.setAttribute("csrfToken", csrfToken);
+
+        String googleClientId = PropertiesService.getGoogleClientId();
+        request.setAttribute("googleClientId", googleClientId);
 
         request.getRequestDispatcher("login.jsp").forward(request, response);
     }

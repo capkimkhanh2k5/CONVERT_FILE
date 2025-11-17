@@ -133,7 +133,12 @@ public class GoogleLoginServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) 
             throws ServletException, IOException {
-        resp.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED, 
-            "GET method not supported. Use POST.");
+    
+        Properties props = new Properties();
+        props.load(getServletContext().getResourceAsStream("/WEB-INF/classes/application.properties"));
+        
+        req.setAttribute("googleClientId", props.getProperty("google.client.id"));
+        
+        req.getRequestDispatcher("/WEB-INF/views/login.jsp").forward(req, resp);
     }
 }
