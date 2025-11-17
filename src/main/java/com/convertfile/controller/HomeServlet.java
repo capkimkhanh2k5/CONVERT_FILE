@@ -61,7 +61,7 @@ public class HomeServlet extends HttpServlet{
             String[] file_ids;
 
             if(username != null){
-                long user_id = userBO.getUserByUsername(username);
+                long user_id = userBO.getUserIdByUsername(username);
                 file_ids = fileBO.getAllFile_idsByUser_id(user_id);
             } else {
                 @SuppressWarnings("unchecked")
@@ -118,7 +118,7 @@ public class HomeServlet extends HttpServlet{
             user_id = 0;
             isGuest = true;
         } else {
-            user_id = userBO.getUserByUsername(username);
+            user_id = userBO.getUserIdByUsername(username);
         }
 
         try {

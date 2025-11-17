@@ -11,6 +11,7 @@ CREATE TABLE IF NOT EXISTS `users` (
     `username` VARCHAR(50) NOT NULL UNIQUE,
     `password` CHAR(60) NOT NULL,
     `email` VARCHAR(100) NOT NULL UNIQUE,
+    `picture_url` VARCHAR(255) NULL,
     `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
