@@ -1,7 +1,7 @@
 package com.convertfile.bo;
 
-import com.convertfile.dao.FileDAO;
-import com.convertfile.model.FileInfo;
+import com.convertfile.model.bean.FileInfo;
+import com.convertfile.model.dao.FileDAO;
 
 public class FileBO {
     private final FileDAO fileDAO = new FileDAO();

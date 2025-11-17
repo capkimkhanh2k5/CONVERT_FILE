@@ -1,4 +1,4 @@
-package com.convertfile.dao;
+package com.convertfile.model.dao;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -6,9 +6,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 
-import com.convertfile.model.EnumStatus.TaskStatus;
-import com.convertfile.model.EnumStatus.TaskType;
-import com.convertfile.model.TaskJob;
+import com.convertfile.model.bean.TaskJob;
+import com.convertfile.model.bean.EnumStatus.TaskStatus;
+import com.convertfile.model.bean.EnumStatus.TaskType;
 
 public class TaskQueueDAO {
     public boolean insertTask(TaskJob job) {

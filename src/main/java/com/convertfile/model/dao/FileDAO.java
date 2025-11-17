@@ -1,4 +1,4 @@
-package com.convertfile.dao;
+package com.convertfile.model.dao;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -9,8 +9,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.convertfile.model.EnumStatus.FileStatus;
-import com.convertfile.model.FileInfo;
+import com.convertfile.model.bean.FileInfo;
+import com.convertfile.model.bean.EnumStatus.FileStatus;
 
 public class FileDAO {
     public boolean insertFile(FileInfo file) {

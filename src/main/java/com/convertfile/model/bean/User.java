@@ -1,4 +1,4 @@
-package com.convertfile.model;
+package com.convertfile.model.bean;
 
 import java.time.LocalDateTime;
 

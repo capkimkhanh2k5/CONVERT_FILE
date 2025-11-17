@@ -1,8 +1,8 @@
-package com.convertfile.model;
+package com.convertfile.model.bean;
 
 import java.time.LocalDateTime;
 
-import com.convertfile.model.EnumStatus.FileStatus;
+import com.convertfile.model.bean.EnumStatus.FileStatus;
 
 public class FileInfo {
     private String file_id;

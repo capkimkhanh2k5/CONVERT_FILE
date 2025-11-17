@@ -1,4 +1,4 @@
-package com.convertfile.dao;
+package com.convertfile.model.dao;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -6,7 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 
-import com.convertfile.model.User;
+import com.convertfile.model.bean.User;
 import com.convertfile.service.passwordService;
 
 public class UserDAO {

@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 
 import com.convertfile.bo.UserBO;
-import com.convertfile.model.User;
+import com.convertfile.model.bean.User;
 import com.convertfile.service.PropertiesService;
 
 import jakarta.servlet.ServletException;
