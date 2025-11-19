@@ -2,85 +2,95 @@ package com.convertfile.model.dao;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 public class JobDAO {
 
-    public static boolean createNewJob(String originalName, String savedName, String fullPath, String taskType) {
-        // 1. Khai báo kết nối ở ngoài (để null trước)
+    // 1. Hàm tạo Job mới (NHẬN 5 THAM SỐ - CÓ USERID)
+    public static boolean createNewJob(String originalName, String savedName, String fullPath, String taskType, long userId) {
         Connection conn = null;
-        
+        // Tạo UUID ngẫu nhiên cho file
         String fileId = UUID.randomUUID().toString(); 
-        String sqlFile = "INSERT INTO files (file_id, original_name, saved_name, file_size, input_path, input_format) VALUES (?, ?, ?, ?, ?, ?)";
+
+        String sqlFile = "INSERT INTO files (file_id, original_name, saved_name, file_size, input_path, input_format, user_id) VALUES (?, ?, ?, ?, ?, ?, ?)";
         String sqlTask = "INSERT INTO tasks (file_id, task_type, status, progress_percent) VALUES (?, ?, 'WAITING', 0)";
 
         try {
-            // 2. --- SỬA LỖI TẠI ĐÂY ---
-            // Đưa dòng này vào trong TRY để bắt lỗi SQLException
             conn = ConnectDB.getConnection();
-            
-            // Nếu không kết nối được thì dừng luôn
-            if (conn == null) {
-                System.out.println("❌ Lỗi: Không thể kết nối Database trong JobDAO");
-                return false;
-            }
+            if (conn == null) return false;
 
-            // 3. Tắt chế độ tự lưu
             conn.setAutoCommit(false);
 
-            // 4. Thêm vào bảng FILES
+            // Thêm vào bảng FILES
             PreparedStatement psFile = conn.prepareStatement(sqlFile);
             psFile.setString(1, fileId);
             psFile.setString(2, originalName);
             psFile.setString(3, savedName);
-            psFile.setLong(4, 1024); 
+            psFile.setLong(4, 1024); // Tạm để size cố định
             psFile.setString(5, fullPath);
-            psFile.setString(6, "docx"); 
+            psFile.setString(6, "docx"); // Tạm để format
+            
+            // Quan trọng: Xử lý User ID
+            if (userId > 0) {
+                psFile.setLong(7, userId);
+            } else {
+                psFile.setNull(7, java.sql.Types.BIGINT);
+            }
+            
             psFile.executeUpdate();
 
-            // 5. Thêm vào bảng TASKS
+            // Thêm vào bảng TASKS
             PreparedStatement psTask = conn.prepareStatement(sqlTask);
             psTask.setString(1, fileId);
             psTask.setString(2, taskType);
             psTask.executeUpdate();
 
-            // 6. Chốt đơn (Commit)
             conn.commit();
-            System.out.println("✅ Đã lưu Job vào Database: " + originalName);
             return true;
-
         } catch (Exception e) {
             e.printStackTrace();
-            try { 
-                if (conn != null) conn.rollback(); // Nếu lỗi thì hoàn tác
-            } catch (Exception ex) {} 
+            try { if(conn!=null) conn.rollback(); } catch (Exception ex) {}
             return false;
         } finally {
-             // Đóng kết nối (Optional nhưng nên làm)
-             try { if (conn != null) conn.close(); } catch (Exception ex) {}
+            try { if(conn!=null) conn.close(); } catch (Exception e) {}
         }
     }
 
-    // Hàm lấy danh sách tất cả các Job để hiển thị ra Web
-    public static java.util.List<java.util.Map<String, Object>> getAllJobs() {
-        java.util.List<java.util.Map<String, Object>> list = new java.util.ArrayList<>();
-        Connection conn = ConnectDB.getConnection();
+    // 2. Hàm lấy danh sách Job (NHẬN 1 THAM SỐ USERID)
+    public static List<Map<String, Object>> getAllJobs(long userId) {
+        List<Map<String, Object>> list = new ArrayList<>();
+        Connection conn = null;
         try {
-            String sql = "SELECT * FROM tasks JOIN files ON tasks.file_id = files.file_id ORDER BY tasks.created_at DESC";
+            conn = ConnectDB.getConnection();
+            if (conn == null) return list;
+
+            // Lọc theo User ID (hoặc lấy file của khách vãng lai nếu userId = 0)
+            String sql = "SELECT * FROM tasks t JOIN files f ON t.file_id = f.file_id WHERE f.user_id " + (userId > 0 ? "= ?" : "IS NULL") + " ORDER BY t.created_at DESC";
+            
             PreparedStatement ps = conn.prepareStatement(sql);
-            java.sql.ResultSet rs = ps.executeQuery();
+            if (userId > 0) {
+                ps.setLong(1, userId);
+            }
+            
+            ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
-                java.util.Map<String, Object> map = new java.util.HashMap<>();
+                Map<String, Object> map = new HashMap<>();
                 map.put("name", rs.getString("original_name"));
                 map.put("type", rs.getString("task_type"));
                 map.put("status", rs.getString("status"));
                 map.put("progress", rs.getInt("progress_percent"));
                 list.add(map);
             }
-            conn.close();
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+             try { if(conn!=null) conn.close(); } catch (Exception e) {}
         }
         return list;
     }

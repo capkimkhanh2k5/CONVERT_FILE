@@ -47,8 +47,17 @@ public class UploadServlet extends HttpServlet {
                 // Lưu vật lý
                 part.write(fullPath); 
 
+                // Lấy user_id từ Session (Do LoginServlet đã lưu)
+                jakarta.servlet.http.HttpSession session = request.getSession();
+                Object userIdObj = session.getAttribute("userId");
+                
+                long userId = 0; // Mặc định là Guest
+                if (userIdObj != null) {
+                    userId = (Long) userIdObj;
+                }
+
                 // Lưu vào Database
-                com.convertfile.model.dao.JobDAO.createNewJob(fileName, savedName, fullPath, taskType);
+                com.convertfile.model.dao.JobDAO.createNewJob(fileName, savedName, fullPath, taskType, userId);
 
                 // ===> ĐÂY LÀ CHỖ ĐÚNG ĐỂ CHUYỂN TRANG <===
                 // Sau khi lưu xong, quay về trang home.jsp

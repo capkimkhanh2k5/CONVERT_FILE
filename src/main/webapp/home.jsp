@@ -6,8 +6,16 @@
 
 <%
     // --- LOGIC THÔNG MINH: CHỈ RELOAD KHI CẦN THIẾT ---
+    // Lấy userId từ Session
+    Object uidObj = session.getAttribute("userId");
+    long currentUserId = 0;
+    if (uidObj != null) {
+        currentUserId = (Long) uidObj;
+    }
+
     boolean needReload = false;
-    List<Map<String, Object>> listJobs = JobDAO.getAllJobs(); // Lấy dữ liệu ngay tại đây
+    // Truyền ID vào hàm getAllJobs
+    List<Map<String, Object>> listJobs = JobDAO.getAllJobs(currentUserId); // Lấy dữ liệu ngay tại đây
     
     if (listJobs != null) {
         for (Map<String, Object> job : listJobs) {
@@ -842,7 +850,15 @@
                                 </div>
                             </div>
                             <span class="<%= badgeClass %>"><%= status %> <%= progress %>%</span>
-                            <div class="download-icon"><%= dlIcon %></div>
+                            <div class="download-icon">
+                                <% if(status.equals("COMPLETED")) { %>
+                                    <a href="download?file=<%= job.get("name") %>" class="download-icon" title="Download" style="text-decoration: none; color: inherit;">
+                                        ↓
+                                    </a>
+                                <% } else { %>
+                                    <div class="download-icon" title="Processing">...</div>
+                                <% } %>
+                            </div>
                         </div>
                 <%      }
                     } else { %>

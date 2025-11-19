@@ -59,12 +59,17 @@ public class LoginServlet extends HttpServlet {
             }
 
             session.setAttribute("username", username);
+
+            // --- LẤY USER ID ---
+            com.convertfile.model.dao.UserDAO userDAO = new com.convertfile.model.dao.UserDAO();
+            long userId = userDAO.getUserIdByUsername(username);
+            session.setAttribute("userId", userId); // Lưu ID vào session (QUAN TRỌNG)
+
             String userEmail = userBO.getUserEmailByUsername(username);
             session.setAttribute("useremail", userEmail);
             session.setMaxInactiveInterval(30 * 60); // 30 phút
 
             session.removeAttribute("errorMessage");
-
             response.sendRedirect(request.getContextPath() + "/home");
         } else {
             session.setAttribute("errorMessage", "Username or password is invalid!");

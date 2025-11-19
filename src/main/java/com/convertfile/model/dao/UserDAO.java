@@ -127,4 +127,22 @@ public class UserDAO {
             return false;
         }
     }
+
+    // Hàm lấy ID của user dựa trên username (Để dùng khi Upload)
+    public long getUserIdByUsername(String username) {
+        String sql = "SELECT user_id FROM users WHERE username = ?";
+        try (Connection conn = ConnectDB.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            
+            ps.setString(1, username);
+            ResultSet rs = ps.executeQuery();
+            
+            if (rs.next()) {
+                return rs.getLong("user_id");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0; // Không tìm thấy hoặc lỗi
+    }
 }
