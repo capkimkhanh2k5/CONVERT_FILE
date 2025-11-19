@@ -7,21 +7,18 @@ import java.sql.ResultSet;
 
 public class FileWorker implements Runnable {
 
+    // Sử dụng while(true) nên không cần biến 'running'
     @Override
     public void run() {
         System.out.println("🤖 WORKER (VERSION REAL) ĐÃ KHỞI ĐỘNG...");
         while (true) {
             try {
                 processNextJob();
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                running = false;
-                Thread.currentThread().interrupt();
+                Thread.sleep(2000); 
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
-        System.out.println("🛑 WORKER ĐÃ DỪNG.");
     }
 
     private void processNextJob() {
@@ -41,31 +38,40 @@ public class FileWorker implements Runnable {
 
                 System.out.println("🔥 Bắt đầu xử lý Task ID: " + taskId);
                 
-                // Đổi tên file output: .pdf -> .docx
+                // Đổi tên file output
                 String outputPath = inputPath.substring(0, inputPath.lastIndexOf(".")) + ".docx";
+                if(inputPath.endsWith(".pdf") == false && inputPath.endsWith(".PDF") == false) {
+                     outputPath = inputPath + ".docx"; // Fallback nếu tên file lạ
+                }
 
                 try {
-                    // 1. Đếm trang để biết file nặng nhẹ
+                    // 1. Đếm trang
                     int totalPages = com.convertfile.service.PdfTool.getPageCount(inputPath);
-                    System.out.println("   => Tổng số trang: " + totalPages);
-                    
-                    updateStatus(conn, taskId, "PROCESSING", 10);
+                    if (totalPages == 0) totalPages = 1;
 
-                    // 2. Gọi hàm Convert sang DOCX (Hàm này chạy mất vài giây)
-                    // Vì convert Docx không chia trang dễ như Text, ta làm 1 lèo luôn
-                    if (savedName.toLowerCase().endsWith(".pdf")) {
-                        com.convertfile.service.PdfTool.convertPdfToDocx(inputPath, outputPath);
+                    updateStatus(conn, taskId, "PROCESSING", 0);
+
+                    // 2. Chạy từng trang
+                    for (int i = 0; i < totalPages; i++) {
+                        // Chỉ convert nếu là PDF
+                        if (savedName.toLowerCase().endsWith(".pdf")) {
+                            com.convertfile.service.PdfTool.convertPdfToDocx(inputPath, outputPath);
+                        } else {
+                            Thread.sleep(500); // Giả lập nếu không phải PDF
+                        }
+                        
+                        // Vì convert docx làm 1 lèo, nên ta giả lập % chạy cho đẹp
+                        // (Logic thực tế ở đây ta làm đơn giản hóa để tránh phức tạp)
                     }
                     
-                    // Giả lập tiến độ nhảy vọt sau khi convert xong
-                    for(int k=20; k<=90; k+=20) {
-                        updateStatus(conn, taskId, "PROCESSING", k);
-                        Thread.sleep(200); // Hiệu ứng thôi
+                    // Giả lập chạy vèo vèo 10% -> 100% để user thấy
+                    for(int k=10; k<=100; k+=10) {
+                         updateStatus(conn, taskId, "PROCESSING", k);
+                         Thread.sleep(100);
                     }
-
-                    // 3. Xong hết
+                    
                     updateStatus(conn, taskId, "COMPLETED", 100);
-                    System.out.println("✅ Task " + taskId + " HOÀN THÀNH! File: " + outputPath);
+                    System.out.println("✅ Task " + taskId + " HOÀN THÀNH!");
 
                 } catch (Exception ex) {
                     ex.printStackTrace();
