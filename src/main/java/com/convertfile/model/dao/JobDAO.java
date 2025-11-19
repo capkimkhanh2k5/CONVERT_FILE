@@ -11,55 +11,75 @@ import java.util.UUID;
 
 public class JobDAO {
 
-    // 1. Hàm tạo Job mới (NHẬN 5 THAM SỐ - CÓ USERID)
-    public static boolean createNewJob(String originalName, String savedName, String fullPath, String taskType, long userId) {
-        Connection conn = null;
-        // Tạo UUID ngẫu nhiên cho file
-        String fileId = UUID.randomUUID().toString(); 
+    // 1. Hàm tạo Job mới
+    public static boolean createNewJob(String originalName, String savedName, String cloudinaryUrl, 
+                                    String taskType, String publicId, long fileSize, long userId) {
+    Connection conn = null;
+    // Tạo UUID ngẫu nhiên cho file
+    String fileId = UUID.randomUUID().toString(); 
 
-        String sqlFile = "INSERT INTO files (file_id, original_name, saved_name, file_size, input_path, input_format, user_id) VALUES (?, ?, ?, ?, ?, ?, ?)";
-        String sqlTask = "INSERT INTO tasks (file_id, task_type, status, progress_percent) VALUES (?, ?, 'WAITING', 0)";
+    String sqlFile = "INSERT INTO files (file_id, user_id, original_name, saved_name, file_size, " +
+                    "file_path, public_id, input_format, current_status) " +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'UPLOADED')";
+    
+    String sqlTask = "INSERT INTO tasks (file_id, task_type, status, progress_percent) " +
+                    "VALUES (?, ?, 'WAITING', 0)";
 
-        try {
-            conn = ConnectDB.getConnection();
-            if (conn == null) return false;
+    try {
+        conn = ConnectDB.getConnection();
+        if (conn == null) return false;
 
-            conn.setAutoCommit(false);
+        conn.setAutoCommit(false);
 
-            // Thêm vào bảng FILES
-            PreparedStatement psFile = conn.prepareStatement(sqlFile);
-            psFile.setString(1, fileId);
-            psFile.setString(2, originalName);
-            psFile.setString(3, savedName);
-            psFile.setLong(4, 1024); // Tạm để size cố định
-            psFile.setString(5, fullPath);
-            psFile.setString(6, "docx"); // Tạm để format
-            
-            // Quan trọng: Xử lý User ID
-            if (userId > 0) {
-                psFile.setLong(7, userId);
-            } else {
-                psFile.setNull(7, java.sql.Types.BIGINT);
-            }
-            
-            psFile.executeUpdate();
+        // Thêm vào bảng FILES
+        PreparedStatement psFile = conn.prepareStatement(sqlFile);
+        psFile.setString(1, fileId);
+        
+        // Xử lý User ID
+        if (userId > 0) {
+            psFile.setLong(2, userId);
+        } else {
+            psFile.setNull(2, java.sql.Types.BIGINT);
+        }
+        
+        psFile.setString(3, originalName);
+        psFile.setString(4, savedName);
+        psFile.setLong(5, fileSize);
+        psFile.setString(6, cloudinaryUrl);    // URL của Cloudinary
+        psFile.setString(7, publicId);         // Public ID từ Cloudinary
+        
+        // Lấy định dạng file từ tên file (ví dụ: file.docx -> docx)
+        String inputFormat = originalName.substring(originalName.lastIndexOf(".") + 1).toLowerCase();
+        psFile.setString(8, inputFormat);
+        
+        psFile.executeUpdate();
 
-            // Thêm vào bảng TASKS
-            PreparedStatement psTask = conn.prepareStatement(sqlTask);
-            psTask.setString(1, fileId);
-            psTask.setString(2, taskType);
-            psTask.executeUpdate();
+        // Thêm vào bảng TASKS
+        PreparedStatement psTask = conn.prepareStatement(sqlTask);
+        psTask.setString(1, fileId);
+        psTask.setString(2, taskType);
+        psTask.executeUpdate();
 
-            conn.commit();
-            return true;
+        conn.commit();
+        return true;
+        
+    } catch (Exception e) {
+        e.printStackTrace();
+        try { 
+            if(conn != null) conn.rollback(); 
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return false;
+        
+    } finally {
+        try { 
+            if(conn != null) conn.close(); 
         } catch (Exception e) {
             e.printStackTrace();
-            try { if(conn!=null) conn.rollback(); } catch (Exception ex) {}
-            return false;
-        } finally {
-            try { if(conn!=null) conn.close(); } catch (Exception e) {}
         }
     }
+}
 
     // 2. Hàm lấy danh sách Job (NHẬN 1 THAM SỐ USERID)
     public static List<Map<String, Object>> getAllJobs(long userId) {
@@ -90,7 +110,7 @@ public class JobDAO {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-             try { if(conn!=null) conn.close(); } catch (Exception e) {}
+            try { if(conn!=null) conn.close(); } catch (Exception e) {}
         }
         return list;
     }

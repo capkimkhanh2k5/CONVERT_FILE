@@ -1,6 +1,7 @@
 package com.convertfile.worker;
 
 import com.convertfile.model.dao.ConnectDB;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -20,7 +21,7 @@ public class FileWorker implements Runnable {
             }
         }
     }
-
+    
     private void processNextJob() {
         Connection conn = null;
         try {
@@ -66,8 +67,8 @@ public class FileWorker implements Runnable {
                     
                     // Giả lập chạy vèo vèo 10% -> 100% để user thấy
                     for(int k=10; k<=100; k+=10) {
-                         updateStatus(conn, taskId, "PROCESSING", k);
-                         Thread.sleep(100);
+                        updateStatus(conn, taskId, "PROCESSING", k);
+                        Thread.sleep(100);
                     }
                     
                     updateStatus(conn, taskId, "COMPLETED", 100);

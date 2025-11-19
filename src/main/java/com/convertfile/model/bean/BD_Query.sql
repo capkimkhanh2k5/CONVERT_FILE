@@ -30,7 +30,8 @@ CREATE TABLE IF NOT EXISTS `files` (
     `original_name` VARCHAR(255) NOT NULL,
     `saved_name` VARCHAR(255) NOT NULL UNIQUE,
     `file_size` BIGINT UNSIGNED NOT NULL,
-    `file_path` VARCHAR(1024) NULL,
+    `file_path` VARCHAR(1024) NULL COMMENT 'Cloudinary secure_url',
+    `public_id` VARCHAR(255) NULL COMMENT 'Cloudinary public_id for deletion',
     `input_format` VARCHAR(20) NOT NULL,
     `output_format` VARCHAR(20) NULL,
     `current_status` ENUM('UPLOADED', 'PROCESSING', 'CONVERTED', 'FAILED', 'DELETED') NOT NULL DEFAULT 'UPLOADED',
@@ -42,6 +43,7 @@ CREATE TABLE IF NOT EXISTS `files` (
 
 CREATE INDEX `idx_user_id` ON `files` (`user_id`);
 CREATE INDEX `idx_status_created_at` ON `files` (`current_status`, `created_at`);
+CREATE INDEX `idx_public_id` ON `files` (`public_id`);
 
 -- 5. Bảng tasks 
 CREATE TABLE IF NOT EXISTS `tasks` (

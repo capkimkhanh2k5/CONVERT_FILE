@@ -3,14 +3,20 @@ package com.convertfile.model.dao;
 import java.sql.Connection;
 import java.sql.DriverManager;
 
+import com.convertfile.service.PropertiesService;
+
 public class ConnectDB {
-    // Cấu hình XAMPP (User: root, Pass: rỗng)
-    private static final String DB_URL = "jdbc:mysql://localhost:3306/file_converter?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true";
-    private static final String USER = "root";
-    private static final String PASS = ""; 
+    
+    private static String DB_URL;
+    private static String USER;
+    private static String PASS; 
 
     public static Connection getConnection() {
         try {
+            DB_URL = PropertiesService.getDatabaseUrl();
+            USER = PropertiesService.getDatabaseUsername();
+            PASS = PropertiesService.getDatabasePassword();
+
             // 1. Nạp Driver thủ công (Để Worker Thread nhìn thấy)
             Class.forName("com.mysql.cj.jdbc.Driver");
             
