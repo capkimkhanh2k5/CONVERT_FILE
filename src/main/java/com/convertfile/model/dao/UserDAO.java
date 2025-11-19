@@ -30,12 +30,24 @@ public class UserDAO {
 
     public User getUser(String username) {
         String sql = "SELECT * FROM users WHERE username = ?";
-        try (Connection conn = ConnectDB.getConnection();
-            PreparedStatement ps = conn.prepareStatement(sql)) {
+        
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
 
+        try {
+            conn = ConnectDB.getConnection();
+            
+            // --- THÊM ĐOẠN NÀY ĐỂ TRÁNH LỖI 500 ---
+            if (conn == null) {
+                System.out.println("❌ Lỗi: Không kết nối được Database trong UserDAO!");
+                return null;
+            }
+            // -------------------------------------
+
+            ps = conn.prepareStatement(sql);
             ps.setString(1, username);
-
-            ResultSet rs = ps.executeQuery();
+            rs = ps.executeQuery();
 
             if (rs.next()) {
                 return mapRow(rs);
@@ -43,6 +55,11 @@ public class UserDAO {
 
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            // Đóng kết nối thủ công cho an toàn
+            try { if (rs != null) rs.close(); } catch (Exception e) {}
+            try { if (ps != null) ps.close(); } catch (Exception e) {}
+            try { if (conn != null) conn.close(); } catch (Exception e) {}
         }
 
         return null;
@@ -126,5 +143,23 @@ public class UserDAO {
             e.printStackTrace();
             return false;
         }
+    }
+
+    // Hàm lấy ID của user dựa trên username (Để dùng khi Upload)
+    public long getUserIdByUsername(String username) {
+        String sql = "SELECT user_id FROM users WHERE username = ?";
+        try (Connection conn = ConnectDB.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            
+            ps.setString(1, username);
+            ResultSet rs = ps.executeQuery();
+            
+            if (rs.next()) {
+                return rs.getLong("user_id");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0; // Không tìm thấy hoặc lỗi
     }
 }

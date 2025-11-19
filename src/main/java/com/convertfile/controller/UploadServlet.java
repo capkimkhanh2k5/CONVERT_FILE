@@ -33,8 +33,33 @@ public class UploadServlet extends HttpServlet {
             String taskType = request.getParameter("taskType"); 
             String fileName = FileService.extractFileName(part);
             
-            // 2. Kiểm tra file
-            if (fileName == null || fileName.isEmpty()) {
+            // 3. Xử lý lưu file
+            if (fileName != null && !fileName.isEmpty()) {
+                // Đổi tên file để tránh trùng
+                String savedName = System.currentTimeMillis() + "_" + fileName;
+                String fullPath = SAVE_DIR + File.separator + savedName;
+                
+                // Lưu vật lý
+                part.write(fullPath); 
+
+                // Lấy user_id từ Session (Do LoginServlet đã lưu)
+                jakarta.servlet.http.HttpSession session = request.getSession();
+                Object userIdObj = session.getAttribute("userId");
+                
+                long userId = 0; // Mặc định là Guest
+                if (userIdObj != null) {
+                    userId = (Long) userIdObj;
+                }
+
+                // Lưu vào Database
+                com.convertfile.model.dao.JobDAO.createNewJob(fileName, savedName, fullPath, taskType, userId);
+
+                // ===> ĐÂY LÀ CHỖ ĐÚNG ĐỂ CHUYỂN TRANG <===
+                // Sau khi lưu xong, quay về trang home.jsp
+                response.sendRedirect(request.getContextPath() + "/home.jsp");
+                
+            } else {
+                // Nếu không có file thì báo lỗi
                 response.setContentType("text/html;charset=UTF-8");
                 response.getWriter().println("<h3>❌ Lỗi: Bạn chưa chọn file!</h3>");
                 return;

@@ -6,6 +6,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -16,13 +17,18 @@ public class JobListServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
         
-        // 1. Gọi DAO lấy dữ liệu
-        List<Map<String, Object>> jobList = JobDAO.getAllJobs();
+        // 1. Lấy UserID từ Session
+        HttpSession session = request.getSession();
+        Object userIdObj = session.getAttribute("userId");
+        long userId = 0;
+        if (userIdObj != null) {
+            userId = (Long) userIdObj;
+        }
+
+        // 2. Gọi hàm DAO (Đã sửa có tham số)
+        List<Map<String, Object>> jobList = JobDAO.getAllJobs(userId);
         
-        // 2. Đẩy dữ liệu sang JSP
         request.setAttribute("LIST_JOB", jobList);
-        
-        // 3. Chuyển hướng về trang giao diện
         request.getRequestDispatcher("jobs.jsp").forward(request, response);
     }
 }
