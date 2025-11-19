@@ -667,6 +667,98 @@
 
         .tool-entry .tool-action { margin-left: 8px; }
 
+        /* Danh sách file đã chọn trước khi upload */
+        .selected-files-container {
+            margin-top: 24px;
+            border-radius: 12px;
+            background: #f7fafc;
+            padding: 16px 20px;
+            border: 1px dashed #e2e8f0;
+        }
+
+        .selected-files-container.empty {
+            display: none;
+        }
+
+        .selected-file-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 10px 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .selected-file-row:last-child {
+            border-bottom: none;
+        }
+
+        .selected-file-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .selected-file-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: #2d3748;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .selected-file-size {
+            font-size: 12px;
+            color: #718096;
+            margin-top: 2px;
+        }
+
+        .selected-file-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .selected-file-select {
+            padding: 6px 8px;
+            font-size: 12px;
+            border-radius: 6px;
+            border: 1px solid #cbd5e0;
+            background: #ffffff;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .selected-file-select:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 1px rgba(102,126,234,0.4);
+        }
+
+        .selected-file-remove {
+            width: 28px;
+            height: 28px;
+            border-radius: 999px;
+            border: none;
+            background: #fed7d7;
+            color: #c53030;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s ease;
+        }
+
+        .selected-file-remove:hover {
+            background: #feb2b2;
+        }
+
+        /* Drag over effect dùng chung với upload-area */
+        .upload-area.dragover {
+            border-color: #667eea;
+            background: #eef2ff;
+            border-style: solid;
+        }
 
         @media (max-width: 1200px) {
             .app-container {
@@ -795,26 +887,44 @@
             <div class="header">
                 <h1 class="page-title">PDF to Word</h1>
                 <a href="<c:url value='/index.jsp'/>" class="logo">
-                    <span>Convert</span><span">File</span>
+                    <span>Convert</span><span>File</span>
                 </a>
             </div>
 
             <!-- Upload Area -->
             <div class="upload-container">
-                <form id="realUploadForm" action="upload" method="post" enctype="multipart/form-data">
-                    <div class="upload-area" id="uploadArea">
-                        <div class="upload-icon">☁️</div>
-                        <div class="upload-text">Drag your files here, file size less than 15 MB or</div>
-                        <div class="upload-hint">Supports PDF, DOCX</div>
-                        
-                        <button type="button" class="browse-btn" onclick="document.getElementById('fileInput').click()">Browse File</button>
-                        
-                        <input type="file" name="file" id="fileInput" style="display: none;" 
-                            onchange="document.getElementById('realUploadForm').submit()">
-                        
-                        <input type="hidden" name="taskType" value="PDF_TO_DOCX">
-                    </div>
-                </form>
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-icon">☁️</div>
+                    <div class="upload-text">Drag your files here or click to select</div>
+                    <div class="upload-hint">Supports PDF, DOCX — up to 15 MB/file</div>
+
+                    <button type="button" class="browse-btn" id="browseBtn">
+                        Browse Files
+                    </button>
+
+                    <!-- input thật, cho phép chọn nhiều file -->
+                    <input type="file"
+                        id="fileInput"
+                        name="file"  <%-- tên "file" để UploadServlet.getPart("file") hoạt động --%>
+                        multiple
+                        accept=".pdf,.doc,.docx"
+                        style="display:none;">
+                </div>
+
+                <!-- Danh sách file đã chọn + dropdown per file -->
+                <div id="selectedFilesContainer" class="selected-files-container empty">
+                    <!-- JS sẽ render từng file vào đây -->
+                </div>
+
+                <!-- Nút gửi tất cả lên server -->
+                <div style="margin-top: 16px; text-align: right;">
+                    <button type="button"
+                            class="browse-btn"
+                            id="uploadAllBtn"
+                            disabled>
+                        Convert All
+                    </button>
+                </div>
             </div>
 
             <!-- Converted Files -->
@@ -942,41 +1052,223 @@
     </div>
 
     <script>
+        // --- Multi-file upload + dropdown per file ---
         const uploadArea = document.getElementById('uploadArea');
         const fileInput = document.getElementById('fileInput');
+        const browseBtn = document.getElementById('browseBtn');
+        const selectedFilesContainer = document.getElementById('selectedFilesContainer');
+        const uploadAllBtn = document.getElementById('uploadAllBtn');
 
-        // Drag and drop functionality
-        uploadArea.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            uploadArea.classList.add('dragover');
-        });
+        // URL /upload (phù hợp với @WebServlet("/upload"))
+        const uploadUrl = '<c:url value="/upload"/>';
 
-        uploadArea.addEventListener('dragleave', () => {
-            uploadArea.classList.remove('dragover');
-        });
+        // Mảng lưu các file đã chọn + taskType tương ứng
+        let selectedFiles = [];
 
-        uploadArea.addEventListener('drop', (e) => {
-            e.preventDefault();
-            uploadArea.classList.remove('dragover');
-            const files = e.dataTransfer.files;
-            handleFiles(files);
-        });
-
-        uploadArea.addEventListener('click', (e) => {
-            if (e.target.tagName !== 'BUTTON') {
+        // Click Browse Files
+        if (browseBtn && fileInput) {
+            browseBtn.addEventListener('click', () => {
                 fileInput.click();
-            }
-        });
+            });
 
-        fileInput.addEventListener('change', (e) => {
-            handleFiles(e.target.files);
-        });
+            fileInput.addEventListener('change', (e) => {
+                addFiles(e.target.files);
+                fileInput.value = ''; // reset để chọn lại cùng file nếu muốn
+            });
+        }
 
-        function handleFiles(files) {
-            if (files.length > 0) {
-                console.log('Files selected:', files);
-                // Add your file handling logic here
+        // Drag & Drop
+        if (uploadArea) {
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadArea.classList.add('dragover');
+            });
+
+            uploadArea.addEventListener('dragleave', (e) => {
+                e.preventDefault();
+                uploadArea.classList.remove('dragover');
+            });
+
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadArea.classList.remove('dragover');
+                if (e.dataTransfer && e.dataTransfer.files) {
+                    addFiles(e.dataTransfer.files);
+                }
+            });
+
+            // Click vào vùng upload (trừ nút)
+            uploadArea.addEventListener('click', (e) => {
+                if (e.target.tagName !== 'BUTTON' && fileInput) {
+                    fileInput.click();
+                }
+            });
+        }
+
+        function addFiles(files) {
+            if (!files || files.length === 0) return;
+
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                const lower = file.name.toLowerCase();
+
+                // Chỉ nhận PDF/DOC/DOCX
+                if (!lower.endsWith('.pdf') && !lower.endsWith('.doc') && !lower.endsWith('.docx')) {
+                    console.warn('Skip unsupported file:', file.name);
+                    continue;
+                }
+
+                // Check trùng theo name + size
+                const exists = selectedFiles.some(
+                    (item) => item.file.name === file.name && item.file.size === file.size
+                );
+                if (exists) continue;
+
+                // ⚠ taskType trùng với giá trị bạn lưu trong DB / dùng trong Worker
+                // hiện tại bạn đã dùng "PDF_TO_DOCX" trước đó, nên giữ lại
+                selectedFiles.push({
+                    file: file,
+                    taskType: 'PDF_TO_DOCX' // default
+                });
             }
+
+            renderSelectedFiles();
+            updateUploadAllState();
+        }
+
+        function renderSelectedFiles() {
+            if (!selectedFilesContainer) return;
+
+            if (selectedFiles.length === 0) {
+                selectedFilesContainer.innerHTML = '';
+                selectedFilesContainer.classList.add('empty');
+                return;
+            }
+
+            selectedFilesContainer.classList.remove('empty');
+            selectedFilesContainer.innerHTML = '';
+
+            selectedFiles.forEach((item, index) => {
+                const row = document.createElement('div');
+                row.className = 'selected-file-row';
+
+                let html = '';
+
+                // Phần info file
+                html += '<div class="selected-file-info">';
+                html +=   '<div class="selected-file-name" title="' + escapeHtml(item.file.name) + '">';
+                html +=       escapeHtml(item.file.name);
+                html +=   '</div>';
+                html +=   '<div class="selected-file-size">' + formatBytes(item.file.size) + '</div>';
+                html += '</div>';
+
+                // Phần dropdown + nút xoá
+                html += '<div class="selected-file-actions">';
+                html +=   '<select class="selected-file-select" data-index="' + index + '">';
+
+                html +=     '<option value="PDF_TO_DOCX"'
+                        + (item.taskType === 'PDF_TO_DOCX' ? ' selected' : '')
+                        + '>PDF → DOCX</option>';
+
+                html +=     '<option value="PDF_TO_IMAGES"'
+                        + (item.taskType === 'PDF_TO_IMAGES' ? ' selected' : '')
+                        + '>PDF → Images (JPG)</option>';
+
+                html +=   '</select>';
+
+                html +=   '<button type="button"'
+                        + ' class="selected-file-remove"'
+                        + ' title="Remove this file"'
+                        + ' data-index="' + index + '">×</button>';
+
+                html += '</div>';
+
+                row.innerHTML = html;
+                selectedFilesContainer.appendChild(row);
+            });
+
+            // Gán event cho dropdown
+            selectedFilesContainer
+                .querySelectorAll('.selected-file-select')
+                .forEach((select) => {
+                    select.addEventListener('change', (e) => {
+                        const idx = parseInt(e.target.dataset.index, 10);
+                        if (!Number.isNaN(idx) && selectedFiles[idx]) {
+                            selectedFiles[idx].taskType = e.target.value;
+                        }
+                    });
+                });
+
+            // Gán event cho nút remove
+            selectedFilesContainer
+                .querySelectorAll('.selected-file-remove')
+                .forEach((btn) => {
+                    btn.addEventListener('click', (e) => {
+                        const idx = parseInt(e.target.dataset.index, 10);
+                        if (!Number.isNaN(idx)) {
+                            selectedFiles.splice(idx, 1);
+                            renderSelectedFiles();
+                            updateUploadAllState();
+                        }
+                    });
+                });
+        }
+
+        function updateUploadAllState() {
+            if (!uploadAllBtn) return;
+            uploadAllBtn.disabled = selectedFiles.length === 0;
+        }
+
+        function formatBytes(bytes, decimals = 2) {
+            if (bytes === 0) return '0 B';
+            const k = 1024;
+            const dm = decimals < 0 ? 0 : decimals;
+            const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+        }
+
+        function escapeHtml(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        // Gửi từng file lên /upload (UploadServlet)
+        if (uploadAllBtn) {
+            uploadAllBtn.addEventListener('click', async () => {
+                if (selectedFiles.length === 0) return;
+
+                uploadAllBtn.disabled = true;
+
+                for (const item of selectedFiles) {
+                    const formData = new FormData();
+                    // ⚠ key "file" trùng với request.getPart("file")
+                    formData.append('file', item.file);
+                    formData.append('taskType', item.taskType);
+
+                    try {
+                        const res = await fetch(uploadUrl, {
+                            method: 'POST',
+                            body: formData
+                        });
+                        if (!res.ok) {
+                            console.error('Upload failed for', item.file.name);
+                        }
+                    } catch (err) {
+                        console.error('Error uploading', item.file.name, err);
+                    }
+                }
+
+                // Xoá list local, reload để JobDAO.getAllJobs(...) có dữ liệu mới
+                selectedFiles = [];
+                renderSelectedFiles();
+                updateUploadAllState();
+                window.location.reload();
+            });
         }
 
         // --- View toggling: hide/show History panel based on left nav clicks ---
@@ -995,7 +1287,6 @@
                 });
             }
 
-            // Toggle logic: clicking History toggles panel; clicking All Tools opens modal; clicking other views hides History
             const toolsOverlay = document.getElementById('toolsModalOverlay');
             const toolsCloseBtn = document.getElementById('toolsModalClose');
 
@@ -1024,20 +1315,16 @@
                             appContainer.classList.add('no-history');
                             setActiveByName('home');
                         }
-                        // ensure modal closed when switching
                         hideToolsModal();
                     } else if (view === 'tools') {
-                        // Toggle modal when clicking All Tools
                         const isOpen = toolsOverlay && toolsOverlay.classList.contains('visible');
                         if (isOpen) {
                             hideToolsModal();
-                            // keep All Tools active state toggled off when closing
                             setActiveByName('home');
                         } else {
                             showToolsModal();
                             setActiveByName('tools');
                         }
-                        // hide history while modal is up
                         appContainer.classList.add('no-history');
                     } else {
                         appContainer.classList.add('no-history');
@@ -1047,7 +1334,6 @@
                 });
             });
 
-            // Close modal on overlay click or on close button
             if (toolsOverlay) {
                 toolsOverlay.addEventListener('click', (e) => {
                     if (e.target === toolsOverlay) hideToolsModal();
@@ -1057,7 +1343,6 @@
                 toolsCloseBtn.addEventListener('click', hideToolsModal);
             }
 
-            // Initialize: Home active and history hidden
             appContainer.classList.add('no-history');
             setActiveByName('home');
         })();
