@@ -6,14 +6,14 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 
-import com.convertfile.model.bean.TaskJob;
+import com.convertfile.model.bean.Tasks;
 import com.convertfile.model.bean.EnumStatus.TaskStatus;
 import com.convertfile.model.bean.EnumStatus.TaskType;
 
 public class TaskQueueDAO {
-    public boolean insertTask(TaskJob job) {
+    public boolean insertTask(Tasks job) {
     String sql = """
-        INSERT INTO task_queue (file_id, task_type, status, message, worker_id, attempt_count, created_at, started_at, completed_at)
+        INSERT INTO tasks (file_id, task_type, status, message, worker_id, attempt_count, created_at, started_at, completed_at)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         """;
 
@@ -38,7 +38,7 @@ public class TaskQueueDAO {
 }
 
 
-    public TaskJob getNextWaitingTask() {
+    public Tasks getNextWaitingTask() {
         String sql = """
             SELECT * FROM tasks 
             WHERE status = ? ORDER BY created_at ASC LIMIT 1 
@@ -51,7 +51,7 @@ public class TaskQueueDAO {
 
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    TaskJob job = new TaskJob();
+                    Tasks job = new Tasks();
                     job.setTask_id(rs.getLong("task_id"));
                     job.setFileId(rs.getString("file_id"));
                     job.setTask_type(TaskType.valueOf(rs.getString("task_type")));

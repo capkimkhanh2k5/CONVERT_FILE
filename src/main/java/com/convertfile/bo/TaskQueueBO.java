@@ -1,17 +1,17 @@
 package com.convertfile.bo;
 
-import com.convertfile.model.bean.TaskJob;
+import com.convertfile.model.bean.Tasks;
 import com.convertfile.model.bean.EnumStatus.TaskStatus;
 import com.convertfile.model.dao.TaskQueueDAO;
 
 public class TaskQueueBO {
     private final TaskQueueDAO taskQueueDAO = new TaskQueueDAO();
 
-    public boolean insertTask(TaskJob job) {
+    public boolean insertTask(Tasks job) {
         return taskQueueDAO.insertTask(job);
     }
 
-    public TaskJob getNextWaitingTask() {
+    public Tasks getNextWaitingTask() {
         return taskQueueDAO.getNextWaitingTask();
     }
     

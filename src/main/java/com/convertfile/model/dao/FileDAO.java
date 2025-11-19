@@ -9,15 +9,15 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.convertfile.model.bean.FileInfo;
+import com.convertfile.model.bean.Files;
 import com.convertfile.model.bean.EnumStatus.FileStatus;
 
 public class FileDAO {
-    public boolean insertFile(FileInfo file) {
+    public boolean insertFile(Files file) {
         String sql = """
-            INSERT INTO files (file_id, user_id, original_name, saved_name, file_size, input_path, output_path, 
+            INSERT INTO files (file_id, user_id, original_name, saved_name, file_size, file_path, 
             input_format, output_format, current_status, description, created_at, updated_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """;
         try (Connection conn = ConnectDB.getConnection();
             PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -27,14 +27,13 @@ public class FileDAO {
             ps.setString(3, file.getOriginal_name());
             ps.setString(4, file.getSaved_name());
             ps.setLong(5, file.getFile_size());
-            ps.setString(6, file.getInput_path());
-            ps.setString(7, file.getOutput_path());
-            ps.setString(8, file.getInput_format());
-            ps.setString(9, file.getOutput_format());
-            ps.setString(10, file.getCurrent_status().name());
-            ps.setString(11, file.getDescription());
-            ps.setTimestamp(12, Timestamp.valueOf(file.getCreated_at()));
-            ps.setTimestamp(13, Timestamp.valueOf(file.getUpdated_at()));
+            ps.setString(6, file.getFile_path());
+            ps.setString(7, file.getInput_format());
+            ps.setString(8, file.getOutput_format());
+            ps.setString(9, file.getCurrent_status().name());
+            ps.setString(10, file.getDescription());
+            ps.setTimestamp(11, Timestamp.valueOf(file.getCreated_at()));
+            ps.setTimestamp(12, Timestamp.valueOf(file.getUpdated_at()));
 
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
@@ -43,8 +42,8 @@ public class FileDAO {
         }
     }
 
-    public List<FileInfo> getAllFiles(){
-        List<FileInfo> list = new ArrayList<>();
+    public List<Files> getAllFiles(){
+        List<Files> list = new ArrayList<>();
         String sql = "SELECT * FROM files";
         try(Connection conn = ConnectDB.getConnection();
             PreparedStatement ps = conn.prepareStatement(sql);
@@ -61,7 +60,7 @@ public class FileDAO {
         return list;
     }
 
-    public FileInfo getFileByID(String fileID){
+    public Files getFileByID(String fileID){
         String sql = "SELECT * FROM files WHERE file_id = ?";
         try(Connection conn = ConnectDB.getConnection();
             PreparedStatement ps = conn.prepareStatement(sql)){
@@ -99,16 +98,15 @@ public class FileDAO {
         }
     }
 
-    private FileInfo mapRow(ResultSet rs) throws SQLException {
-        FileInfo f = new FileInfo();
+    private Files mapRow(ResultSet rs) throws SQLException {
+        Files f = new Files();
 
         f.setFile_id(rs.getString("file_id"));
         f.setUser_id(rs.getLong("user_id"));
         f.setOriginal_name(rs.getString("original_name"));
         f.setSaved_name(rs.getString("saved_name"));
         f.setFile_size(rs.getLong("file_size"));
-        f.setInput_path(rs.getString("input_path"));
-        f.setOutput_path(rs.getString("output_path"));
+        f.setFile_path(rs.getString("file_path"));
         f.setInput_format(rs.getString("input_format"));
         f.setOutput_format(rs.getString("output_format"));
 

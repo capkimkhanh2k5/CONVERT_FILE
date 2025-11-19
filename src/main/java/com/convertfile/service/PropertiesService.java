@@ -54,4 +54,19 @@ public class PropertiesService {
         return properties.getProperty("database.password");
     }
 
+    public static String getCloudinaryCloudName() {
+        return properties.getProperty("cloudinary.cloud.name");
+    }
+
+    public static String getCloudinaryApiKey() {
+        return properties.getProperty("cloudinary.api.key");
+    }
+
+    public static String getCloudinaryApiSecret() {
+        return properties.getProperty("cloudinary.api.secret");
+    }
+
+    public static boolean getCloudinaryUrlSecure() {
+        return Boolean.parseBoolean(properties.getProperty("cloudinary.url.secure", "true"));
+    }
 }

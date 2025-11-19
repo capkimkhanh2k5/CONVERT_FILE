@@ -60,7 +60,7 @@ public class EmailSerive  {
         + "  body {font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #f6f6f6; margin: 0; padding: 0;}"
         + "  .email-wrapper {width: 100%; background-color: #f6f6f6; padding: 40px 0;}"
         + "  .email-content {max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); overflow: hidden;}"
-        + "  .header {background-color: #2c3e50; padding: 30px; text-align: center;}"
+        + "  .header {background: linear-gradient(90deg, #5e35b1, #00bcd4); padding: 30px; text-align: center;}"
         + "  .header h1 {color: #ffffff; margin: 0; font-size: 24px; font-weight: 600; letter-spacing: 1px;}"
         + "  .body-content {padding: 40px 30px; text-align: center; color: #333333;}"
         + "  .greeting {font-size: 18px; margin-bottom: 20px; color: #555555;}"
@@ -78,7 +78,7 @@ public class EmailSerive  {
         
         // --- HEADER ---
         + "      <div class='header'>"
-        + "        <h1>Authentication Required</h1>"
+        + "        <h1>ConvertFile DUT</h1>"
         + "      </div>"
         
         // --- BODY ---
