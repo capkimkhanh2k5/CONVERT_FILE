@@ -44,14 +44,14 @@ CREATE TABLE IF NOT EXISTS `files` (
 CREATE INDEX `idx_user_id` ON `files` (`user_id`);
 CREATE INDEX `idx_status_created_at` ON `files` (`current_status`, `created_at`);
 
--- 5. Bảng tasks (Đã thêm cột progress)
+-- 5. Bảng tasks 
 CREATE TABLE IF NOT EXISTS `tasks` (
     `task_id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     `file_id` VARCHAR(36) NOT NULL,
     `task_type` ENUM('DOCX_TO_PDF', 'PDF_TO_DOCX', 'DOCX_TO_XML', 'XML_TO_DOCX', 'DOCX_TO_HTML', 'DOCX_MERGE', 'UNKNOWN') NOT NULL,
     `status` ENUM('WAITING', 'PROCESSING', 'COMPLETED', 'FAILED', 'CANCELED') NOT NULL DEFAULT 'WAITING',
     
-    `progress_percent` INT DEFAULT 0, -- QUAN TRỌNG: Cột này để hiển thị % trên web
+    `progress_percent` INT DEFAULT 0, 
     
     `message` VARCHAR(1000) NULL,
     `worker_id` VARCHAR(50) NULL,

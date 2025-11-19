@@ -7,20 +7,30 @@ import java.sql.ResultSet;
 
 public class FileWorker implements Runnable {
 
+    private volatile boolean running = true;
+
+    public void stop() {
+        running = false;
+    }
+
     // QUAN TRỌNG: Không được có bất kỳ hàm public FileWorker(...) nào ở đây cả!
     // Để trống thế này Java sẽ tự tạo constructor rỗng.
 
     @Override
     public void run() {
         System.out.println("🤖 WORKER ĐÃ KHỞI ĐỘNG - Đang chờ việc...");
-        while (true) {
+        while (running) {
             try {
                 processNextJob();
-                Thread.sleep(2000); 
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                running = false;
+                Thread.currentThread().interrupt();
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
+        System.out.println("🛑 WORKER ĐÃ DỪNG.");
     }
 
     private void processNextJob() {
@@ -47,7 +57,7 @@ public class FileWorker implements Runnable {
                 updateStatus(conn, taskId, "COMPLETED", 100);
                 System.out.println("✅ Task " + taskId + " HOÀN THÀNH!");
             }
-            ps.close(); 
+            ps.close();
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
