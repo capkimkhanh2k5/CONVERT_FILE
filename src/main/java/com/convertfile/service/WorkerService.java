@@ -2,11 +2,11 @@ package com.convertfile.service;
 
 import com.convertfile.worker.fileWorker;
 
-public class WockerService {
+public class WorkerService {
     private final int NUMBER_OF_WORKERS = 1; // Số lượng worker threads
     private final Thread[] workers;
 
-    public WockerService() {
+    public WorkerService() {
         workers = new Thread[NUMBER_OF_WORKERS];
 
         for (int i = 0; i < NUMBER_OF_WORKERS; i++) {

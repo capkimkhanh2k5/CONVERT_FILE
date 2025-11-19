@@ -25,6 +25,9 @@ public class RegisterServlet extends HttpServlet {
         String username = request.getParameter("username");
         String password = request.getParameter("password");
         String email = request.getParameter("email");
+        String googleClientId = PropertiesService.getGoogleClientId();
+        request.setAttribute("googleClientId", googleClientId);
+        request.setAttribute("activeForm", "register");
         
         if (username.isEmpty() || password.isEmpty() || !checkFormatEmail(email)) {
             if(!checkFormatEmail(email)){
@@ -55,6 +58,7 @@ public class RegisterServlet extends HttpServlet {
         
         String googleClientId = PropertiesService.getGoogleClientId();
         request.setAttribute("googleClientId", googleClientId);
+        request.setAttribute("activeForm", "register");
 
         request.getRequestDispatcher("auth.jsp").forward(request, response);
     }

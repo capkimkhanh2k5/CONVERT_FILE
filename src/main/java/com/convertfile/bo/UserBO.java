@@ -48,4 +48,12 @@ public class UserBO {
         userDAO.updateUserInfo(user);
     }
 
+    public boolean checkEmailExist(String email) {
+        return userDAO.checkEmailExist(email);
+    }
+
+    public boolean updatePassword(String email, String newPassword) {
+        return userDAO.updatePassword(email, newPassword);
+    }
+
 }

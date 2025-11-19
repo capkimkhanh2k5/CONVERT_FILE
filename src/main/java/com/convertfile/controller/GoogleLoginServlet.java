@@ -163,6 +163,6 @@ public class GoogleLoginServlet extends HttpServlet {
         
         req.setAttribute("googleClientId", props.getProperty("google.client.id"));
         
-        req.getRequestDispatcher("/WEB-INF/views/login.jsp").forward(req, resp);
+        req.getRequestDispatcher("/auth.jsp").forward(req, resp);
     }
 }

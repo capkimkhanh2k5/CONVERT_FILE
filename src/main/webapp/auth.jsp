@@ -1,5 +1,5 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="jakarta.tags.core" prefix="c" %>
 
 <!DOCTYPE html>
 <html lang="vi">
@@ -13,8 +13,6 @@
         href="login.jsp" → href="auth.jsp"
         href="register.jsp" → href="auth.jsp?form=register"
     -->
-
-
 
     <!-- Google Sign-In Library -->
     <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -659,13 +657,25 @@
     </style>
 </head>
 <body>
+<%
+    String activeForm = request.getParameter("form");
+    if (activeForm == null) {
+        Object formAttr = request.getAttribute("activeForm");
+        if (formAttr != null) {
+            activeForm = formAttr.toString();
+        }
+    }
+    if (activeForm == null) {
+        activeForm = "login";
+    }
+%>
     <!-- Back Arrow - Fixed Position -->
-    <a href="home.jsp" class="back-arrow">← HOME</a>
+    <a href="<c:url value='/home'/>" class="back-arrow">← HOME</a>
 
-    <div class="auth-container" id="authContainer">
+    <div class="auth-container" id="authContainer" data-initial-form="<%= activeForm %>">
         <!-- Image Side -->
         <div class="image-side">
-            <img src="${pageContext.request.contextPath}/resources/img/IMAGE_LOGIN.png" alt="Auth Image">
+            <img src="<c:url value='/resources/img/IMAGE_LOGIN.png'/>" alt="Auth Image">
         </div>
 
         <!-- Form Side -->
@@ -679,13 +689,13 @@
                     </div>
 
                     <!-- Login Messages -->
-                    <% if ("login".equals(request.getParameter("form")) && request.getAttribute("errorMessage") != null) { %>
+                    <% if ("login".equals(activeForm) && request.getAttribute("errorMessage") != null) { %>
                         <div class="message error show">
                             ✗ <%= request.getAttribute("errorMessage") %>
                         </div>
                     <% } %>
 
-                    <% if ("login".equals(request.getParameter("form")) && request.getAttribute("successMessage") != null) { %>
+                    <% if ("login".equals(activeForm) && request.getAttribute("successMessage") != null) { %>
                         <div class="message success show">
                             ✓ <%= request.getAttribute("successMessage") %>
                         </div>
@@ -715,7 +725,7 @@
                                 <input type="checkbox" name="remember">
                                 <span>Remember me</span>
                             </label>
-                            <a href="forgot-password.jsp" class="forgot-link">Forgot Password?</a>
+                            <a href="<c:url value='/forgot-password'/>" class="forgot-link">Forgot Password?</a>
                         </div>
 
                         <button type="submit" class="submit-btn" name="action" value="loginBtn">
@@ -727,7 +737,7 @@
 
                     <!-- Google Sign-In Button for Login -->
                     <div class="social-login">
-                        <div id="g_id_onload_login"
+                        <div id="g_id_onload"
                             data-client_id="${googleClientId}"
                             data-context="signin"
                             data-ux_mode="popup"
@@ -759,13 +769,13 @@
                     </div>
 
                     <!-- Register Messages -->
-                    <% if ("register".equals(request.getParameter("form")) && request.getAttribute("successMessage") != null) { %>
+                    <% if ("register".equals(activeForm) && request.getAttribute("successMessage") != null) { %>
                         <div class="message success show">
                             ✓ <%= request.getAttribute("successMessage") %>
                         </div>
                     <% } %>
 
-                    <% if ("register".equals(request.getParameter("form")) && request.getAttribute("errorMessage") != null) { %>
+                    <% if ("register".equals(activeForm) && request.getAttribute("errorMessage") != null) { %>
                         <div class="message error show">
                             ✗ <%= request.getAttribute("errorMessage") %>
                         </div>
@@ -815,7 +825,7 @@
 
                     <!-- Google Sign-In Button for Register -->
                     <div class="social-login">
-                        <div id="g_id_onload_register"
+                        <div id="g_id_onload"
                             data-client_id="${googleClientId}"
                             data-context="signin"
                             data-ux_mode="popup"
@@ -845,6 +855,52 @@
     <script>
         const authContainer = document.getElementById('authContainer');
 
+        // GOOGLE SIGN-IN CALLBACK 
+        function handleCredentialResponse(response) {
+            console.log("Encoded JWT ID token: " + response.credential);
+            
+            // XÓA COOKIE g_state NGAY LẬP TỨC
+            document.cookie = "g_state=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+            document.cookie = "g_state=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=" + window.location.hostname;
+            
+            const googleBtns = document.querySelectorAll('.g_id_signin');
+            googleBtns.forEach(btn => {
+                btn.style.opacity = '0.5';
+                btn.style.pointerEvents = 'none';
+            });
+
+            fetch('google-login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'credential=' + encodeURIComponent(response.credential)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showMessage('success', 'Welcome ' + data.user.name + '! Redirecting...');
+                    setTimeout(() => {
+                        window.location.href = 'home.jsp';
+                    }, 1500);
+                } else {
+                    showMessage('error', data.error || 'Login failed');
+                    googleBtns.forEach(btn => {
+                        btn.style.opacity = '1';
+                        btn.style.pointerEvents = 'auto';
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showMessage('error', 'Network error. Please try again.');
+                googleBtns.forEach(btn => {
+                    btn.style.opacity = '1';
+                    btn.style.pointerEvents = 'auto';
+                });
+            });
+        }
+
         // Switch to Register
         function switchToRegister() {
             authContainer.classList.add('register-mode');
@@ -860,8 +916,18 @@
         // Check URL parameter on page load
         window.addEventListener('DOMContentLoaded', function() {
             const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.get('form') === 'register') {
+            const initialForm = urlParams.get('form') || authContainer.dataset.initialForm || 'login';
+
+            if (initialForm === 'register') {
                 switchToRegister();
+            } else {
+                switchToLogin();
+            }
+
+            if (authContainer.classList.contains('register-mode')) {
+                document.getElementById('registerUsername').focus();
+            } else {
+                document.getElementById('loginUsername').focus();
             }
         });
 
@@ -1081,9 +1147,6 @@
                 }, 500);
             }, 5000);
         });
-
-        // AUTO-FOCUS
-        document.getElementById('loginUsername').focus();
     </script>
 </body>
 </html>
