@@ -440,7 +440,7 @@
                 <div class="hero-content">
                     <h1>
                         Convert your all types of files with 
-                        <span class="highlight-text">One Click</span> 
+                        <span class="highlight-text">One Click</span>
                     </h1>
                     <p>Simply upload your files and click the convert button.</p>
                     <a href="<c:url value='/home'/>" class="btn-try">Try it for Free</a>

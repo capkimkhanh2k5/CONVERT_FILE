@@ -1,5 +1,6 @@
 {
     "java.configuration.updateBuildConfiguration": "automatic",
     "maven.view": "flat",
-    "chatgpt.openOnStartup": true
+    "chatgpt.openOnStartup": true,
+    "java.compile.nullAnalysis.mode": "automatic"
 }

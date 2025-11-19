@@ -1,5 +1,25 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib uri="jakarta.tags.core" prefix="c" %>
+<%@ page import="java.util.List" %>
+<%@ page import="java.util.Map" %>
+<%@ page import="com.convertfile.model.dao.JobDAO" %>
+
+<%
+    // --- LOGIC THÔNG MINH: CHỈ RELOAD KHI CẦN THIẾT ---
+    boolean needReload = false;
+    List<Map<String, Object>> listJobs = JobDAO.getAllJobs(); // Lấy dữ liệu ngay tại đây
+    
+    if (listJobs != null) {
+        for (Map<String, Object> job : listJobs) {
+            String s = (String) job.get("status");
+            // Nếu còn file nào đang quay quay -> Bật chế độ tự F5
+            if ("WAITING".equals(s) || "PROCESSING".equals(s)) {
+                needReload = true;
+                break;
+            }
+        }
+    }
+%>
 
 <!DOCTYPE html>
 <html lang="vi">
@@ -7,6 +27,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ConvertFile</title>
+
+    <% if (needReload) { %>
+        <meta http-equiv="refresh" content="2">
+    <% } %>
+
     <style>
         html, body{
             height: 100%;
@@ -768,51 +793,61 @@
 
             <!-- Upload Area -->
             <div class="upload-container">
-                <div class="upload-area" id="uploadArea">
-                    <div class="upload-icon">☁️</div>
-                    <div class="upload-text">Drag your files here, file size less than 15 MB or</div>
-                    <div class="upload-hint"></div>
-                    <button class="browse-btn" onclick="document.getElementById('fileInput').click()">Browse File</button>
-                    <input type="file" id="fileInput" accept=".pdf,.zip" multiple>
-                </div>
+                <form id="realUploadForm" action="upload" method="post" enctype="multipart/form-data">
+                    <div class="upload-area" id="uploadArea">
+                        <div class="upload-icon">☁️</div>
+                        <div class="upload-text">Drag your files here, file size less than 15 MB or</div>
+                        <div class="upload-hint">Supports PDF, DOCX</div>
+                        
+                        <button type="button" class="browse-btn" onclick="document.getElementById('fileInput').click()">Browse File</button>
+                        
+                        <input type="file" name="file" id="fileInput" style="display: none;" 
+                            onchange="document.getElementById('realUploadForm').submit()">
+                        
+                        <input type="hidden" name="taskType" value="PDF_TO_DOCX">
+                    </div>
+                </form>
             </div>
 
             <!-- Converted Files -->
             <div class="converted-files">
                 <div class="file-header">
                     <h2 class="file-title">Uploaded Files</h2>
-                    <!-- <button class="icon-btn">⋯</button> -->
                 </div>
 
-                <div class="file-item">
-                    <div class="file-icon-wrapper">📄</div>
-                    <div class="file-info">
-                        <div class="file-name">Biography Nelson Mandela.doc</div>
-                    </div>
-                    <span class="status-badge converted">Converted</span>
-                    <span class="file-size">2.31 mb</span>
-                    <div class="download-icon">↓</div>
-                </div>
+                <%
+                    if (listJobs != null && !listJobs.isEmpty()) {
+                        int count = 0;
+                        for (Map<String, Object> job : listJobs) {
+                            if (count++ >= 5) break; // Chỉ hiện 5 cái
 
-                <div class="file-item">
-                    <div class="file-icon-wrapper">📄</div>
-                    <div class="file-info">
-                        <div class="file-name">How to Choose The Most Fresh Fish.doc</div>
-                    </div>
-                    <span class="status-badge converted">Converted</span>
-                    <span class="file-size">1.35 mb</span>
-                    <div class="download-icon">↓</div>
-                </div>
-
-                <div class="file-item">
-                    <div class="file-icon-wrapper">📄</div>
-                    <div class="file-info">
-                        <div class="file-name">Journal of Business and Research.doc</div>
-                    </div>
-                    <span class="status-badge converted">Converted</span>
-                    <span class="file-size">4.11 mb</span>
-                    <div class="download-icon">↓</div>
-                </div>
+                            String status = (String) job.get("status");
+                            int progress = (Integer) job.get("progress");
+                            
+                            // Logic màu sắc
+                            String badgeClass = "status-badge";
+                            String dlIcon = "...";
+                            
+                            if (status.equals("COMPLETED")) {
+                                badgeClass += " converted";
+                                dlIcon = "↓";
+                            }
+                %>
+                        <div class="file-item">
+                            <div class="file-icon-wrapper">📄</div>
+                            <div class="file-info">
+                                <div class="file-name"><%= job.get("name") %></div>
+                                <div style="height: 4px; background: #eee; width: 100%; margin-top: 5px; border-radius: 2px;">
+                                    <div style="height: 100%; background: #667eea; width: <%= progress %>%;"></div>
+                                </div>
+                            </div>
+                            <span class="<%= badgeClass %>"><%= status %> <%= progress %>%</span>
+                            <div class="download-icon"><%= dlIcon %></div>
+                        </div>
+                <%      }
+                    } else { %>
+                        <div style="text-align: center; padding: 20px; color: #999;">Chưa có file nào.</div>
+                <% } %>
             </div>
 
         </main>
@@ -825,67 +860,24 @@
             </div>
 
             <div class="history-section">
-                <div class="history-date">Today</div>
+                <div class="history-date">Recent Tasks</div>
                 
-                <div class="history-item">
-                    <div class="history-icon purple">📄</div>
-                    <div class="history-file-info">
-                        <div class="history-file-name">Task 2 Math ; Essay.doc</div>
-                        <div class="history-file-size">2.1 mb</div>
+                <%
+                    if (listJobs != null) {
+                        int hCount = 0;
+                        for (Map<String, Object> job : listJobs) {
+                            if (hCount++ >= 8) break; // Lấy 8 cái lịch sử
+                %>
+                    <div class="history-item">
+                        <div class="history-icon purple">🕒</div>
+                        <div class="history-file-info">
+                            <div class="history-file-name"><%= job.get("name") %></div>
+                            <div class="history-file-size"><%= job.get("type") %></div>
+                        </div>
                     </div>
-                </div>
-
-                <div class="history-item">
-                    <div class="history-icon purple">🖼️</div>
-                    <div class="history-file-info">
-                        <div class="history-file-name">Graduation 13/01/22.png</div>
-                        <div class="history-file-size">5.31 mb</div>
-                    </div>
-                </div>
-
-                <div class="history-item">
-                    <div class="history-icon yellow">🎨</div>
-                    <div class="history-file-info">
-                        <div class="history-file-name">Scenery Illustration.svg</div>
-                        <div class="history-file-size">7.11 mb</div>
-                    </div>
-                </div>
-
-                <div class="history-item">
-                    <div class="history-icon blue">📄</div>
-                    <div class="history-file-info">
-                        <div class="history-file-name">Task 2 Math ; Essay.doc</div>
-                        <div class="history-file-size">1.09 mb</div>
-                    </div>
-                </div>
-
-                <div class="history-item">
-                    <div class="history-icon orange">📊</div>
-                    <div class="history-file-info">
-                        <div class="history-file-name">Poster.ai</div>
-                        <div class="history-file-size">5.8 mb</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="history-section">
-                <div class="history-date">Yesterday</div>
-                
-                <div class="history-item">
-                    <div class="history-icon green">📊</div>
-                    <div class="history-file-info">
-                        <div class="history-file-name">Financial Report.xls</div>
-                        <div class="history-file-size">1.22 mb</div>
-                    </div>
-                </div>
-
-                <div class="history-item">
-                    <div class="history-icon orange">🎨</div>
-                    <div class="history-file-info">
-                        <div class="history-file-name">Animal Illustration.ai</div>
-                        <div class="history-file-size">6.13 mb</div>
-                    </div>
-                </div>
+                <%      }
+                    }
+                %>
             </div>
         </aside>
         
