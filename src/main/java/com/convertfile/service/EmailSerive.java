@@ -52,59 +52,72 @@ public class EmailSerive  {
 
     public static String getOtpEmail(String otpCode) {
         return "<!DOCTYPE html>"
-        + "<html>"
-        + "<head>"
-        + "<meta charset='UTF-8'>"
-        + "<meta name='viewport' content='width=device-width, initial-scale=1.0'>"
-        + "<style>"
-        + "  body {font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #f6f6f6; margin: 0; padding: 0;}"
-        + "  .email-wrapper {width: 100%; background-color: #f6f6f6; padding: 40px 0;}"
-        + "  .email-content {max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); overflow: hidden;}"
-        + "  .header {background: linear-gradient(90deg, #5e35b1, #00bcd4); padding: 30px; text-align: center;}"
-        + "  .header h1 {color: #ffffff; margin: 0; font-size: 24px; font-weight: 600; letter-spacing: 1px;}"
-        + "  .body-content {padding: 40px 30px; text-align: center; color: #333333;}"
-        + "  .greeting {font-size: 18px; margin-bottom: 20px; color: #555555;}"
-        + "  .message {font-size: 16px; line-height: 1.6; color: #666666; margin-bottom: 30px;}"
-        + "  .otp-container {margin: 30px 0;}"
-        + "  .otp-code {font-size: 32px; font-weight: 700; color: #2c3e50; background-color: #e8f0fe; padding: 15px 40px; border-radius: 6px; letter-spacing: 8px; display: inline-block; border: 1px solid #ccdfff;}"
-        + "  .warning {font-size: 14px; color: #e74c3c; margin-top: 20px; font-weight: 500;}"
-        + "  .footer {background-color: #f9f9f9; padding: 20px; text-align: center; font-size: 12px; color: #999999; border-top: 1px solid #eeeeee;}"
-        + "  .footer a {color: #2c3e50; text-decoration: none; font-weight: bold;}"
-        + "</style>"
-        + "</head>"
-        + "<body>"
-        + "  <div class='email-wrapper'>"
-        + "    <div class='email-content'>"
-        
-        // --- HEADER ---
-        + "      <div class='header'>"
-        + "        <h1>ConvertFile DUT</h1>"
-        + "      </div>"
-        
-        // --- BODY ---
-        + "      <div class='body-content'>"
-        + "        <p class='greeting'>Hello,</p>"
-        + "        <p class='message'>You recently requested to verify your account for <strong>CONVERTFILE DUT</strong>.<br>Please use the code below to complete the process.</p>"
-        
-        // OTP BOX
-        + "        <div class='otp-container'>"
-        + "          <span class='otp-code'>" + otpCode + "</span>"
-        + "        </div>"
-        
-        + "        <p class='message'>This verification code is valid for <strong>5 minutes</strong>.</p>"
-        + "        <p class='warning'>If you did not request this code, please ignore this email.</p>"
-        + "      </div>"
-        
-        // --- FOOTER ---
-        + "      <div class='footer'>"
-        + "        <p>&copy; 2025 CONVERTFILE DUT. All rights reserved.</p>"
-        + "        <p>Need help? <a href='#'>Contact Support</a></p>"
-        + "      </div>"
-        
-        + "    </div>"
-        + "  </div>"
-        + "</body>"
-        + "</html>";
+            + "<html>"
+            + "<head>"
+            + "<meta charset='UTF-8'>"
+            + "<meta name='viewport' content='width=device-width, initial-scale=1.0'>"
+            + "<style>"
+            + "  body {font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0;}"
+            + "  .email-wrapper {width: 100%; background-color: #f4f4f4; padding: 40px 0;}"
+            + "  .email-content {max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); overflow: hidden;}"
+            
+            // HEADER STYLE: Nền trắng để làm nổi bật chữ Gradient
+            + "  .header {padding: 30px 20px; text-align: center; border-bottom: 1px solid #eeeeee;}"
+            
+            // LOGO STYLE: Gradient Text
+            + "  .logo-text {font-size: 28px; font-weight: 800; margin: 0; letter-spacing: -0.5px;"
+            + "    background: linear-gradient(90deg, #5e35b1, #00bcd4);" // Màu chuyển bạn yêu cầu
+            + "    -webkit-background-clip: text;"
+            + "    -webkit-text-fill-color: transparent;"
+            + "    color: #5e35b1; display: inline-block;}" // Fallback color (Tím) cho Outlook
+            
+            + "  .header-sub {font-size: 14px; color: #888888; margin-top: 5px; text-transform: uppercase; letter-spacing: 1px;}"
+            + "  .body-content {padding: 40px 30px; text-align: center; color: #333333;}"
+            + "  .greeting {font-size: 18px; margin-bottom: 20px; color: #444444;}"
+            + "  .message {font-size: 16px; line-height: 1.6; color: #666666; margin-bottom: 30px;}"
+            
+            // OTP BOX STYLE
+            + "  .otp-container {margin: 30px 0;}"
+            + "  .otp-code {font-size: 36px; font-weight: 700; color: #5e35b1; background-color: #f3e5f5; padding: 15px 40px; border-radius: 8px; letter-spacing: 8px; display: inline-block; border: 1px dashed #5e35b1;}"
+            
+            + "  .warning {font-size: 13px; color: #e74c3c; margin-top: 25px; font-style: italic;}"
+            + "  .footer {background-color: #f9f9f9; padding: 20px; text-align: center; font-size: 12px; color: #999999; border-top: 1px solid #eeeeee;}"
+            + "</style>"
+            + "</head>"
+            + "<body>"
+            + "  <div class='email-wrapper'>"
+            + "    <div class='email-content'>"
+            
+            // --- HEADER VỚI GRADIENT TEXT ---
+            + "      <div class='header'>"
+            + "        <h1 class='logo-text'>CONVERTFILE DUT</h1>"
+            + "        <div class='header-sub'>Authentication Service</div>"
+            + "      </div>"
+            
+            // --- BODY ---
+            + "      <div class='body-content'>"
+            + "        <p class='greeting'>Hello,</p>"
+            + "        <p class='message'>We received a request to verify your email address. Please use the One-Time Password (OTP) below to proceed.</p>"
+            
+            // OTP CODE
+            + "        <div class='otp-container'>"
+            + "          <span class='otp-code'>" + otpCode + "</span>"
+            + "        </div>"
+            
+            + "        <p class='message'>This code is valid for <strong>5 minutes</strong>.</p>"
+            + "        <p class='warning'>If you did not initiate this request, please ignore this email immediately.</p>"
+            + "      </div>"
+            
+            // --- FOOTER ---
+            + "      <div class='footer'>"
+            + "        <p>&copy; 2025 CONVERTFILE DUT. All rights reserved.</p>"
+            + "        <p>Automated message, please do not reply.</p>"
+            + "      </div>"
+            
+            + "    </div>"
+            + "  </div>"
+            + "</body>"
+            + "</html>";
     }
 
     public static String generateOTP() {

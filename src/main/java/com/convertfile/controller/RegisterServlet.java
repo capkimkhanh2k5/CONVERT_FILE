@@ -28,16 +28,6 @@ public class RegisterServlet extends HttpServlet {
         String googleClientId = PropertiesService.getGoogleClientId();
         request.setAttribute("googleClientId", googleClientId);
         request.setAttribute("activeForm", "register");
-        
-        if (username.isEmpty() || password.isEmpty() || !checkFormatEmail(email)) {
-            if(!checkFormatEmail(email)){
-                request.setAttribute("errorMessage", "Email format is invalid!");
-            } else{
-                request.setAttribute("errorMessage", "Please fill in all information!");
-            }
-            request.getRequestDispatcher("auth.jsp").forward(request, response);
-            return;
-        }
 
         User user = new User();
         user.setUsername(username);
@@ -61,13 +51,5 @@ public class RegisterServlet extends HttpServlet {
         request.setAttribute("activeForm", "register");
 
         request.getRequestDispatcher("auth.jsp").forward(request, response);
-    }
-
-    private boolean checkFormatEmail(String email) {
-        if (email == null || email.isEmpty()) return false;
-        String regex = "^[a-zA-Z0-9_+&*-]+(?:\\." +
-                        "[a-zA-Z0-9_+&*-]+)*@" +
-                        "(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
-        return email.matches(regex);
     }
 }
