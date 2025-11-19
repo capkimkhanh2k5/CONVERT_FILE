@@ -33,4 +33,25 @@ public class PropertiesService {
     public static String getGoogleClientSecret() {
         return properties.getProperty("google.client.secret");
     }
+
+    public static String getEmailUsername() {
+        return properties.getProperty("email.username");
+    }
+
+    public static String getEmailPassword() {
+        return properties.getProperty("email.password");
+    }
+
+    public static String getDatabaseUrl() {
+        return properties.getProperty("database.url");
+    }
+
+    public static String getDatabaseUsername() {
+        return properties.getProperty("database.username");
+    }
+    
+    public static String getDatabasePassword() {
+        return properties.getProperty("database.password");
+    }
+
 }

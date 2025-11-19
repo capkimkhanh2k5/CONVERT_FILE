@@ -1,5 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="jakarta.tags.core" prefix="c" %>
 
 <!DOCTYPE html>
 <html lang="vi">
@@ -100,6 +100,22 @@
         .nav-buttons {
             display: flex;
             gap: 15px;
+        }
+
+        .nav-user {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-chip {
+            background: #f4f4f6;
+            border: 1px solid #e0e0e0;
+            padding: 10px 18px;
+            border-radius: 20px;
+            font-weight: 600;
+            color: #333;
+            text-decoration: none;
         }
 
         .btn-signup {
@@ -400,8 +416,19 @@
                     <li><a href="#contact">Contact</a></li>
                 </ul>
                 <div class="nav-buttons">
-                    <a href="<c:url value='/register'/>" class="btn-signup">Sign Up</a>
-                    <a href="<c:url value='/login'/>" class="btn-login">Log In</a>
+                    <c:choose>
+                        <c:when test="${not empty sessionScope.username}">
+                            <div class="nav-user">
+                                <span class="user-chip">${sessionScope.username}</span>
+                                <a href="<c:url value='/home.jsp'/>" class="btn-login">Home</a>
+                                <a href="<c:url value='/logout'/>" class="btn-login">Log Out</a>
+                            </div>
+                        </c:when>
+                        <c:otherwise>
+                            <a href="<c:url value='/register'/>" class="btn-signup">Sign Up</a>
+                            <a href="<c:url value='/login'/>" class="btn-login">Log In</a>
+                        </c:otherwise>
+                    </c:choose>
                 </div>
             </nav>
         </div>

@@ -1,5 +1,5 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="jakarta.tags.core" prefix="c" %>
 
 <!DOCTYPE html>
 <html lang="vi">
@@ -738,7 +738,7 @@
                     <%
                         if (username != null && !username.isEmpty()){
                             %>
-                                <a href="logout" class ="nav-link">
+                                <a href="<c:url value='/logout'/>" class ="nav-link">
                                     <span class="nav-icon">⬅️</span>
                                     <span>Logout</span>
                                 </a>
@@ -746,7 +746,7 @@
                         }
                         else{
                             %>
-                                <a href="login" class ="nav-link">
+                                <a href="<c:url value='/login'/>" class ="nav-link">
                                     <span class="nav-icon">➡️</span>
                                     <span>Login</span>
                                 </a>

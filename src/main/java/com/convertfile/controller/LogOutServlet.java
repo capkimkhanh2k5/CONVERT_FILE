@@ -10,6 +10,7 @@ import jakarta.servlet.http.HttpSession;
 
 @WebServlet("/logout")
 public class LogOutServlet extends HttpServlet {
+    @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession(false);
 
@@ -19,6 +20,7 @@ public class LogOutServlet extends HttpServlet {
         response.sendRedirect("index.jsp");
     }
 
+    @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
         doGet(request, response);

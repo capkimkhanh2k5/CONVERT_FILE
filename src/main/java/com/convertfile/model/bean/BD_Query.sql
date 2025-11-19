@@ -83,6 +83,22 @@ VALUES (
     NOW()
 );
 
+INSERT INTO users (username, password, email, created_at) 
+VALUES (
+    'capkhanh', 
+    '$2a$12$apGfQptjppS0PgqPNIa9PuRNaCnwq7bgifN1fXn7M8CFxcAnbf7ny', 
+    'capkhanh@gmail.com', 
+    NOW()
+);
+
+INSERT INTO users (username, password, email, created_at) 
+VALUES (
+    'capkhanh2k5', 
+    '$2a$12$apGfQptjppS0PgqPNIa9PuRNaCnwq7bgifN1fXn7M8CFxcAnbf7ny', 
+    'capkimkhanh2k5@gmail.com', 
+    NOW()
+);
+
 
 DROP TABLE IF EXISTS `tasks`;
 DROP TABLE IF EXISTS `files`;

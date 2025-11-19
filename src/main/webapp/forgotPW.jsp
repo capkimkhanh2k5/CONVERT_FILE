@@ -1,5 +1,5 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="jakarta.tags.core" prefix="c" %>
 
 <!DOCTYPE html>
 <html lang="vi">
@@ -569,12 +569,12 @@
 </head>
 <body>
     <!-- Back Arrow -->
-    <a href="login.jsp" class="back-arrow">← BACK TO LOGIN</a>
+    <a href="<c:url value='/home'/>" class="back-arrow">← HOME</a>
 
     <div class="forgot-container">
         <!-- Left Side - Image -->
         <div class="left-side">
-            <img src="${pageContext.request.contextPath}/resources/img/IMAGE_LOGIN.png" alt="Forgot Password Image">
+            <img src="<c:url value='/resources/img/IMAGE_LOGIN.png'/>" alt="Forgot Password Image">
         </div>
 
         <!-- Right Side - Form -->
@@ -622,7 +622,7 @@
                 </form>
 
                 <div class="back-to-login">
-                    Remember your password? <a href="login.jsp">Login here</a>
+                    Remember your password? <a href="<c:url value='/login'/>">Login here</a>
                 </div>
             </div>
 
@@ -690,7 +690,7 @@
                     <div class="password-requirements">
                         <strong>Password must contain:</strong>
                         <ul id="passwordChecks">
-                            <li id="check-length">At least 8 characters</li>
+                            <li id="check-length">At least 6 characters</li>
                             <li id="check-uppercase">One uppercase letter</li>
                             <li id="check-lowercase">One lowercase letter</li>
                             <li id="check-number">One number</li>
@@ -710,7 +710,7 @@
         let currentStep = 1;
         let userEmail = '';
         let verificationCode = '';
-        let resendTimer = 60;
+        let resendTimer = 180;
         let timerInterval;
 
         // Step navigation
@@ -738,16 +738,18 @@
         function showMessage(type, message) {
             const messageContainer = document.getElementById('messageContainer');
             const messageDiv = document.createElement('div');
-            messageDiv.className = `${type}-message show`;
+            messageDiv.className = type + '-message show';
             messageDiv.textContent = (type === 'error' ? '✗ ' : type === 'success' ? '✓ ' : 'ℹ️ ') + message;
             
             messageContainer.innerHTML = '';
             messageContainer.appendChild(messageDiv);
             
-            setTimeout(() => {
+            setTimeout(function() {
                 messageDiv.style.opacity = '0';
                 messageDiv.style.transition = 'opacity 0.5s ease';
-                setTimeout(() => messageDiv.remove(), 500);
+                setTimeout(function() {
+                    messageDiv.remove();
+                }, 500);
             }, 5000);
         }
 
@@ -774,13 +776,15 @@
             sendBtn.disabled = true;
 
             try {
-                // Call API to send verification code
+                // IMPORTANT
+                const encodedEmail = encodeURIComponent(email);
+                
                 const response = await fetch('forgot-password', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',
                     },
-                    body: 'action=sendCode&email=' + encodeURIComponent(email)
+                    body: 'action=sendCode&email=' + encodedEmail
                 });
 
                 const data = await response.json();
@@ -788,13 +792,17 @@
                 if (data.success) {
                     userEmail = email;
                     showMessage('success', 'Verification code sent to your email!');
-                    setTimeout(() => {
+                    setTimeout(function() {
                         showStep(2);
                         startResendTimer();
                         document.getElementById('code1').focus();
                     }, 1500);
-                } else {
+                } else if (data.error) {
                     showMessage('error', data.message || 'Email not found');
+                    sendBtn.textContent = 'Send Verification Code';
+                    sendBtn.disabled = false;
+                } else {
+                    showMessage('error', 'Failed to send code. Please try again.');
                     sendBtn.textContent = 'Send Verification Code';
                     sendBtn.disabled = false;
                 }
@@ -809,7 +817,7 @@
         // STEP 2: Verify Code
         // Auto-focus next input
         const codeInputs = document.querySelectorAll('.code-input');
-        codeInputs.forEach((input, index) => {
+        codeInputs.forEach(function(input, index) {
             input.addEventListener('input', function(e) {
                 if (this.value.length === 1 && index < codeInputs.length - 1) {
                     codeInputs[index + 1].focus();
@@ -834,7 +842,9 @@
             e.preventDefault();
 
             let code = '';
-            codeInputs.forEach(input => code += input.value);
+            codeInputs.forEach(function(input) {
+                code += input.value;
+            });
 
             if (code.length !== 6) {
                 showMessage('error', 'Please enter complete 6-digit code');
@@ -846,12 +856,15 @@
             verifyBtn.disabled = true;
 
             try {
+                const encodedEmail = encodeURIComponent(userEmail);
+                const encodedCode = encodeURIComponent(code);
+                
                 const response = await fetch('forgot-password', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',
                     },
-                    body: `action=verifyCode&email=${encodeURIComponent(userEmail)}&code=${code}`
+                    body: 'action=verifyCode&email=' + encodedEmail + '&code=' + encodedCode
                 });
 
                 const data = await response.json();
@@ -860,7 +873,7 @@
                     verificationCode = code;
                     showMessage('success', 'Code verified successfully!');
                     clearInterval(timerInterval);
-                    setTimeout(() => {
+                    setTimeout(function() {
                         showStep(3);
                         document.getElementById('newPassword').focus();
                     }, 1500);
@@ -868,7 +881,9 @@
                     showMessage('error', data.message || 'Invalid verification code');
                     verifyBtn.textContent = 'Verify Code';
                     verifyBtn.disabled = false;
-                    codeInputs.forEach(input => input.value = '');
+                    codeInputs.forEach(function(input) {
+                        input.value = '';
+                    });
                     codeInputs[0].focus();
                 }
             } catch (error) {
@@ -881,10 +896,10 @@
 
         // Resend code
         function startResendTimer() {
-            resendTimer = 60;
+            resendTimer = 120;
             document.getElementById('resendBtn').disabled = true;
             
-            timerInterval = setInterval(() => {
+            timerInterval = setInterval(function() {
                 resendTimer--;
                 document.getElementById('timer').textContent = resendTimer;
                 
@@ -900,12 +915,14 @@
             this.disabled = true;
             
             try {
+                const encodedEmail = encodeURIComponent(userEmail);
+                
                 const response = await fetch('forgot-password', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',
                     },
-                    body: 'action=sendCode&email=' + encodeURIComponent(userEmail)
+                    body: 'action=sendCode&email=' + encodedEmail
                 });
 
                 const data = await response.json();
@@ -913,7 +930,9 @@
                 if (data.success) {
                     showMessage('success', 'New code sent to your email!');
                     startResendTimer();
-                    codeInputs.forEach(input => input.value = '');
+                    codeInputs.forEach(function(input) {
+                        input.value = '';
+                    });
                     codeInputs[0].focus();
                 } else {
                     showMessage('error', 'Failed to resend code. Please try again.');
@@ -929,7 +948,9 @@
         // Back to step 1
         document.getElementById('backToStep1').addEventListener('click', function() {
             clearInterval(timerInterval);
-            codeInputs.forEach(input => input.value = '');
+            codeInputs.forEach(function(input) {
+                input.value = '';
+            });
             showStep(1);
             document.getElementById('email').focus();
         });
@@ -962,7 +983,7 @@
             const password = this.value;
 
             // Check length
-            passwordChecks.length = password.length >= 8;
+            passwordChecks.length = password.length >= 6;
             document.getElementById('check-length').className = passwordChecks.length ? 'valid' : 'invalid';
 
             // Check uppercase
@@ -987,7 +1008,11 @@
             const resetBtn = document.getElementById('resetPasswordBtn');
 
             // Validate all password requirements
-            if (!Object.values(passwordChecks).every(check => check)) {
+            const allValid = Object.values(passwordChecks).every(function(check) {
+                return check;
+            });
+            
+            if (!allValid) {
                 showMessage('error', 'Password does not meet all requirements');
                 return;
             }
@@ -1003,20 +1028,25 @@
             resetBtn.disabled = true;
 
             try {
+                const encodedEmail = encodeURIComponent(userEmail);
+                const encodedCode = encodeURIComponent(verificationCode);
+                const encodedPassword = encodeURIComponent(newPassword);
+                
                 const response = await fetch('forgot-password', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',
                     },
-                    body: `action=resetPassword&email=${encodeURIComponent(userEmail)}&code=${verificationCode}&newPassword=${encodeURIComponent(newPassword)}`
+                    //body: 'action=resetPassword&email=' + encodedEmail + '&code=' + encodedCode + '&newPassword=' + encodedPassword
+                    body: 'action=resetPassword&email=' + encodedEmail + '&newPassword=' + encodedPassword
                 });
 
                 const data = await response.json();
 
                 if (data.success) {
                     showMessage('success', 'Password reset successfully! Redirecting to login...');
-                    setTimeout(() => {
-                        window.location.href = 'login.jsp';
+                    setTimeout(function() {
+                        window.location.href = 'login';
                     }, 2000);
                 } else {
                     showMessage('error', data.message || 'Failed to reset password');

@@ -94,4 +94,37 @@ public class UserDAO {
             e.printStackTrace();
         }
     }
+
+    public boolean checkEmailExist(String email) {
+        String sql = "SELECT COUNT(*) FROM users WHERE email = ?";
+        try (Connection conn = ConnectDB.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, email);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                int count = rs.getInt(1);
+                return count > 0;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean updatePassword(String email, String newPassword) {
+        String sql = "UPDATE users SET password = ? WHERE email = ?";
+        try (Connection conn = ConnectDB.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, passwordService.hassPassword(newPassword));
+            ps.setString(2, email);
+
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 }
