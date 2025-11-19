@@ -1,4 +1,4 @@
-package com.convertfile.service.microService;
+package com.convertfile.service.ConvertService;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
