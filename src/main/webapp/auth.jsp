@@ -782,6 +782,8 @@
                     <% } %>
 
                     <form action="register" method="post" id="registerForm">
+                        <input type="hidden" name="csrfToken" value="${sessionScope.csrfToken}">
+                        
                         <div class="form-group">
                             <label for="registerUsername">Username</label>
                             <input type="text" name="username" id="registerUsername" 
