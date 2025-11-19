@@ -5,7 +5,7 @@
 <%@ page import="com.convertfile.model.dao.JobDAO" %>
 
 <%
-    // --- LOGIC THÔNG MINH: CHỈ RELOAD KHI CẦN THIẾT ---
+    // --- CHỈ RELOAD KHI CẦN THIẾT ---
     boolean needReload = false;
     List<Map<String, Object>> listJobs = JobDAO.getAllJobs(); // Lấy dữ liệu ngay tại đây
     
@@ -846,7 +846,7 @@
                         </div>
                 <%      }
                     } else { %>
-                        <div style="text-align: center; padding: 20px; color: #999;">Chưa có file nào.</div>
+                        <div style="text-align: center; padding: 20px; color: #999;">Not Files Yet</div>
                 <% } %>
             </div>
 

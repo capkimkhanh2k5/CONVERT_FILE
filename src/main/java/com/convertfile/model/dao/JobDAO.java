@@ -56,8 +56,8 @@ public class JobDAO {
             } catch (Exception ex) {} 
             return false;
         } finally {
-             // Đóng kết nối (Optional nhưng nên làm)
-             try { if (conn != null) conn.close(); } catch (Exception ex) {}
+            // Đóng kết nối (Optional nhưng nên làm)
+            try { if (conn != null) conn.close(); } catch (Exception ex) {}
         }
     }
 
