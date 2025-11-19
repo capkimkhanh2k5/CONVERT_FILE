@@ -1,7 +1,9 @@
 package com.convertfile.service;
 
-import com.convertfile.model.bean.FileInfo;
+import com.convertfile.model.bean.Files;
 import com.convertfile.model.dao.FileDAO;
+
+import jakarta.servlet.http.Part;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -13,7 +15,7 @@ public class FileService {
     //TODO: Bổ sung khi có DATABASE
     private final List<String> typeFile = Arrays.asList("doc", "docx", "xml", "pdf", "txt");
 
-    public boolean saveFileMetaData(FileInfo file) throws SQLException {
+    public boolean saveFileMetaData(Files file) throws SQLException {
         return fileDAO.insertFile(file);
     }
 
@@ -56,5 +58,16 @@ public class FileService {
     public void convertFile(String file_id) {
         // TODO: sử dụng microService
         throw new UnsupportedOperationException("Unimplemented method 'convertFile'");
+    }
+
+    public static String extractFileName(Part part) {
+        String contentDisp = part.getHeader("content-disposition");
+        String[] items = contentDisp.split(";");
+        for (String s : items) {
+            if (s.trim().startsWith("filename")) {
+                return s.substring(s.indexOf("=") + 2, s.length() - 1).replace("\"", "");
+            }
+        }
+        return "";
     }
 }

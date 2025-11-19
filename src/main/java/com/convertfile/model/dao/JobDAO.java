@@ -2,6 +2,8 @@ package com.convertfile.model.dao;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 public class JobDAO {
@@ -62,8 +64,9 @@ public class JobDAO {
     }
 
     // Hàm lấy danh sách tất cả các Job để hiển thị ra Web
-    public static java.util.List<java.util.Map<String, Object>> getAllJobs() {
-        java.util.List<java.util.Map<String, Object>> list = new java.util.ArrayList<>();
+    public static List<Map<String, Object>> getAllJobs() {
+        List<Map<String, Object>> list = new java.util.ArrayList<>();
+        
         Connection conn = ConnectDB.getConnection();
         try {
             String sql = "SELECT * FROM tasks JOIN files ON tasks.file_id = files.file_id ORDER BY tasks.created_at DESC";

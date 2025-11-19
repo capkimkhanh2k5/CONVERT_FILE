@@ -1,16 +1,16 @@
 package com.convertfile.bo;
 
-import com.convertfile.model.bean.FileInfo;
+import com.convertfile.model.bean.Files;
 import com.convertfile.model.dao.FileDAO;
 
 public class FileBO {
     private final FileDAO fileDAO = new FileDAO();
 
-    public boolean insertFile(FileInfo file) {
+    public boolean insertFile(Files file) {
         return fileDAO.insertFile(file);
     }
 
-    public FileInfo getFileByID(String fileID) {
+    public Files getFileByID(String fileID) {
         return fileDAO.getFileByID(fileID);
     }
 

@@ -20,7 +20,7 @@ import jakarta.servlet.http.Part;
 import com.convertfile.bo.FileBO;
 import com.convertfile.bo.UserBO;
 import com.convertfile.model.bean.EnumStatus;
-import com.convertfile.model.bean.FileInfo;
+import com.convertfile.model.bean.Files;
 import com.convertfile.service.FileService;
 
 @WebServlet("/home")
@@ -46,7 +46,7 @@ public class HomeServlet extends HttpServlet{
         // Nếu không có session -> Guest
         if(session == null){
             request.setAttribute("username", "GUEST");
-            request.setAttribute("files", new ArrayList<FileInfo>());
+            request.setAttribute("files", new ArrayList<Files>());
             request.setAttribute("totalFiles", 0);
             request.setAttribute("completedFiles", 0);
             
@@ -73,12 +73,12 @@ public class HomeServlet extends HttpServlet{
                 }
             }
 
-            List<FileInfo> filesList = new ArrayList<>();
+            List<Files> filesList = new ArrayList<>();
             int totalFiles = 0;
             int completedFiles = 0;
             
             for(String file_id : file_ids) {
-                FileInfo file = fileBO.getFileByID(file_id);
+                Files file = fileBO.getFileByID(file_id);
                 if (file == null) continue;
                 
                 filesList.add(file);
@@ -148,7 +148,7 @@ public class HomeServlet extends HttpServlet{
             filePart.write(savedFilePath);
 
             // Lưu metadata
-            FileInfo info = new FileInfo();
+            Files info = new Files();
             
             info.setFile_id(file_id);
             LocalDateTime now = LocalDateTime.now();
@@ -157,8 +157,7 @@ public class HomeServlet extends HttpServlet{
             info.setUser_id(user_id);
             info.setSaved_name(saved_name);
             info.setFile_size((long)filePart.getSize());
-            info.setInput_path(inputDir);
-            info.setOutput_path(uploadPath);
+            info.setFile_path(savedFilePath);
             info.setInput_format(input_format);
             info.setOutput_format(null);
             info.setCurrent_status(EnumStatus.FileStatus.UPLOADED);

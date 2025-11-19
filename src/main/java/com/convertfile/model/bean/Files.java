@@ -4,14 +4,13 @@ import java.time.LocalDateTime;
 
 import com.convertfile.model.bean.EnumStatus.FileStatus;
 
-public class FileInfo {
+public class Files {
     private String file_id;
     private long user_id;
     private String original_name;
     private String saved_name;
     private long file_size;
-    private String input_path;
-    private String output_path;
+    private String file_path;
     private String input_format;
     private String output_format;
     private FileStatus current_status;
@@ -20,14 +19,13 @@ public class FileInfo {
     private LocalDateTime updated_at;
 
     //Constructor
-    public FileInfo(){
+    public Files(){
         this.file_id = "";
         this.user_id = 0;
         this.original_name = "";
         this.saved_name = "";
         this.file_size = 0;
-        this.input_path = "";
-        this.output_path = "";
+        this.file_path = "";
         this.input_format = "";
         this.output_format = "";
         this.current_status = FileStatus.UPLOADED;
@@ -36,14 +34,13 @@ public class FileInfo {
         this.updated_at = LocalDateTime.now();
     }
 
-    public FileInfo(String file_id, long user_id, String original_name, String saved_name, long file_size, String input_path, String output_path, String input_format, String output_format, FileStatus current_status, String description, LocalDateTime created_at, LocalDateTime updated_at) {
+    public Files(String file_id, long user_id, String original_name, String saved_name, long file_size, String input_path, String output_path, String input_format, String output_format, FileStatus current_status, String description, LocalDateTime created_at, LocalDateTime updated_at) {
         this.file_id = file_id;
         this.user_id = user_id;
         this.original_name = original_name;
         this.saved_name = saved_name;
         this.file_size = file_size;
-        this.input_path = input_path;
-        this.output_path = output_path;
+        this.file_path = file_path;
         this.input_format = input_format;
         this.output_format = output_format;
         this.current_status = current_status;
@@ -52,14 +49,13 @@ public class FileInfo {
         this.updated_at = updated_at;
     }
 
-    public FileInfo(FileInfo info){
+    public Files(Files info){
         this.file_id = info.getFile_id();
         this.user_id = info.getUser_id();
         this.original_name = info.getOriginal_name();
         this.saved_name = info.getSaved_name();
         this.file_size = info.getFile_size();
-        this.input_path = info.getInput_path();
-        this.output_path = info.getOutput_path();
+        this.file_path = info.getFile_path();
         this.input_format = info.getInput_format();
         this.output_format = info.getOutput_format();
         this.current_status = info.getCurrent_status();
@@ -84,12 +80,9 @@ public class FileInfo {
     public long getFile_size() { return file_size; }
     public void setFile_size(long file_size) { this.file_size = file_size; }
 
-    public String getInput_path() { return input_path; }
-    public void setInput_path(String input_path) { this.input_path = input_path; }
-
-    public String getOutput_path() { return output_path; }
-    public void setOutput_path(String output_path) { this.output_path = output_path; }
-
+    public String getFile_path() { return file_path; }
+    public void setFile_path(String file_path) { this.file_path = file_path; }
+    
     public String getInput_format() { return input_format; }
     public void setInput_format(String input_format) { this.input_format = input_format; }
 

@@ -6,11 +6,12 @@ import com.convertfile.model.bean.EnumStatus.TaskStatus;
 import com.convertfile.model.bean.EnumStatus.TaskType;
 
 
-public class TaskJob {
+public class Tasks {
     private long task_id;
     private String file_id;
     private TaskType task_type;
     private TaskStatus status;
+    private int progress_percent;
     private String message;
     private String worker_id;
     private int attempt_count;
@@ -21,11 +22,12 @@ public class TaskJob {
 
 
     // Constructor
-    public TaskJob() {
+    public Tasks() {
         this.task_id = 0;
         this.file_id = "";
         this.task_type = null;
         this.status = TaskStatus.WAITING;
+        this.progress_percent = 0;
         this.message = "";
         this.worker_id = "";
         this.attempt_count = 0;
@@ -34,11 +36,12 @@ public class TaskJob {
         this.completed_at = null;
     }
 
-    public TaskJob(long task_id, String fileId, TaskType task_type, TaskStatus status, String message, String worker_id, int attempt_count, LocalDateTime created_at, LocalDateTime started_at, LocalDateTime completed_at) {
+    public Tasks(long task_id, String fileId, TaskType task_type, TaskStatus status, int progress_percent, String message, String worker_id, int attempt_count, LocalDateTime created_at, LocalDateTime started_at, LocalDateTime completed_at) {
         this.task_id = task_id;
         this.file_id = fileId;
         this.task_type = task_type;
         this.status = status;
+        this.progress_percent = progress_percent;
         this.message = message;
         this.worker_id = worker_id;
         this.attempt_count = attempt_count;
@@ -47,11 +50,12 @@ public class TaskJob {
         this.completed_at = completed_at;
     }
 
-    public TaskJob(TaskJob job){
+    public Tasks(Tasks job){
         this.task_id = job.getTask_id();
         this.file_id = job.getFileId();
         this.task_type = job.getTask_type();
         this.status = job.getStatus();
+        this.progress_percent = job.getProgress_percent();
         this.message = job.getMessage();
         this.worker_id = job.getWorker_id();
         this.attempt_count = job.getAttempt_count();
@@ -72,6 +76,9 @@ public class TaskJob {
 
     public TaskStatus getStatus() { return status; }
     public void setStatus(TaskStatus status) { this.status = status; }
+
+    public int getProgress_percent() { return progress_percent; }
+    public void setProgress_percent(int progress_percent) { this.progress_percent = progress_percent; }
 
     public String getMessage() { return message; }
     public void setMessage(String message) { this.message = message; }
