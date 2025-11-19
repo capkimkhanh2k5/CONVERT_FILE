@@ -1,7 +1,5 @@
 package com.convertfile.controller;
 
-import java.util.Random;
-
 import com.convertfile.bo.UserBO;
 import com.convertfile.service.EmailSerive;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -17,7 +15,6 @@ import jakarta.servlet.http.HttpSession;
 public class ForgotPWServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private UserBO userBO = new UserBO();
-    private EmailSerive EmailService = new EmailSerive();
 
     @Override
     protected void doGet(jakarta.servlet.http.HttpServletRequest request, 
@@ -59,11 +56,11 @@ public class ForgotPWServlet extends HttpServlet {
 
             if (email != null && userBO.checkEmailExist(email)) {
                 // Gửi mã xác nhận đến email
-                String otpValue = EmailService.generateOTP();
+                String otpValue = EmailSerive.generateOTP();
+                String htmlContent = EmailSerive.getOtpEmail(otpValue);
 
                 try {
-                    EmailService.sendEmail(email, "OPT CODE", "Your OPT code is: " + otpValue);
-
+                    EmailSerive.sendEmail(email, "CODE FOR RESET PASSWORD", htmlContent);
                     // Lưu OTP vào Session
                     HttpSession session = request.getSession();
 

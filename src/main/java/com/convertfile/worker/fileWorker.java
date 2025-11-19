@@ -13,11 +13,15 @@ public class FileWorker implements Runnable {
         while (true) {
             try {
                 processNextJob();
-                Thread.sleep(2000); 
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                running = false;
+                Thread.currentThread().interrupt();
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
+        System.out.println("🛑 WORKER ĐÃ DỪNG.");
     }
 
     private void processNextJob() {
