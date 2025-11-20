@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Context>
-    <CookieProcessor className="org.apache.tomcat.util.http.Rfc6265CookieProcessor"
-                        sameSiteCookies="none" />
+    <!-- 
+        Tomcat 11 does not support LegacyCookieProcessor.
+        We rely on application-level cleanup (Filter/Servlet) to handle invalid cookies.
+    -->
 </Context>
