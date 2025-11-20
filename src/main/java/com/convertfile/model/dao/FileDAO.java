@@ -15,12 +15,12 @@ import com.convertfile.model.bean.EnumStatus.FileStatus;
 public class FileDAO {
     public boolean insertFile(Files file) {
         String sql = """
-            INSERT INTO files (file_id, user_id, original_name, saved_name, file_size, file_path, 
-            input_format, output_format, current_status, description, created_at, updated_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """;
+                INSERT INTO files (file_id, user_id, original_name, saved_name, file_size, file_path,
+                input_format, output_format, current_status, description, created_at, updated_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """;
         try (Connection conn = ConnectDB.getConnection();
-            PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, file.getFile_id());
             ps.setLong(2, file.getUser_id());
@@ -42,47 +42,47 @@ public class FileDAO {
         }
     }
 
-    public List<Files> getAllFiles(){
+    public List<Files> getAllFiles() {
         List<Files> list = new ArrayList<>();
         String sql = "SELECT * FROM files";
-        try(Connection conn = ConnectDB.getConnection();
-            PreparedStatement ps = conn.prepareStatement(sql);
-            ResultSet rs = ps.executeQuery()){
+        try (Connection conn = ConnectDB.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()) {
 
-            while(rs.next()){
+            while (rs.next()) {
                 list.add(mapRow(rs));
             }
-            
+
         } catch (Exception e) {
-            e.printStackTrace();   
+            e.printStackTrace();
         }
 
         return list;
     }
 
-    public Files getFileByID(String fileID){
+    public Files getFileByID(String fileID) {
         String sql = "SELECT * FROM files WHERE file_id = ?";
-        try(Connection conn = ConnectDB.getConnection();
-            PreparedStatement ps = conn.prepareStatement(sql)){
+        try (Connection conn = ConnectDB.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, fileID);
-            try(ResultSet rs = ps.executeQuery()){
-                if(rs.next()){
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
                     return mapRow(rs);
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        
+
         return null;
     }
 
-    public boolean updateStatus(String fileID, String status){
-        
+    public boolean updateStatus(String fileID, String status) {
+
         String sql = "UPDATE files SET current_status = ? AND updated_at = ? WHERE file_id = ?";
-        try(Connection conn = ConnectDB.getConnection();
-            PreparedStatement ps = conn.prepareStatement(sql)){
+        try (Connection conn = ConnectDB.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
 
             LocalDateTime now = LocalDateTime.now();
 
@@ -91,8 +91,8 @@ public class FileDAO {
             ps.setString(3, fileID);
 
             return ps.executeUpdate() > 0;
-            
-        } catch(Exception e){
+
+        } catch (Exception e) {
             e.printStackTrace();
             return false;
         }
@@ -135,7 +135,7 @@ public class FileDAO {
         List<String> fileIds = new ArrayList<>();
 
         try (Connection conn = ConnectDB.getConnection();
-            PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setLong(1, user_id);
 
@@ -150,5 +150,31 @@ public class FileDAO {
         }
 
         return fileIds.toArray(new String[0]);
+    }
+
+    public boolean updateConvertedFile(String fileId, String filePath, String savedName, long fileSize,
+            String publicId) {
+        String sql = """
+                UPDATE files
+                SET file_path = ?, saved_name = ?, file_size = ?, public_id = ?, current_status = 'CONVERTED', updated_at = ?
+                WHERE file_id = ?
+                """;
+
+        try (Connection conn = ConnectDB.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, filePath);
+            ps.setString(2, savedName);
+            ps.setLong(3, fileSize);
+            ps.setString(4, publicId);
+            ps.setTimestamp(5, Timestamp.valueOf(LocalDateTime.now()));
+            ps.setString(6, fileId);
+
+            return ps.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 }

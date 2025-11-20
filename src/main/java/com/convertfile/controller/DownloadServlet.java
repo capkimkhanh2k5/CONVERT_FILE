@@ -19,12 +19,13 @@ import java.sql.ResultSet;
 @WebServlet("/download")
 public class DownloadServlet extends HttpServlet {
 
-    private static final String UPLOAD_DIR = "C:\\uploads";
+    // Sử dụng cùng thư mục với FileWorker
+    private static final String UPLOAD_DIR = System.getProperty("user.home") + File.separator + "uploads";
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) 
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
+
         // 1. Lấy tên file gốc từ tham số URL (VD: BaoCao.pdf)
         String originalFileName = request.getParameter("file");
         if (originalFileName == null || originalFileName.isEmpty()) {
@@ -62,7 +63,7 @@ public class DownloadServlet extends HttpServlet {
         // 4. Cấu hình Header để trình duyệt hiểu đây là file cần tải về
         // Thiết lập MIME type cho Word
         response.setContentType("application/vnd.openxmlformats-officedocument.wordprocessingml.document");
-        
+
         // Tạo tên file hiển thị khi tải về (Lấy tên gốc thay đuôi .pdf thành .docx)
         String downloadNameDisplay = originalFileName;
         if (originalFileName.toLowerCase().endsWith(".pdf")) {
@@ -74,14 +75,14 @@ public class DownloadServlet extends HttpServlet {
         // Xử lý tên file có tiếng Việt hoặc dấu cách
         String encodedFileName = URLEncoder.encode(downloadNameDisplay, "UTF-8").replaceAll("\\+", "%20");
         response.setHeader("Content-Disposition", "attachment; filename=\"" + encodedFileName + "\"");
-        
+
         // Thiết lập độ dài file
         response.setContentLength((int) fileToDownload.length());
 
         // 5. Ghi dữ liệu file ra luồng phản hồi (Response)
         try (FileInputStream in = new FileInputStream(fileToDownload);
-             OutputStream out = response.getOutputStream()) {
-            
+                OutputStream out = response.getOutputStream()) {
+
             byte[] buffer = new byte[4096]; // Bộ đệm 4KB
             int bytesRead;
             while ((bytesRead = in.read(buffer)) != -1) {
@@ -102,14 +103,18 @@ public class DownloadServlet extends HttpServlet {
             ps = conn.prepareStatement(sql);
             ps.setString(1, originalName);
             rs = ps.executeQuery();
-            
+
             if (rs.next()) {
                 return rs.getString("saved_name");
             }
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            try { if (conn != null) conn.close(); } catch (Exception e) {}
+            try {
+                if (conn != null)
+                    conn.close();
+            } catch (Exception e) {
+            }
         }
         return null;
     }

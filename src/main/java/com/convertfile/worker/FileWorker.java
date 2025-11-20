@@ -1,104 +1,146 @@
 package com.convertfile.worker;
 
-import com.convertfile.model.dao.ConnectDB;
+import com.convertfile.model.dao.FileDAO;
+import com.convertfile.model.dao.TaskDAO;
+import com.convertfile.model.bean.Files;
+import com.convertfile.model.bean.Tasks;
+import com.convertfile.model.bean.EnumStatus.TaskStatus;
+import com.convertfile.service.PdfTool;
+import com.convertfile.service.CloudService.CloudUploadService;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
+import java.io.InputStream;
+import java.net.URL;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+import java.util.Map;
 
 public class FileWorker implements Runnable {
 
-    // Sử dụng while(true) nên không cần biến 'running'
+    private final TaskDAO taskDAO = new TaskDAO();
+    private final FileDAO fileDAO = new FileDAO();
+
     @Override
     public void run() {
-        System.out.println("🤖 WORKER (VERSION REAL) ĐÃ KHỞI ĐỘNG...");
-        while (true) {
+        System.out.println("🤖 WORKER (CLOUD) ĐÃ KHỞI ĐỘNG...");
+
+        while (!Thread.currentThread().isInterrupted()) {
             try {
                 processNextJob();
-                Thread.sleep(2000); 
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                System.out.println("⚠️ WORKER: Nhận tín hiệu shutdown...");
+                Thread.currentThread().interrupt(); // Restore interrupted status
+                break; // Exit loop gracefully
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
+
+        System.out.println("🛑 WORKER: Đã dừng hoạt động.");
     }
-    
+
     private void processNextJob() {
-        Connection conn = null;
+        Path tempInput = null;
+        Path tempOutput = null;
+
         try {
-            conn = ConnectDB.getConnection();
-            if (conn == null) return;
-
-            String sqlFind = "SELECT * FROM tasks JOIN files ON tasks.file_id = files.file_id WHERE tasks.status = 'WAITING' LIMIT 1";
-            PreparedStatement ps = conn.prepareStatement(sqlFind);
-            ResultSet rs = ps.executeQuery();
-
-            if (rs.next()) {
-                String taskId = rs.getString("task_id");
-                String inputPath = rs.getString("input_path");
-                String savedName = rs.getString("saved_name");
-
-                System.out.println("🔥 Bắt đầu xử lý Task ID: " + taskId);
-                
-                // Đổi tên file output
-                String outputPath = inputPath.substring(0, inputPath.lastIndexOf(".")) + ".docx";
-                if(inputPath.endsWith(".pdf") == false && inputPath.endsWith(".PDF") == false) {
-                     outputPath = inputPath + ".docx"; // Fallback nếu tên file lạ
-                }
-
-                try {
-                    // 1. Đếm trang
-                    int totalPages = com.convertfile.service.PdfTool.getPageCount(inputPath);
-                    if (totalPages == 0) totalPages = 1;
-
-                    updateStatus(conn, taskId, "PROCESSING", 0);
-
-                    // 2. Chạy từng trang
-                    for (int i = 0; i < totalPages; i++) {
-                        // Chỉ convert nếu là PDF
-                        if (savedName.toLowerCase().endsWith(".pdf")) {
-                            com.convertfile.service.PdfTool.convertPdfToDocx(inputPath, outputPath);
-                        } else {
-                            Thread.sleep(500); // Giả lập nếu không phải PDF
-                        }
-                        
-                        // Vì convert docx làm 1 lèo, nên ta giả lập % chạy cho đẹp
-                        // (Logic thực tế ở đây ta làm đơn giản hóa để tránh phức tạp)
-                    }
-                    
-                    // Giả lập chạy vèo vèo 10% -> 100% để user thấy
-                    for(int k=10; k<=100; k+=10) {
-                        updateStatus(conn, taskId, "PROCESSING", k);
-                        Thread.sleep(100);
-                    }
-                    
-                    updateStatus(conn, taskId, "COMPLETED", 100);
-                    System.out.println("✅ Task " + taskId + " HOÀN THÀNH!");
-
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                    updateStatus(conn, taskId, "FAILED", 0);
-                    System.out.println("❌ Lỗi xử lý: " + ex.getMessage());
-                }
+            // 1. Lấy task tiếp theo từ hàng đợi (qua DAO)
+            Tasks task = taskDAO.getNextWaitingTask();
+            if (task == null) {
+                return; // Không có task nào đang chờ
             }
-            ps.close();
+
+            long taskId = task.getTask_id();
+            String fileId = task.getFileId();
+            String taskType = task.getTask_type().name();
+
+            // 2. Lấy thông tin file (qua DAO)
+            Files file = fileDAO.getFileByID(fileId);
+            if (file == null) {
+                System.out.println("❌ Không tìm thấy file: " + fileId);
+                taskDAO.updateStatus(taskId, TaskStatus.FAILED, 0, "File not found");
+                return;
+            }
+
+            String fileUrl = file.getFile_path(); // URL Cloudinary
+            String savedName = file.getSaved_name();
+
+            System.out.println("🔥 Bắt đầu xử lý Task ID: " + taskId);
+            System.out.println("   File ID: " + fileId);
+            System.out.println("   URL: " + fileUrl);
+
+            // 3. Cập nhật trạng thái sang PROCESSING (qua DAO)
+            taskDAO.updateStatus(taskId, TaskStatus.PROCESSING, 0, "Starting conversion");
+
+            try {
+                // 4. Download file từ Cloudinary về Temp Input
+                System.out.println("   ⬇️ Đang tải file từ Cloudinary...");
+                tempInput = java.nio.file.Files.createTempFile("input_", "_" + savedName);
+                try (InputStream in = new URL(fileUrl).openStream()) {
+                    java.nio.file.Files.copy(in, tempInput, StandardCopyOption.REPLACE_EXISTING);
+                }
+                System.out.println("   ✅ Đã tải về Temp: " + tempInput.toString());
+
+                // 5. Tạo Temp Output
+                String outputExtension = savedName.toLowerCase().endsWith(".pdf") ? ".docx" : ".docx";
+                tempOutput = java.nio.file.Files.createTempFile("output_", outputExtension);
+
+                // 6. Xử lý Convert (PDF -> DOCX)
+                System.out.println("   ⚙️ Đang convert...");
+
+                if (savedName.toLowerCase().endsWith(".pdf")) {
+                    PdfTool.convertPdfToDocx(tempInput.toString(), tempOutput.toString());
+                } else {
+                    // Dummy convert cho các loại khác
+                    java.nio.file.Files.copy(tempInput, tempOutput, StandardCopyOption.REPLACE_EXISTING);
+                }
+
+                // 7. Cập nhật tiến độ (qua DAO)
+                for (int k = 10; k <= 80; k += 20) {
+                    taskDAO.updateStatus(taskId, TaskStatus.PROCESSING, k, "Converting...");
+                    Thread.sleep(200);
+                }
+
+                // 8. Upload kết quả lên Cloudinary
+                System.out.println("   ☁️ Đang upload kết quả lên Cloudinary...");
+                Map<String, Object> uploadResult = CloudUploadService.uploadFile(
+                        tempOutput.toFile(),
+                        "converted_" + savedName,
+                        taskType);
+
+                String newUrl = (String) uploadResult.get("secure_url");
+                String newPublicId = (String) uploadResult.get("public_id");
+                String newSavedName = (String) uploadResult.get("original_filename") + "."
+                        + (String) uploadResult.get("format");
+                long newSize = ((Number) uploadResult.get("bytes")).longValue();
+
+                System.out.println("   ✅ Upload thành công: " + newUrl);
+
+                // 9. Cập nhật thông tin file mới vào Database (qua DAO)
+                fileDAO.updateConvertedFile(fileId, newUrl, newSavedName, newSize, newPublicId);
+
+                // 10. Cập nhật trạng thái task COMPLETED (qua DAO)
+                taskDAO.updateStatus(taskId, TaskStatus.COMPLETED, 100, "Conversion completed");
+                System.out.println("✅ Task " + taskId + " HOÀN THÀNH!");
+
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                taskDAO.updateStatus(taskId, TaskStatus.FAILED, 0, "Error: " + ex.getMessage());
+                System.out.println("❌ Lỗi xử lý: " + ex.getMessage());
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            try { if (conn != null) conn.close(); } catch (Exception e) {}
-        }
-    }
-
-    private void updateStatus(Connection conn, String taskId, String status, int progress) {
-        try {
-            String sql = "UPDATE tasks SET status = ?, progress_percent = ? WHERE task_id = ?";
-            PreparedStatement ps = conn.prepareStatement(sql);
-            ps.setString(1, status);
-            ps.setInt(2, progress);
-            ps.setString(3, taskId);
-            ps.executeUpdate();
-            ps.close();
-        } catch (Exception e) {
-            e.printStackTrace();
+            // Cleanup temporary files
+            try {
+                if (tempInput != null)
+                    java.nio.file.Files.deleteIfExists(tempInput);
+                if (tempOutput != null)
+                    java.nio.file.Files.deleteIfExists(tempOutput);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 }

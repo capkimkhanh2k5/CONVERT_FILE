@@ -49,3 +49,9 @@ id_rsa
 .DS_Store
 .AppleDouble
 .LSOverride
+
+# ==================================
+# DEPLOYMENT SCRIPTS
+# ==================================
+deploy.sh
+*.deploy.sh

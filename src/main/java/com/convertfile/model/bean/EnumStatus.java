@@ -1,7 +1,7 @@
 package com.convertfile.model.bean;
 
 public class EnumStatus {
-    public enum FileStatus{
+    public enum FileStatus {
         UPLOADED,
         PROCESSING,
         CONVERTED,
@@ -14,10 +14,10 @@ public class EnumStatus {
         PROCESSING,
         COMPLETED,
         FAILED,
-        CANCELED
+        CANCELED,
     }
 
-    //TODO: Chưa hoàn thiện, bổ sung khi làm đủ
+    // TODO: Chưa hoàn thiện, bổ sung khi làm đủ
     public enum TaskType {
         CONVERT_PDF_TO_DOCX,
         CONVERT_DOCX_TO_PDF,
