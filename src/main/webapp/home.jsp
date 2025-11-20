@@ -5,10 +5,11 @@
 <%@ page import="com.convertfile.model.dao.JobDAO" %>
 
 
-<% // Lấy userId từ Session 
+<% 
+    // Lấy userId từ Session 
     Object uidObj=session.getAttribute("userId"); 
     long currentUserId=0;
-    if(uidObj !=null) { currentUserId=(Long) uidObj; } // Truyền ID vào hàm getAllJobs để hiển thịHistory và trạng thái ban đầu 
+    if(uidObj !=null) { currentUserId=(Long) uidObj; } // Truyền ID vào hàm getAllJobs để hiển
     List<Map<String, Object>> listJobs = JobDAO.getAllJobs(currentUserId);
 %>
 
@@ -629,6 +630,10 @@
             <div class="user-profile">
                 <div class="avatar">
                     <c:choose>
+                        <c:when test="${not empty sessionScope.userpicture}">
+                            <img src="${sessionScope.userpicture}" alt="Avatar"
+                                style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+                        </c:when>
                         <c:when test="${not empty sessionScope.username}">
                             ${sessionScope.username.substring(0, 1).toUpperCase()}
                         </c:when>

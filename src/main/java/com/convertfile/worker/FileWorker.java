@@ -5,8 +5,8 @@ import com.convertfile.model.dao.TaskDAO;
 import com.convertfile.model.bean.Files;
 import com.convertfile.model.bean.Tasks;
 import com.convertfile.model.bean.EnumStatus.TaskStatus;
-import com.convertfile.service.PdfTool;
 import com.convertfile.service.CloudService.CloudUploadService;
+import com.convertfile.service.ConvertService.PdfTool;
 
 import java.io.InputStream;
 import java.net.URL;

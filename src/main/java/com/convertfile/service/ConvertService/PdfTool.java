@@ -1,4 +1,4 @@
-package com.convertfile.service;
+package com.convertfile.service.ConvertService;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
@@ -25,7 +25,7 @@ public class PdfTool {
     // Hàm Convert PDF sang DOCX (Word)
     public static void convertPdfToDocx(String inputPath, String outputPath) throws IOException {
         File inputFile = new File(inputPath);
-        
+
         // 1. Đọc nội dung từ PDF
         String pdfText = "";
         try (PDDocument document = PDDocument.load(inputFile)) {
@@ -38,7 +38,7 @@ public class PdfTool {
             // Tạo một đoạn văn bản
             XWPFParagraph paragraph = docx.createParagraph();
             XWPFRun run = paragraph.createRun();
-            
+
             // Xử lý xuống dòng (Word không hiểu \n như Text)
             String[] lines = pdfText.split("\n");
             for (String line : lines) {
