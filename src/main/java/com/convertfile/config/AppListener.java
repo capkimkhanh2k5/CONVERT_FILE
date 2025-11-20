@@ -20,10 +20,27 @@ public class AppListener implements ServletContextListener {
 
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
-        // Khi tắt server thì ngắt luồng (đơn giản hóa, không cần gọi .stop())
+        System.out.println("🛑 APP LISTENER: Đang tắt server...");
+
+        // Gửi tín hiệu interrupt đến worker thread
         if (workerThread != null && workerThread.isAlive()) {
             workerThread.interrupt();
+
+            try {
+                // Đợi worker thread dừng hoàn toàn (timeout 5 giây)
+                workerThread.join(5000);
+
+                if (workerThread.isAlive()) {
+                    System.out.println("⚠️ Worker thread không dừng sau 5 giây!");
+                } else {
+                    System.out.println("✅ Worker thread đã dừng thành công.");
+                }
+            } catch (InterruptedException e) {
+                System.out.println("⚠️ Bị gián đoạn khi đợi worker thread.");
+                Thread.currentThread().interrupt();
+            }
         }
-        System.out.println("🛑 APP LISTENER: Server đã tắt.");
+
+        System.out.println("🛑 APP LISTENER: Server đã tắt hoàn toàn.");
     }
 }

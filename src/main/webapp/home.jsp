@@ -4,125 +4,174 @@
 <%@ page import="java.util.Map" %>
 <%@ page import="com.convertfile.model.dao.JobDAO" %>
 
-<%
-    // --- LOGIC THÔNG MINH: CHỈ RELOAD KHI CẦN THIẾT ---
-    // Lấy userId từ Session
-    Object uidObj = session.getAttribute("userId");
-    long currentUserId = 0;
-    if (uidObj != null) {
-        currentUserId = (Long) uidObj;
-    }
 
-    boolean needReload = false;
-    // Truyền ID vào hàm getAllJobs
-    List<Map<String, Object>> listJobs = JobDAO.getAllJobs(currentUserId); // Lấy dữ liệu ngay tại đây
-    
-    if (listJobs != null) {
-        for (Map<String, Object> job : listJobs) {
-            String s = (String) job.get("status");
-            // Nếu còn file nào đang quay quay -> Bật chế độ tự F5
-            if ("WAITING".equals(s) || "PROCESSING".equals(s)) {
-                needReload = true;
-                break;
-            }
-        }
-    }
+<% // Lấy userId từ Session 
+    Object uidObj=session.getAttribute("userId"); 
+    long currentUserId=0;
+    if(uidObj !=null) { currentUserId=(Long) uidObj; } // Truyền ID vào hàm getAllJobs để hiển thịHistory và trạng thái ban đầu 
+    List<Map<String, Object>> listJobs = JobDAO.getAllJobs(currentUserId);
 %>
 
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ConvertFile</title>
+    <title>Dashboard - ConvertFile</title>
 
-    <% if (needReload) { %>
-        <meta http-equiv="refresh" content="2">
-    <% } %>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
 
     <style>
-        html, body{
-            height: 100%;
-            min-height: 100%;
-            margin: 0;
-            padding: 0;
-            overflow-x: hidden;
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #ec4899;
+            --accent: #8b5cf6;
+            --text-main: #1e293b;
+            --text-light: #64748b;
+            --bg-glass: rgba(255, 255, 255, 0.7);
+            --bg-glass-strong: rgba(255, 255, 255, 0.9);
+            --shadow-glass: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+            --border-glass: 1px solid rgba(255, 255, 255, 0.18);
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
         }
-        
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: #f5f7fa;
-            color: #2d3748;
-        }
-
-        /* Layout chính */
-        .app-container {
-            display: grid;
-            grid-template-columns: 240px 1fr 320px;
-            height: 100vh;
             min-height: 100vh;
-            width: 100vw;
-            overflow: hidden; 
+            background: #f0f2f5;
+            overflow: hidden;
+            /* Prevent body scroll, use inner scroll */
+            position: relative;
         }
 
-        /* Sidebar trái */
-        .sidebar {
-            background: white;
-            border-right: 1px solid #e2e8f0;
+        /* Animated Background */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+            background: linear-gradient(45deg, #f3f4f6, #e5e7eb);
+        }
+
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.5;
+            animation: float 20s infinite ease-in-out;
+        }
+
+        .orb-1 {
+            width: 500px;
+            height: 500px;
+            background: var(--primary);
+            top: -10%;
+            left: -10%;
+            animation-delay: 0s;
+        }
+
+        .orb-2 {
+            width: 400px;
+            height: 400px;
+            background: var(--secondary);
+            bottom: -10%;
+            right: -10%;
+            animation-delay: -5s;
+        }
+
+        .orb-3 {
+            width: 300px;
+            height: 300px;
+            background: var(--accent);
+            top: 40%;
+            left: 40%;
+            animation-delay: -10s;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translate(0, 0) scale(1);
+            }
+
+            33% {
+                transform: translate(30px, -50px) scale(1.1);
+            }
+
+            66% {
+                transform: translate(-20px, 20px) scale(0.9);
+            }
+        }
+
+        /* Main Layout */
+        .app-layout {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            height: 100vh;
+            width: 100vw;
+            gap: 20px;
+            padding: 20px;
+            transition: grid-template-columns 0.3s ease;
+        }
+
+        .app-layout.show-history {
+            grid-template-columns: 260px 1fr 320px;
+        }
+
+        /* Glass Panel Common */
+        .glass-panel {
+            background: var(--bg-glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 24px;
+            border: var(--border-glass);
+            box-shadow: var(--shadow-glass);
             display: flex;
             flex-direction: column;
-            padding: 24px 16px;
-            overflow-y: auto;
-            height: 100vh;
-        }
-
-        .user-profile {
-            text-align: center;
-            margin-bottom: 32px;
-            padding-bottom: 24px;
-            border-bottom: 1px solid #e2e8f0;
-        }
-
-        .avatar {
-            width: 64px;
-            height: 64px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            margin: 0 auto 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 28px;
-            color: white;
             overflow: hidden;
         }
 
-        .avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
+        /* Sidebar */
+        .sidebar {
+            padding: 24px;
         }
 
-        .user-name {
-            font-weight: 600;
-            font-size: 15px;
-            color: #1a202c;
-            margin-bottom: 4px;
-        }
-
-        .user-email {
-            font-size: 12px;
-            color: #718096;
+        .brand {
+            font-size: 24px;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 40px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
         .nav-menu {
             flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
         }
 
         .nav-item {
@@ -130,1222 +179,806 @@
             align-items: center;
             gap: 12px;
             padding: 12px 16px;
-            border-radius: 8px;
+            border-radius: 12px;
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
             cursor: pointer;
-            transition: all 0.2s;
-            margin-bottom: 4px;
-            color: #4a5568;
-            font-size: 14px;
         }
 
-        .nav-item:hover {
-            background: #f7fafc;
-            color: #667eea;
+        .nav-item:hover,
+        .nav-item.active {
+            background: rgba(255, 255, 255, 0.5);
+            color: var(--primary);
+            transform: translateX(5px);
         }
 
         .nav-item.active {
-            background: #eef2ff;
-            color: #667eea;
-            font-weight: 500;
-        }
-
-        .nav-icon {
-            font-size: 20px;
-            width: 20px;
-            text-align: center;
-        }
-
-        .nav-bottom {
-            margin-top: auto;
-            padding-top: 16px;
-            border-top: 1px solid #e2e8f0;
-        }
-
-        .nav-item a.nav-link {
-            text-decoration: none;
-            color: inherit;
-            cursor: pointer;
-        }
-
-        .nav-item a.nav-link:hover {
-            opacity: 0.8;
-        }
-
-        /* Main content */
-        .main-content {
-            padding: 32px 48px;
-            overflow-y: auto;
-            height: 100vh;
-        }
-
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 32px;
-        }
-
-        .logo {
-            text-decoration: none;
-            margin-right: 16px;
-            font-size: 28px;
-            font-weight: bold;
-            display: inline-block;
-            transition: all 0.3s ease;
-            position: relative;
-        }
-
-        .logo span:first-child {
-            color: #5e35b1;
-            transition: all 0.3s ease;
-        }
-
-        .logo span:last-child {
-            color: #1e88e5;
-            transition: all 0.3s ease;
-        }
-
-        .logo:hover {
-            transform: scale(1.05);
-            filter: drop-shadow(0 0 8px rgba(94, 53, 177, 0.4));
-        }
-
-        .logo:hover span:first-child {
-            color: #7e57c2;
-            text-shadow: 0 0 10px rgba(94, 53, 177, 0.5);
-        }
-
-        .logo:hover span:last-child {
-            color: #42a5f5;
-            text-shadow: 0 0 10px rgba(30, 136, 229, 0.5);
-        }
-
-        .page-title {
-            font-size: 24px;
-            font-weight: 600;
-            color: #1a202c;
-        }
-
-        .header-actions {
-            display: flex;
-            gap: 8px;
-        }
-
-        .icon-btn {
-            width: 36px;
-            height: 36px;
-            border-radius: 8px;
-            border: none;
             background: white;
-            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .user-profile {
+            margin-top: auto;
+            padding-top: 20px;
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 18px;
-            transition: all 0.2s;
+            color: white;
+            font-weight: 700;
+            font-size: 16px;
         }
 
-        .icon-btn:hover {
-            background: #f7fafc;
+        .user-info h4 {
+            font-size: 14px;
+            color: var(--text-main);
         }
 
-        /* Upload area */
-        .upload-container {
-            background: white;
-            border-radius: 16px;
-            padding: 48px;
+        .user-info p {
+            font-size: 12px;
+            color: var(--text-light);
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 32px;
+            overflow-y: auto;
+        }
+
+        .header {
             margin-bottom: 32px;
         }
 
-        .upload-area {
-            border: 2px dashed #cbd5e0;
-            border-radius: 12px;
-            padding: 64px 32px;
+        .header h1 {
+            font-size: 28px;
+            color: var(--text-main);
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            color: var(--text-light);
+        }
+
+        /* Upload Area */
+        .upload-zone {
+            background: rgba(255, 255, 255, 0.5);
+            border: 2px dashed #cbd5e1;
+            border-radius: 20px;
+            padding: 60px;
             text-align: center;
+            transition: all 0.3s ease;
             cursor: pointer;
-            transition: all 0.3s;
-            background: #f7fafc;
+            margin-bottom: 32px;
+            position: relative;
+            overflow: hidden;
         }
 
-        .upload-area:hover {
-            border-color: #667eea;
-            background: #eef2ff;
-        }
-
-        .upload-area.dragover {
-            border-color: #667eea;
-            background: #eef2ff;
-            border-style: solid;
+        .upload-zone:hover,
+        .upload-zone.dragover {
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.05);
+            transform: scale(1.01);
         }
 
         .upload-icon {
             width: 80px;
             height: 80px;
-            margin: 0 auto 24px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: white;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 40px;
-            color: white;
+            margin: 0 auto 20px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+            color: var(--primary);
+            font-size: 32px;
         }
 
-        .upload-text {
-            font-size: 16px;
-            color: #2d3748;
+        .upload-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-main);
             margin-bottom: 8px;
         }
 
-        .upload-hint {
-            font-size: 13px;
-            color: #718096;
+        .upload-desc {
+            color: var(--text-light);
+            font-size: 14px;
             margin-bottom: 24px;
         }
 
         .browse-btn {
-            background: #667eea;
+            padding: 12px 32px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
             color: white;
             border: none;
-            padding: 12px 32px;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 500;
+            border-radius: 12px;
+            font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
         }
 
         .browse-btn:hover {
-            background: #5568d3;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4);
         }
 
-        input[type="file"] {
-            display: none;
+        /* Selected Files */
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-main);
+            margin-bottom: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        /* Converted files section */
-        .converted-files {
-            background: white;
-            border-radius: 16px;
-            padding: 32px;
+        .file-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 32px;
         }
 
         .file-item {
+            background: white;
+            padding: 16px;
+            border-radius: 16px;
             display: flex;
             align-items: center;
             gap: 16px;
-            padding: 16px;
-            border-radius: 8px;
-            margin-bottom: 12px;
-            transition: all 0.2s;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+            transition: all 0.3s ease;
+            animation: slideIn 0.3s ease;
         }
 
         .file-item:hover {
-            background: #f7fafc;
-        }
-
-        .file-icon-wrapper {
-            width: 40px;
-            height: 40px;
-            background: #f7fafc;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-        }
-
-        .file-info {
-            flex: 1;
-        }
-
-        .file-name {
-            font-size: 14px;
-            font-weight: 500;
-            color: #2d3748;
-            margin-bottom: 4px;
-        }
-
-        .file-size {
-            font-size: 12px;
-            color: #718096;
-        }
-
-        .status-badge {
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-size: 11px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .status-badge.converted {
-            background: #c6f6d5;
-            color: #22543d;
-        }
-
-        .download-icon {
-            width: 32px;
-            height: 32px;
-            border-radius: 6px;
-            border: 1px solid #e2e8f0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-size: 16px;
-        }
-
-        .download-icon:hover {
-            background: #f7fafc;
-            border-color: #cbd5e0;
-        }
-
-        /* Right sidebar - History */
-        .history-panel {
-            background: white;
-            border-left: 1px solid #e2e8f0;
-            padding: 24px 16px;
-            overflow-y: auto;
-            height: 100vh;
-            width: 320px;
-            box-sizing: border-box;
-            transition: opacity 0.32s ease, transform 0.32s ease, width 0.32s ease, padding 0.32s ease;
-            transform: translateX(0);
-            opacity: 1;
-        }
-
-        /* When history is hidden, collapse the right column and expand main area */
-        .app-container.no-history {
-            grid-template-columns: 240px 1fr;
-        }
-
-        .app-container.no-history .history-panel {
-            width: 0;
-            padding: 0 0;
-            opacity: 0;
-            transform: translateX(12px);
-            pointer-events: none;
-            overflow: hidden;
-            border: none;
-        }
-
-        .history-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 24px;
-        }
-
-        .history-title {
-            font-size: 16px;
-            font-weight: 600;
-            color: #1a202c;
-        }
-
-        .history-section {
-            margin-bottom: 24px;
-        }
-
-        .history-date {
-            font-size: 12px;
-            font-weight: 600;
-            color: #718096;
-            text-transform: uppercase;
-            margin-bottom: 12px;
-        }
-
-        .history-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 8px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .history-item:hover {
-            background: #f7fafc;
-        }
-
-        .history-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            flex-shrink: 0;
-        }
-
-        .history-icon.purple { background: #e9d5ff; }
-        .history-icon.yellow { background: #fef3c7; }
-        .history-icon.blue { background: #dbeafe; }
-        .history-icon.orange { background: #fed7aa; }
-        .history-icon.green { background: #d1fae5; }
-
-        .history-file-info {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .history-file-name {
-            font-size: 13px;
-            font-weight: 500;
-            color: #2d3748;
-            margin-bottom: 2px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .history-file-size {
-            font-size: 11px;
-            color: #718096;
-        }
-
-        /* Recommended Tools */
-        .recommended-tools {
-            background: white;
-            border-radius: 16px;
-            padding: 32px;
-        }
-
-        .tools-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 24px;
-        }
-
-        .tools-title {
-            font-size: 18px;
-            font-weight: 600;
-            color: #1a202c;
-        }
-
-        .file-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 24px;
-        }
-
-        .file-title {
-            font-size: 18px;
-            font-weight: 600;
-            color: #1a202c;
-        }
-
-        .tools-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 16px;
-        }
-
-        .tool-card {
-            padding: 20px;
-            border: 1px solid #e2e8f0;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .tool-card:hover {
-            border-color: #667eea;
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
             transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.05);
         }
 
-        .tool-icon {
+        .file-icon {
             width: 48px;
             height: 48px;
-            border-radius: 8px;
+            background: #f1f5f9;
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 24px;
-            margin-bottom: 12px;
         }
 
-        .tool-icon.green { background: #d1fae5; }
-        .tool-icon.orange { background: #fed7aa; }
-        .tool-icon.blue { background: #dbeafe; }
-        .tool-icon.yellow { background: #fef3c7; }
-        .tool-icon.purple { background: #e9d5ff; }
-        .tool-icon.red { background: #fecaca; }
+        .file-details {
+            flex: 1;
+        }
 
-        .tool-name {
-            font-size: 14px;
+        .file-name {
             font-weight: 600;
-            color: #2d3748;
+            color: var(--text-main);
+            font-size: 14px;
             margin-bottom: 4px;
         }
 
-        .tool-description {
+        .file-meta {
             font-size: 12px;
-            color: #718096;
-            line-height: 1.4;
-        }
-
-        /* Modal for All Tools */
-        .modal-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(15, 23, 42, 0.45);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1200;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.24s ease;
-        }
-
-        .modal-overlay.visible {
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-        .tools-modal {
-            background: white;
-            width: 520px;
-            max-width: calc(100% - 40px);
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(2,6,23,0.2);
-            transform: translateY(8px) scale(0.99);
-            transition: transform 0.28s cubic-bezier(.2,.9,.38,1), opacity 0.28s ease;
-            opacity: 0;
-            overflow: hidden;
-        }
-
-        .modal-overlay.visible .tools-modal {
-            transform: translateY(0) scale(1);
-            opacity: 1;
-        }
-
-        .tools-modal header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 16px 20px;
-            border-bottom: 1px solid #edf2f7;
-        }
-
-        .tools-modal .modal-body {
-            padding: 16px 20px 20px;
-            max-height: 60vh;
-            overflow: auto;
-        }
-
-        .tool-entry {
+            color: var(--text-light);
             display: flex;
             gap: 12px;
+        }
+
+        .file-actions {
+            display: flex;
             align-items: center;
-            padding: 12px;
+            gap: 12px;
+        }
+
+        .format-select {
+            padding: 8px 12px;
             border-radius: 8px;
-            transition: background 0.12s;
-            cursor: default;
-        }
-
-        .tool-entry:hover { background: #f7fafc; }
-
-        .tool-entry .tool-thumb { width: 44px; height: 44px; border-radius: 8px; display:flex; align-items:center; justify-content:center; font-size:20px; }
-
-        .tool-entry .tool-meta { flex:1; min-width:0; }
-
-        .tool-entry .tool-meta .name { font-weight:600; color:#1a202c; font-size:14px; }
-        
-        .tool-entry .tool-meta .desc { font-size:13px; color:#718096; }
-
-        .tool-entry .tool-action { margin-left: 8px; }
-
-        /* Danh sách file đã chọn trước khi upload */
-        .selected-files-container {
-            margin-top: 24px;
-            border-radius: 12px;
-            background: #f7fafc;
-            padding: 16px 20px;
-            border: 1px dashed #e2e8f0;
-        }
-
-        .selected-files-container.empty {
-            display: none;
-        }
-
-        .selected-file-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
-            padding: 10px 0;
-            border-bottom: 1px solid #e2e8f0;
-        }
-
-        .selected-file-row:last-child {
-            border-bottom: none;
-        }
-
-        .selected-file-info {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .selected-file-name {
-            font-size: 14px;
-            font-weight: 500;
-            color: #2d3748;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .selected-file-size {
-            font-size: 12px;
-            color: #718096;
-            margin-top: 2px;
-        }
-
-        .selected-file-actions {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .selected-file-select {
-            padding: 6px 8px;
-            font-size: 12px;
-            border-radius: 6px;
-            border: 1px solid #cbd5e0;
-            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            background: #f8fafc;
+            font-size: 13px;
+            color: var(--text-main);
             outline: none;
             cursor: pointer;
         }
 
-        .selected-file-select:focus {
-            border-color: #667eea;
-            box-shadow: 0 0 0 1px rgba(102,126,234,0.4);
-        }
-
-        .selected-file-remove {
-            width: 28px;
-            height: 28px;
-            border-radius: 999px;
+        .remove-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
             border: none;
-            background: #fed7d7;
-            color: #c53030;
-            font-size: 14px;
-            cursor: pointer;
+            background: #fee2e2;
+            color: #ef4444;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.15s ease;
+            cursor: pointer;
+            transition: all 0.2s;
         }
 
-        .selected-file-remove:hover {
-            background: #feb2b2;
+        .remove-btn:hover {
+            background: #fecaca;
         }
 
-        /* Drag over effect dùng chung với upload-area */
-        .upload-area.dragover {
-            border-color: #667eea;
-            background: #eef2ff;
-            border-style: solid;
+        /* Convert Button */
+        .convert-all-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, var(--secondary), var(--primary));
+            color: white;
+            border: none;
+            border-radius: 16px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 20px rgba(236, 72, 153, 0.3);
+            display: none;
+            /* Hidden by default */
         }
 
+        .convert-all-btn.show {
+            display: block;
+        }
+
+        .convert-all-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 28px rgba(236, 72, 153, 0.4);
+        }
+
+        .convert-all-btn:disabled {
+            opacity: 0.7;
+            cursor: wait;
+        }
+
+        /* Right Panel - History */
+        .history-panel {
+            padding: 24px;
+            overflow-y: auto;
+            display: none;
+            /* Hidden by default */
+        }
+
+        .history-panel.show {
+            display: flex;
+        }
+
+        .history-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .history-item {
+            background: rgba(255, 255, 255, 0.6);
+            padding: 12px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.2s;
+        }
+
+        .history-item:hover {
+            background: white;
+        }
+
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .status-pending {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .status-processing {
+            background: #dbeafe;
+            color: #2563eb;
+        }
+
+        .status-done {
+            background: #d1fae5;
+            color: #059669;
+        }
+
+        .status-error {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .download-btn {
+            padding: 6px 12px;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            color: var(--primary);
+            font-size: 12px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .download-btn:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        /* Animations */
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive */
         @media (max-width: 1200px) {
-            .app-container {
+            .app-layout {
                 grid-template-columns: 240px 1fr;
             }
+
             .history-panel {
                 display: none;
             }
+
+            /* Hide history on smaller screens for now or make it a modal */
         }
 
         @media (max-width: 768px) {
-            .app-container {
+            .app-layout {
                 grid-template-columns: 1fr;
+                padding: 10px;
             }
+
             .sidebar {
                 display: none;
             }
+
+            /* Mobile menu needed */
             .main-content {
                 padding: 20px;
-            }
-            .tools-grid {
-                grid-template-columns: repeat(2, 1fr);
             }
         }
     </style>
 </head>
-<body>
-    <div class="app-container">
-        <!-- Sidebar trái -->
-        <aside class="sidebar">
-            <div class="user-profile">
-                <div class="avatar">
-                    <%
-                        String username = (String) session.getAttribute("username");
-                        String userpicture = (String) session.getAttribute("userpicture");
-                        String useremail = (String) session.getAttribute("useremail");
 
-                        if(userpicture != null && !userpicture.isEmpty()){
-                            %>
-                                <img src="<%= userpicture %>" alt="User Avatar">
-                            <%
-                        }else{
-                            %>
-                                👤
-                            <%
-                        }   
-                    %>
-                </div>
-                <div class="user-name">
-                    <%
-                        if(username != null && !username.isEmpty()){
-                            %>
-                                <%= username %>
-                            <%
-                        }else{
-                            %>
-                                GUEST
-                            <%
-                        }   
-                    %>
-                </div>
-                <div class="user-email">
-                    <%
-                        if(useremail != null && !useremail.isEmpty()){
-                            %>
-                                <%= useremail %>
-                            <%
-                        }else{
-                            %>
-                                guest_example@gmail.com
-                            <%
-                        }   
-                    %>
-                </div>
+<body>
+
+    <!-- Background Animation -->
+    <div class="bg-animation">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+    </div>
+
+    <div class="app-layout">
+        <!-- Sidebar -->
+        <aside class="glass-panel sidebar">
+            <div class="brand">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <path
+                        d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
+                    <polyline points="14 2 14 8 20 8" />
+                </svg>
+                ConvertFile
             </div>
 
             <nav class="nav-menu">
-                <div class="nav-item active" data-view="home">
-                    <span class="nav-icon">🏠</span>
-                    <span>Home</span>
-                </div>
-                <div class="nav-item" data-view="tools">
-                    <span class="nav-icon">🛠️</span>
-                    <span>All Tools</span>
-                </div>
-                <div class="nav-item" data-view="history">
-                    <span class="nav-icon">⌛</span>
-                    <span>History</span>
-                </div>
+                <a href="#" class="nav-item active" id="navDashboard">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="14" width="7" height="7"></rect>
+                        <rect x="3" y="14" width="7" height="7"></rect>
+                    </svg>
+                    Dashboard
+                </a>
+                <a href="#" class="nav-item" id="navMyFiles">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z">
+                        </path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                        <polyline points="10 9 9 9 8 9"></polyline>
+                    </svg>
+                    My Files
+                </a>
+                <a href="#" class="nav-item">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path
+                            d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z">
+                        </path>
+                    </svg>
+                    Settings
+                </a>
             </nav>
 
-            <div class="nav-bottom">
-                <div class="nav-item">
-                    <span class="nav-icon">⚙️</span>
-                    <span>Setting</span>
+            <div class="user-profile">
+                <div class="avatar">
+                    <c:choose>
+                        <c:when test="${not empty sessionScope.username}">
+                            ${sessionScope.username.substring(0, 1).toUpperCase()}
+                        </c:when>
+                        <c:otherwise>G</c:otherwise>
+                    </c:choose>
                 </div>
-                <div class="nav-item">
-                    <span class="nav-icon">❓</span>
-                    <span>Help Center</span>
+                <div class="user-info">
+                    <h4>${not empty sessionScope.username ? sessionScope.username : "Guest"}
+                    </h4>
+                    <p>${not empty sessionScope.email ? sessionScope.email : "Sign in to save"}
+                    </p>
                 </div>
-                <div class="nav-item">
-                    <%
-                        if (username != null && !username.isEmpty()){
-                            %>
-                                <a href="<c:url value='/logout'/>" class ="nav-link">
-                                    <span class="nav-icon">⬅️</span>
-                                    <span>Logout</span>
-                                </a>
-                            <%
-                        }
-                        else{
-                            %>
-                                <a href="<c:url value='/login'/>" class ="nav-link">
-                                    <span class="nav-icon">➡️</span>
-                                    <span>Login</span>
-                                </a>
-                            <%
-                        }
-                    %>
-                </div>
-            </div>
-        </aside>
-
-        <!-- Main content -->
-        <main class="main-content">
-            <div class="header">
-                <h1 class="page-title">PDF to Word</h1>
-                <a href="<c:url value='/index.jsp'/>" class="logo">
-                    <span>Convert</span><span>File</span>
+                <a href="<c:url value='/logout'/>" title="Logout"
+                    style="margin-left: auto; color: var(--text-light);">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                        <polyline points="16 17 21 12 16 7"></polyline>
+                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                    </svg>
                 </a>
             </div>
+        </aside>
 
-            <!-- Upload Area -->
-            <div class="upload-container">
-                <div class="upload-area" id="uploadArea">
-                    <div class="upload-icon">☁️</div>
-                    <div class="upload-text">Drag your files here or click to select</div>
-                    <div class="upload-hint">Supports PDF, DOCX — up to 15 MB/file</div>
-
-                    <button type="button" class="browse-btn" id="browseBtn">
-                        Browse Files
-                    </button>
-
-                    <!-- input thật, cho phép chọn nhiều file -->
-                    <input type="file"
-                        id="fileInput"
-                        name="file"  <%-- tên "file" để UploadServlet.getPart("file") hoạt động --%>
-                        multiple
-                        accept=".pdf,.doc,.docx"
-                        style="display:none;">
-                </div>
-
-                <!-- Danh sách file đã chọn + dropdown per file -->
-                <div id="selectedFilesContainer" class="selected-files-container empty">
-                    <!-- JS sẽ render từng file vào đây -->
-                </div>
-
-                <!-- Nút gửi tất cả lên server -->
-                <div style="margin-top: 16px; text-align: right;">
-                    <button type="button"
-                            class="browse-btn"
-                            id="uploadAllBtn"
-                            disabled>
-                        Convert All
-                    </button>
-                </div>
+        <!-- Main Content -->
+        <main class="glass-panel main-content">
+            <div class="header">
+                <h1>Welcome back, ${not empty sessionScope.username ? sessionScope.username :
+                    "Guest"}! 👋</h1>
+                <p>Ready to convert some files? Drag and drop them below.</p>
             </div>
 
-            <!-- Converted Files -->
-            <div class="converted-files">
-                <div class="file-header">
-                    <h2 class="file-title">Uploaded Files</h2>
+            <!-- Upload Zone -->
+            <div class="upload-zone" id="dropZone">
+                <div class="upload-icon">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="17 8 12 3 7 8"></polyline>
+                        <line x1="12" y1="3" x2="12" y2="15"></line>
+                    </svg>
                 </div>
-
-                <%
-                    if (listJobs != null && !listJobs.isEmpty()) {
-                        int count = 0;
-                        for (Map<String, Object> job : listJobs) {
-                            if (count++ >= 5) break; // Chỉ hiện 5 cái
-
-                            String status = (String) job.get("status");
-                            int progress = (Integer) job.get("progress");
-                            
-                            // Logic màu sắc
-                            String badgeClass = "status-badge";
-                            String dlIcon = "...";
-                            
-                            if (status.equals("COMPLETED")) {
-                                badgeClass += " converted";
-                                dlIcon = "↓";
-                            }
-                %>
-                        <div class="file-item">
-                            <div class="file-icon-wrapper">📄</div>
-                            <div class="file-info">
-                                <div class="file-name"><%= job.get("name") %></div>
-                                <div style="height: 4px; background: #eee; width: 100%; margin-top: 5px; border-radius: 2px;">
-                                    <div style="height: 100%; background: #667eea; width: <%= progress %>%;"></div>
-                                </div>
-                            </div>
-                            <span class="<%= badgeClass %>"><%= status %> <%= progress %>%</span>
-                            <div class="download-icon">
-                                <% if(status.equals("COMPLETED")) { %>
-                                    <a href="download?file=<%= job.get("name") %>" class="download-icon" title="Download" style="text-decoration: none; color: inherit;">
-                                        ↓
-                                    </a>
-                                <% } else { %>
-                                    <div class="download-icon" title="Processing">...</div>
-                                <% } %>
-                            </div>
-                        </div>
-                <%      }
-                    } else { %>
-                        <div style="text-align: center; padding: 20px; color: #999;">Not Files Yet</div>
-                <% } %>
+                <h3 class="upload-title">Drag & Drop files here</h3>
+                <p class="upload-desc">or click to browse from your computer</p>
+                <button class="browse-btn"
+                    onclick="document.getElementById('fileInput').click()">Browse Files</button>
+                <input type="file" id="fileInput" multiple hidden>
             </div>
 
+            <!-- Selected Files List -->
+            <div id="selectedFilesSection" style="display: none;">
+                <div class="section-title">
+                    <span>Selected Files</span>
+                    <span class="file-count" id="fileCount">0 files</span>
+                </div>
+                <div class="file-list" id="fileList">
+                    <!-- Files will be added here -->
+                </div>
+                <button class="convert-all-btn" id="uploadAllBtn">
+                    Convert All Files 🚀
+                </button>
+            </div>
+
+            <!-- Recent Jobs (Mobile/Tablet view mostly, or main list) -->
+            <div class="section-title" style="margin-top: 40px;">
+                <span>Recent Conversions</span>
+            </div>
+            <div class="file-list" id="jobListMain">
+                <!-- Jobs will be rendered here -->
+            </div>
         </main>
 
-        <!-- History Panel -->
-        <aside class="history-panel">
-            <div class="history-header">
-                <h2 class="history-title">History</h2>
-                <!-- <button class="icon-btn">⋯</button> -->
-            </div>
-
-            <div class="history-section">
-                <div class="history-date">Recent Tasks</div>
-                
-                <%
-                    if (listJobs != null) {
-                        int hCount = 0;
-                        for (Map<String, Object> job : listJobs) {
-                            if (hCount++ >= 8) break; // Lấy 8 cái lịch sử
-                %>
-                    <div class="history-item">
-                        <div class="history-icon purple">🕒</div>
-                        <div class="history-file-info">
-                            <div class="history-file-name"><%= job.get("name") %></div>
-                            <div class="history-file-size"><%= job.get("type") %></div>
-                        </div>
-                    </div>
-                <%      }
-                    }
-                %>
+        <!-- Right Panel (History) -->
+        <aside class="glass-panel history-panel">
+            <div class="section-title">History</div>
+            <div class="history-list" id="historyList">
+                <!-- History items will be rendered here -->
             </div>
         </aside>
-        
-        <!-- All Tools Modal (hidden by default) -->
-        <div id="toolsModalOverlay" class="modal-overlay" aria-hidden="true">
-            <div class="tools-modal" role="dialog" aria-modal="true" aria-labelledby="toolsModalTitle">
-                <header>
-                    <h3 id="toolsModalTitle" style="margin:0; font-size:16px;">All Tools</h3>
-                    <div>
-                        <button id="toolsModalClose" class="icon-btn" aria-label="Close tools">✕</button>
-                    </div>
-                </header>
-                <div class="modal-body">
-                    <!-- Example 3 tools template - edit as needed -->
-                    <div id="toolGeneratedContainer" style="margin-bottom:12px;"></div>
-
-                    <div class="tool-entry">
-                        <div class="tool-thumb blue">📄</div>
-                        <div class="tool-meta">
-                            <div class="name">PDF to Word</div>
-                            <div class="desc">Convert PDF files to editable Word documents</div>
-                        </div>
-                        <div class="tool-action"><button class="browse-btn" input="PDF" output="Word">Use</button></div>
-                    </div>
-
-                    <div class="tool-entry">
-                        <div class="tool-thumb green">🖼️</div>
-                        <div class="tool-meta">
-                            <div class="name">PNG to PDF</div>
-                            <div class="desc">Convert PNG images into a single PDF</div>
-                        </div>
-                        <div class="tool-action"><button class="browse-btn" input="PNG" output="PDF">Use</button></div>
-                    </div>
-
-                    <div class="tool-entry">
-                        <div class="tool-thumb purple">🔗</div>
-                        <div class="tool-meta">
-                            <div class="name">Word to Excel</div>
-                            <div class="desc">Extract tables from Word into Excel files</div>
-                        </div>
-                        <div class="tool-action"><button class="browse-btn" input="Word" output="Excel">Use</button></div>
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
 
     <script>
-        // --- Multi-file upload + dropdown per file ---
-        const uploadArea = document.getElementById('uploadArea');
+        // Clean up Google g_state cookie to prevent Tomcat warnings
+        document.cookie = "g_state=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+
+        // --- Variables ---
+        const dropZone = document.getElementById('dropZone');
         const fileInput = document.getElementById('fileInput');
-        const browseBtn = document.getElementById('browseBtn');
-        const selectedFilesContainer = document.getElementById('selectedFilesContainer');
+        const fileList = document.getElementById('fileList');
+        const selectedFilesSection = document.getElementById('selectedFilesSection');
         const uploadAllBtn = document.getElementById('uploadAllBtn');
+        const fileCount = document.getElementById('fileCount');
+        const historyList = document.getElementById('historyList');
+        const jobListMain = document.getElementById('jobListMain');
 
-        // URL /upload (phù hợp với @WebServlet("/upload"))
-        const uploadUrl = '<c:url value="/upload"/>';
+        // Navigation elements
+        const navDashboard = document.getElementById('navDashboard');
+        const navMyFiles = document.getElementById('navMyFiles');
+        const historyPanel = document.querySelector('.history-panel');
+        const appLayout = document.querySelector('.app-layout');
 
-        // Mảng lưu các file đã chọn + taskType tương ứng
-        let selectedFiles = [];
+        let selectedFiles = []; // Array to store File objects
 
-        // Click Browse Files
-        if (browseBtn && fileInput) {
-            browseBtn.addEventListener('click', () => {
-                fileInput.click();
-            });
+        // --- Navigation Toggle ---
+        navDashboard.addEventListener('click', function (e) {
+            e.preventDefault();
+            navDashboard.classList.add('active');
+            navMyFiles.classList.remove('active');
+            historyPanel.classList.remove('show');
+            appLayout.classList.remove('show-history');
+        });
 
-            fileInput.addEventListener('change', (e) => {
-                addFiles(e.target.files);
-                fileInput.value = ''; // reset để chọn lại cùng file nếu muốn
-            });
+        navMyFiles.addEventListener('click', function (e) {
+            e.preventDefault();
+            navMyFiles.classList.add('active');
+            navDashboard.classList.remove('active');
+            historyPanel.classList.add('show');
+            appLayout.classList.add('show-history');
+        });
+
+        // --- Drag & Drop Logic ---
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
         }
 
-        // Drag & Drop
-        if (uploadArea) {
-            uploadArea.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                uploadArea.classList.add('dragover');
-            });
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropZone.addEventListener(eventName, () => dropZone.classList.add('dragover'), false);
+        });
 
-            uploadArea.addEventListener('dragleave', (e) => {
-                e.preventDefault();
-                uploadArea.classList.remove('dragover');
-            });
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, () => dropZone.classList.remove('dragover'), false);
+        });
 
-            uploadArea.addEventListener('drop', (e) => {
-                e.preventDefault();
-                uploadArea.classList.remove('dragover');
-                if (e.dataTransfer && e.dataTransfer.files) {
-                    addFiles(e.dataTransfer.files);
-                }
-            });
+        dropZone.addEventListener('drop', handleDrop, false);
 
-            // Click vào vùng upload (trừ nút)
-            uploadArea.addEventListener('click', (e) => {
-                if (e.target.tagName !== 'BUTTON' && fileInput) {
-                    fileInput.click();
-                }
-            });
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            handleFiles(files);
         }
 
-        function addFiles(files) {
-            if (!files || files.length === 0) return;
+        fileInput.addEventListener('change', function () {
+            handleFiles(this.files);
+        });
 
-            for (let i = 0; i < files.length; i++) {
-                const file = files[i];
-                const lower = file.name.toLowerCase();
+        function handleFiles(files) {
+            if (!files.length) return;
 
-                // Chỉ nhận PDF/DOC/DOCX
-                if (!lower.endsWith('.pdf') && !lower.endsWith('.doc') && !lower.endsWith('.docx')) {
-                    console.warn('Skip unsupported file:', file.name);
-                    continue;
-                }
-
-                // Check trùng theo name + size
-                const exists = selectedFiles.some(
-                    (item) => item.file.name === file.name && item.file.size === file.size
-                );
-                if (exists) continue;
-
-                // ⚠ taskType trùng với giá trị bạn lưu trong DB / dùng trong Worker
-                // hiện tại bạn đã dùng "PDF_TO_DOCX" trước đó, nên giữ lại
-                selectedFiles.push({
-                    file: file,
-                    taskType: 'PDF_TO_DOCX' // default
-                });
-            }
+            // Convert FileList to Array and add to selectedFiles
+            const newFiles = Array.from(files);
+            selectedFiles = [...selectedFiles, ...newFiles];
 
             renderSelectedFiles();
-            updateUploadAllState();
         }
 
+        // --- Render Selected Files ---
         function renderSelectedFiles() {
-            if (!selectedFilesContainer) return;
+            fileList.innerHTML = '';
 
-            if (selectedFiles.length === 0) {
-                selectedFilesContainer.innerHTML = '';
-                selectedFilesContainer.classList.add('empty');
+            if (selectedFiles.length > 0) {
+                selectedFilesSection.style.display = 'block';
+                uploadAllBtn.classList.add('show');
+                fileCount.textContent = selectedFiles.length + ' files';
+            } else {
+                selectedFilesSection.style.display = 'none';
+                uploadAllBtn.classList.remove('show');
+            }
+
+            selectedFiles.forEach((file, index) => {
+                const item = document.createElement('div');
+                item.className = 'file-item';
+
+                // Determine icon based on type
+                let icon = '📄';
+                if (file.type.includes('pdf')) icon = '📕';
+                else if (file.type.includes('image')) icon = '🖼️';
+                else if (file.type.includes('word')) icon = '📝';
+
+                const size = (file.size / 1024 / 1024).toFixed(2) + ' MB';
+
+                item.innerHTML = `
+                    <div class="file-icon">${icon}</div>
+                    <div class="file-details">
+                    <div class="file-name">${file.name}</div>
+                    <div class="file-meta">${size}</div>
+                    </div>
+                    <div class="file-actions">
+                    <select class="format-select" id="taskType-${index}">
+                    <option value="PDF_TO_DOCX">PDF to Word</option>
+                    <option value="IMG_TO_PDF">Image to PDF</option>
+                    <option value="PDF_TO_IMG">PDF to Image</option>
+                    </select>
+                    <button class="remove-btn" onclick="removeFile(${index})">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </button>
+                    </div>
+                    `;
+                fileList.appendChild(item);
+            });
+        }
+
+        window.removeFile = function (index) {
+            selectedFiles.splice(index, 1);
+            renderSelectedFiles();
+        };
+
+        // --- Upload Logic ---
+        uploadAllBtn.addEventListener('click', async () => {
+            if (selectedFiles.length === 0) return;
+
+            uploadAllBtn.disabled = true;
+            uploadAllBtn.textContent = 'Uploading & Converting... ⏳';
+
+            const uploadPromises = selectedFiles.map((file, index) => {
+                const taskType = document.getElementById(`taskType-${index}`).value;
+                const formData = new FormData();
+                formData.append('file', file);
+                formData.append('taskType', taskType);
+
+                return fetch('upload', {
+                    method: 'POST',
+                    body: formData
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'error') {
+                            console.error('Error uploading ' + file.name + ': ' + data.message);
+                            return { success: false, file: file.name, error: data.message };
+                        }
+                        return { success: true, file: file.name };
+                    })
+                    .catch(error => {
+                        console.error('Network error:', error);
+                        return { success: false, file: file.name, error: 'Network error' };
+                    });
+            });
+
+            try {
+                const results = await Promise.all(uploadPromises);
+
+                // Check results
+                const errors = results.filter(r => !r.success);
+                if (errors.length > 0) {
+                    alert('Some files failed to upload:\n' + errors.map(e => e.file + ': ' + e.error).join('\n'));
+                } else {
+                    // Success animation/notification could go here
+                }
+
+                // Clear selection and refresh jobs
+                selectedFiles = [];
+                renderSelectedFiles();
+                fetchJobs(); // Start polling immediately
+
+            } catch (err) {
+                console.error('Upload process failed:', err);
+                alert('Critical error during upload process.');
+            } finally {
+                uploadAllBtn.disabled = false;
+                uploadAllBtn.textContent = 'Convert All Files 🚀';
+            }
+        });
+
+        // --- Job Polling Logic ---
+        function fetchJobs() {
+            fetch('jobs')
+                .then(response => response.json())
+                .then(jobs => {
+                    renderJobs(jobs);
+
+                    // If any job is still processing, poll again
+                    const hasProcessing = jobs.some(job => job.status === 'PENDING' || job.status === 'IN_PROGRESS');
+                    if (hasProcessing) {
+                        setTimeout(fetchJobs, 2000); // Poll every 2s
+                    }
+                })
+                .catch(err => console.error('Error fetching jobs:', err));
+        }
+
+        function renderJobs(jobs) {
+            // Render Main List (Detailed)
+            jobListMain.innerHTML = '';
+            // Render History List (Compact)
+            historyList.innerHTML = '';
+
+            if (jobs.length === 0) {
+                jobListMain.innerHTML = '<div style="text-align:center; color:var(--text-light); padding:20px;">No recent conversions found.</div>';
+                historyList.innerHTML = '<div style="text-align:center; color:var(--text-light); padding:20px; font-size: 14px;">No history yet.</div>';
                 return;
             }
 
-            selectedFilesContainer.classList.remove('empty');
-            selectedFilesContainer.innerHTML = '';
+            jobs.forEach(job => {
+                // --- Main List Item ---
+                const mainItem = document.createElement('div');
+                mainItem.className = 'file-item';
 
-            selectedFiles.forEach((item, index) => {
-                const row = document.createElement('div');
-                row.className = 'selected-file-row';
+                let statusClass = 'status-pending';
+                let statusText = job.status;
+                let actionHtml = '';
 
-                let html = '';
-
-                // Phần info file
-                html += '<div class="selected-file-info">';
-                html +=   '<div class="selected-file-name" title="' + escapeHtml(item.file.name) + '">';
-                html +=       escapeHtml(item.file.name);
-                html +=   '</div>';
-                html +=   '<div class="selected-file-size">' + formatBytes(item.file.size) + '</div>';
-                html += '</div>';
-
-                // Phần dropdown + nút xoá
-                html += '<div class="selected-file-actions">';
-                html +=   '<select class="selected-file-select" data-index="' + index + '">';
-
-                html +=     '<option value="PDF_TO_DOCX"'
-                        + (item.taskType === 'PDF_TO_DOCX' ? ' selected' : '')
-                        + '>PDF → DOCX</option>';
-
-                html +=     '<option value="PDF_TO_IMAGES"'
-                        + (item.taskType === 'PDF_TO_IMAGES' ? ' selected' : '')
-                        + '>PDF → Images (JPG)</option>';
-
-                html +=   '</select>';
-
-                html +=   '<button type="button"'
-                        + ' class="selected-file-remove"'
-                        + ' title="Remove this file"'
-                        + ' data-index="' + index + '">×</button>';
-
-                html += '</div>';
-
-                row.innerHTML = html;
-                selectedFilesContainer.appendChild(row);
-            });
-
-            // Gán event cho dropdown
-            selectedFilesContainer
-                .querySelectorAll('.selected-file-select')
-                .forEach((select) => {
-                    select.addEventListener('change', (e) => {
-                        const idx = parseInt(e.target.dataset.index, 10);
-                        if (!Number.isNaN(idx) && selectedFiles[idx]) {
-                            selectedFiles[idx].taskType = e.target.value;
-                        }
-                    });
-                });
-
-            // Gán event cho nút remove
-            selectedFilesContainer
-                .querySelectorAll('.selected-file-remove')
-                .forEach((btn) => {
-                    btn.addEventListener('click', (e) => {
-                        const idx = parseInt(e.target.dataset.index, 10);
-                        if (!Number.isNaN(idx)) {
-                            selectedFiles.splice(idx, 1);
-                            renderSelectedFiles();
-                            updateUploadAllState();
-                        }
-                    });
-                });
-        }
-
-        function updateUploadAllState() {
-            if (!uploadAllBtn) return;
-            uploadAllBtn.disabled = selectedFiles.length === 0;
-        }
-
-        function formatBytes(bytes, decimals = 2) {
-            if (bytes === 0) return '0 B';
-            const k = 1024;
-            const dm = decimals < 0 ? 0 : decimals;
-            const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
-            const i = Math.floor(Math.log(bytes) / Math.log(k));
-            return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
-        }
-
-        function escapeHtml(str) {
-            return String(str)
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#39;');
-        }
-
-        // Gửi từng file lên /upload (UploadServlet)
-        if (uploadAllBtn) {
-            uploadAllBtn.addEventListener('click', async () => {
-                if (selectedFiles.length === 0) return;
-
-                uploadAllBtn.disabled = true;
-
-                for (const item of selectedFiles) {
-                    const formData = new FormData();
-                    // ⚠ key "file" trùng với request.getPart("file")
-                    formData.append('file', item.file);
-                    formData.append('taskType', item.taskType);
-
-                    try {
-                        const res = await fetch(uploadUrl, {
-                            method: 'POST',
-                            body: formData
-                        });
-                        if (!res.ok) {
-                            console.error('Upload failed for', item.file.name);
-                        }
-                    } catch (err) {
-                        console.error('Error uploading', item.file.name, err);
-                    }
+                if (job.status === 'DONE') {
+                    statusClass = 'status-done';
+                    actionHtml = `<a href="download?file=${encodeURIComponent(job.name)}" class="download-btn">Download</a>`;
+                } else if (job.status === 'ERROR') {
+                    statusClass = 'status-error';
+                    actionHtml = `<span style="color:var(--error); font-size:12px;">Failed</span>`;
+                } else {
+                    statusClass = 'status-processing';
+                    actionHtml = `<span style="color:var(--primary); font-size:12px;">${job.progress}%</span>`;
                 }
 
-                // Xoá list local, reload để JobDAO.getAllJobs(...) có dữ liệu mới
-                selectedFiles = [];
-                renderSelectedFiles();
-                updateUploadAllState();
-                window.location.reload();
+                mainItem.innerHTML = `
+                    <div class="file-icon">📄</div>
+                    <div class="file-details">
+                    <div class="file-name">${job.name}</div>
+                    <div class="file-meta">
+                    <span class="status-badge ${statusClass}">${statusText}</span>
+                    <span>${job.type}</span>
+                    </div>
+                    </div>
+                    <div class="file-actions">
+                    ${actionHtml}
+                    </div>
+                    `;
+                jobListMain.appendChild(mainItem);
+
+                // --- History List Item ---
+                const historyItem = document.createElement('div');
+                historyItem.className = 'history-item';
+                historyItem.innerHTML = `
+                    <div class="file-icon" style="width:32px; height:32px; font-size:16px;">📄</div>
+                    <div class="file-details">
+                    <div class="file-name" style="font-size:13px;">${job.name}</div>
+                    <span class="status-badge ${statusClass}" style="font-size:9px;">${statusText}</span>
+                    </div>
+                    `;
+                historyList.appendChild(historyItem);
             });
         }
 
-        // --- View toggling: hide/show History panel based on left nav clicks ---
-        (function(){
-            const navItems = document.querySelectorAll('.nav-item[data-view]');
-            const appContainer = document.querySelector('.app-container');
+        // Initial load
+        fetchJobs();
+        // Poll periodically even if idle to catch updates
+        setInterval(fetchJobs, 5000);
 
-            function clearActive() {
-                navItems.forEach(i => i.classList.remove('active'));
-            }
-
-            function setActiveByName(name) {
-                navItems.forEach(item => {
-                    const v = item.dataset.view || '';
-                    item.classList.toggle('active', v === name);
-                });
-            }
-
-            const toolsOverlay = document.getElementById('toolsModalOverlay');
-            const toolsCloseBtn = document.getElementById('toolsModalClose');
-
-            function showToolsModal() {
-                if (!toolsOverlay) return;
-                toolsOverlay.classList.add('visible');
-                toolsOverlay.setAttribute('aria-hidden','false');
-            }
-
-            function hideToolsModal() {
-                if (!toolsOverlay) return;
-                toolsOverlay.classList.remove('visible');
-                toolsOverlay.setAttribute('aria-hidden','true');
-            }
-
-            navItems.forEach(item => {
-                item.addEventListener('click', () => {
-                    const view = item.dataset.view || 'home';
-
-                    if (view === 'history') {
-                        const isHidden = appContainer.classList.contains('no-history');
-                        if (isHidden) {
-                            appContainer.classList.remove('no-history');
-                            setActiveByName('history');
-                        } else {
-                            appContainer.classList.add('no-history');
-                            setActiveByName('home');
-                        }
-                        hideToolsModal();
-                    } else if (view === 'tools') {
-                        const isOpen = toolsOverlay && toolsOverlay.classList.contains('visible');
-                        if (isOpen) {
-                            hideToolsModal();
-                            setActiveByName('home');
-                        } else {
-                            showToolsModal();
-                            setActiveByName('tools');
-                        }
-                        appContainer.classList.add('no-history');
-                    } else {
-                        appContainer.classList.add('no-history');
-                        setActiveByName(view);
-                        hideToolsModal();
-                    }
-                });
-            });
-
-            if (toolsOverlay) {
-                toolsOverlay.addEventListener('click', (e) => {
-                    if (e.target === toolsOverlay) hideToolsModal();
-                });
-            }
-            if (toolsCloseBtn) {
-                toolsCloseBtn.addEventListener('click', hideToolsModal);
-            }
-
-            appContainer.classList.add('no-history');
-            setActiveByName('home');
-        })();
     </script>
 </body>
+
 </html>
