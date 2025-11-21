@@ -1,10 +1,10 @@
 package com.convertfile.controller;
 
 import com.convertfile.bo.UserBO;
-import com.convertfile.service.EmailService;
-import com.convertfile.service.OTPService;
-import com.convertfile.service.OTPService.OTPResult;
-import com.convertfile.service.OTPService.OTPType;
+import com.convertfile.service.EmailSerive.EmailService;
+import com.convertfile.service.EmailSerive.OTPService;
+import com.convertfile.service.EmailSerive.OTPService.OTPResult;
+import com.convertfile.service.EmailSerive.OTPService.OTPType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
