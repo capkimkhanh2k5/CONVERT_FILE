@@ -1,7 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Context>
-    <!-- 
-        Tomcat 11 does not support LegacyCookieProcessor.
-        We rely on application-level cleanup (Filter/Servlet) to handle invalid cookies.
-    -->
+    
 </Context>

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.UUID;
 
 import com.convertfile.bo.UserBO;
+import com.convertfile.model.dao.UserDAO;
 import com.convertfile.service.PropertiesService;
 
 import jakarta.servlet.ServletException;
@@ -61,8 +62,7 @@ public class LoginServlet extends HttpServlet {
             session.setAttribute("username", username);
 
             // --- LẤY USER ID ---
-            com.convertfile.model.dao.UserDAO userDAO = new com.convertfile.model.dao.UserDAO();
-            long userId = userDAO.getUserIdByUsername(username);
+            long userId = userBO.getUserIdByUsername(username);
             session.setAttribute("userId", userId); // Lưu ID vào session (QUAN TRỌNG)
 
             String userEmail = userBO.getUserEmailByUsername(username);
