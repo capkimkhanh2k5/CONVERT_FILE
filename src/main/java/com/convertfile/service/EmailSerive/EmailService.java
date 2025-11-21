@@ -1,7 +1,10 @@
-package com.convertfile.service;
+package com.convertfile.service.EmailSerive;
 
 import java.util.Date;
 import java.util.Properties;
+
+import com.convertfile.service.PropertiesService;
+
 import java.security.SecureRandom;
 import jakarta.mail.Authenticator;
 import jakarta.mail.Message;

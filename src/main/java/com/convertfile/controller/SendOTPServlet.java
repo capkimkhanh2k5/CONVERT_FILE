@@ -1,9 +1,9 @@
 package com.convertfile.controller;
 
 import com.convertfile.bo.UserBO;
-import com.convertfile.service.OTPService;
-import com.convertfile.service.OTPService.OTPResult;
-import com.convertfile.service.OTPService.OTPType;
+import com.convertfile.service.EmailSerive.OTPService;
+import com.convertfile.service.EmailSerive.OTPService.OTPResult;
+import com.convertfile.service.EmailSerive.OTPService.OTPType;
 import com.google.gson.Gson;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;

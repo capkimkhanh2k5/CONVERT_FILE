@@ -1,9 +1,11 @@
-package com.convertfile.service;
+package com.convertfile.service.EmailSerive;
 
 import jakarta.servlet.http.HttpSession;
 import jakarta.mail.MessagingException;
 import java.util.HashMap;
 import java.util.Map;
+
+import com.convertfile.service.passwordService;
 
 /**
  * Centralized OTP Service for managing One-Time Password operations
