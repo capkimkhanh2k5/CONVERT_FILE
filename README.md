@@ -7,6 +7,7 @@
 [![Java](https://img.shields.io/badge/Java-21+-ED8B00?style=for-the-badge&logo=openjdk)](https://openjdk.java.net/)
 [![Jakarta EE](https://img.shields.io/badge/Jakarta_EE-6.0-007396?style=for-the-badge&logo=eclipse)](https://jakarta.ee/)
 [![MySQL](https://img.shields.io/badge/MySQL-8.0+-4479A1?style=for-the-badge&logo=mysql)](https://www.mysql.com/)
+[![RabbitMQ](https://img.shields.io/badge/RabbitMQ-3.12+-FF6600?style=for-the-badge&logo=rabbitmq)](https://www.rabbitmq.com/)
 [![Cloudinary](https://img.shields.io/badge/Cloudinary-Cloud_Storage-3448C5?style=for-the-badge&logo=cloudinary)](https://cloudinary.com/)
 
 *A scalable document processing and conversion platform built on Java EE architecture with cloud storage integration*
@@ -41,6 +42,7 @@
 ### Key Capabilities
 
 - ⚡ **Multi-Format Conversion** — Supports DOCX, PDF, HTML, XML, CSV, and more
+- 🐇 **Message Queue** — RabbitMQ for reliable asynchronous task processing
 - 🔄 **Asynchronous Task System** — Queue-based task management with worker processing
 - 🔐 **Secure Authentication** — Email OTP verification, password hashing (BCrypt), Google OAuth
 - ☁️ **Cloud Storage** — Cloudinary integration for scalable file storage
@@ -87,6 +89,7 @@
 ### Technical Features
 
 - 📦 **Queue-Based Task Processing** — Database-driven task queue with worker threads
+- 🐇 **RabbitMQ Integration** — Advanced message queuing for scalable task distribution
 - ☁️ **Cloudinary Integration** — Cloud file storage with public URL access
 - 🎨 **Server-Side Rendering** — JSP/JSTL templating engine
 - 📤 **Multipart File Upload** — Robust file upload handling
@@ -166,6 +169,10 @@
                 │  │    Gmail SMTP       │  │
                 │  │  (Email Service)    │  │
                 │  └─────────────────────┘  │
+                │  ┌─────────────────────┐  │
+                │  │     RabbitMQ        │  │
+                │  │  (Message Broker)   │  │
+                │  └─────────────────────┘  │
                 └───────────────────────────┘
 ```
 
@@ -223,6 +230,9 @@ Data Processing:
   Gson: (via Google libs)
   JSON: 20240303
 
+Message Broker:
+  RabbitMQ Client: 5.27.1
+
 Build Tool:
   Apache Maven: 3.8+
 ```
@@ -243,6 +253,9 @@ Cloud Storage:
 
 Email Service:
   Gmail SMTP: TLS/SSL enabled
+
+Message Broker:
+  RabbitMQ: 3.12+ (Management Plugin enabled recommended)
 ```
 
 ---
@@ -256,6 +269,7 @@ Email Service:
 - JDK 21 or higher
 - Apache Maven 3.8+
 - MySQL 8.0+
+- RabbitMQ Server 3.12+
 - Apache Tomcat 11.0+ (Jakarta EE 6.0 compatible)
 - Cloudinary account (for file storage)
 - Gmail account with App Password (for email service)
@@ -305,6 +319,13 @@ cloudinary.cloud.name=your_cloudinary_cloud_name
 cloudinary.api.key=your_cloudinary_api_key
 cloudinary.api.secret=your_cloudinary_api_secret
 cloudinary.url.secure=true
+
+# RabbitMQ Configuration
+rabbitmq.host=localhost
+rabbitmq.port=5672
+rabbitmq.username=guest
+rabbitmq.password=guest
+rabbitmq.queue=file_conversion_queue
 ```
 
 **4. Build the project**
