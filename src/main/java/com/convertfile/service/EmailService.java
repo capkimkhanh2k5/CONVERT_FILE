@@ -50,74 +50,56 @@ public class EmailService {
         Transport.send(msg);
     }
 
-    public static String getOtpEmail(String otpCode) {
+    // Helper method to create a consistent, modern email template
+    private static String createEmailTemplate(String title, String subTitle, String contentBody) {
         return "<!DOCTYPE html>"
                 + "<html>"
                 + "<head>"
                 + "<meta charset='UTF-8'>"
                 + "<meta name='viewport' content='width=device-width, initial-scale=1.0'>"
                 + "<style>"
-                + "  body {font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0;}"
-                + "  .email-wrapper {width: 100%; background-color: #f4f4f4; padding: 40px 0;}"
-                + "  .email-content {max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); overflow: hidden;}"
-
-                // HEADER STYLE: Nền trắng để làm nổi bật chữ Gradient
-                + "  .header {padding: 30px 20px; text-align: center; border-bottom: 1px solid #eeeeee;}"
-
-                // LOGO STYLE: Gradient Text
-                + "  .logo-text {font-size: 28px; font-weight: 800; margin: 0; letter-spacing: -0.5px;"
-                + "    background: linear-gradient(90deg, #5e35b1, #00bcd4);"
-                + "    -webkit-background-clip: text;"
-                + "    -webkit-text-fill-color: transparent;"
-                + "    color: #5e35b1; display: inline-block;}" // Fallback color (Tím) cho Outlook
-
-                + "  .header-sub {font-size: 14px; color: #888888; margin-top: 5px; text-transform: uppercase; letter-spacing: 1px;}"
-                + "  .body-content {padding: 40px 30px; text-align: center; color: #333333;}"
-                + "  .greeting {font-size: 18px; margin-bottom: 20px; color: #444444;}"
-                + "  .message {font-size: 16px; line-height: 1.6; color: #666666; margin-bottom: 30px;}"
-
-                // OTP BOX STYLE
-                + "  .otp-container {margin: 30px 0;}"
-                + "  .otp-code {font-size: 36px; font-weight: 700; color: #5e35b1; background-color: #f3e5f5; padding: 15px 40px; border-radius: 8px; letter-spacing: 8px; display: inline-block; border: 1px dashed #5e35b1;}"
-
-                + "  .warning {font-size: 13px; color: #e74c3c; margin-top: 25px; font-style: italic;}"
-                + "  .footer {background-color: #f9f9f9; padding: 20px; text-align: center; font-size: 12px; color: #999999; border-top: 1px solid #eeeeee;}"
+                + "  body { margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; }"
+                + "  .email-container { max-width: 600px; margin: 40px auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }"
+                + "  .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px 20px; text-align: center; color: #ffffff; }"
+                + "  .header h1 { margin: 0; font-size: 28px; font-weight: 700; letter-spacing: 1px; }"
+                + "  .header p { margin: 10px 0 0; font-size: 14px; opacity: 0.9; font-weight: 300; text-transform: uppercase; letter-spacing: 2px; }"
+                + "  .content { padding: 40px 30px; color: #333333; line-height: 1.6; }"
+                + "  .greeting { font-size: 18px; font-weight: 600; margin-bottom: 20px; color: #2d3748; }"
+                + "  .message { margin-bottom: 20px; color: #4a5568; }"
+                + "  .otp-box { background-color: #f0f4f8; border-radius: 8px; padding: 20px; text-align: center; margin: 30px 0; border: 2px dashed #764ba2; }"
+                + "  .otp-code { font-size: 32px; font-weight: bold; color: #764ba2; letter-spacing: 8px; display: inline-block; }"
+                + "  .alert-box { background-color: #fff5f5; border-left: 4px solid #e53e3e; color: #c53030; padding: 15px; border-radius: 4px; margin: 20px 0; }"
+                + "  .footer { background-color: #f8f9fa; padding: 20px; text-align: center; font-size: 12px; color: #a0aec0; border-top: 1px solid #edf2f7; }"
                 + "</style>"
                 + "</head>"
                 + "<body>"
-                + "  <div class='email-wrapper'>"
-                + "    <div class='email-content'>"
-
-                // --- HEADER VỚI GRADIENT TEXT ---
-                + "      <div class='header'>"
-                + "        <h1 class='logo-text'>CONVERTFILE DUT</h1>"
-                + "        <div class='header-sub'>Authentication Service</div>"
-                + "      </div>"
-
-                // --- BODY ---
-                + "      <div class='body-content'>"
-                + "        <p class='greeting'>Hello,</p>"
-                + "        <p class='message'>We received a request to verify your email address. Please use the One-Time Password (OTP) below to proceed.</p>"
-
-                // OTP CODE
-                + "        <div class='otp-container'>"
-                + "          <span class='otp-code'>" + otpCode + "</span>"
-                + "        </div>"
-
-                + "        <p class='message'>This code is valid for <strong>5 minutes</strong>.</p>"
-                + "        <p class='warning'>If you did not initiate this request, please ignore this email immediately.</p>"
-                + "      </div>"
-
-                // --- FOOTER ---
-                + "      <div class='footer'>"
-                + "        <p>&copy; 2025 CONVERTFILE DUT. All rights reserved.</p>"
-                + "        <p>Automated message, please do not reply.</p>"
-                + "      </div>"
-
+                + "  <div class='email-container'>"
+                + "    <div class='header'>"
+                + "      <h1>" + title + "</h1>"
+                + "      <p>" + subTitle + "</p>"
+                + "    </div>"
+                + "    <div class='content'>"
+                + contentBody
+                + "    </div>"
+                + "    <div class='footer'>"
+                + "      <p>&copy; 2025 ConvertFile DUT. All rights reserved.</p>"
+                + "      <p>Automated message, please do not reply.</p>"
                 + "    </div>"
                 + "  </div>"
                 + "</body>"
                 + "</html>";
+    }
+
+    public static String getOtpEmail(String otpCode) {
+        String contentBody = "      <p class='greeting'>Hello,</p>"
+                + "      <p class='message'>We received a request to verify your email address. Please use the One-Time Password (OTP) below to proceed.</p>"
+                + "      <div class='otp-box'>"
+                + "        <span class='otp-code'>" + otpCode + "</span>"
+                + "      </div>"
+                + "      <p class='message'>This code is valid for <strong>5 minutes</strong>.</p>"
+                + "      <p class='message' style='font-size: 13px; color: #718096;'>If you did not initiate this request, please ignore this email.</p>";
+
+        return createEmailTemplate("ConvertFile", "Authentication Service", contentBody);
     }
 
     public static String generateOTP() {
@@ -138,52 +120,15 @@ public class EmailService {
 
     public static void sendPasswordChangeWarning(String email) throws MessagingException {
         String subject = "Security Alert: Password Changed - ConvertFile";
-        String messageHTML = "<!DOCTYPE html>"
-                + "<html>"
-                + "<head>"
-                + "<meta charset='UTF-8'>"
-                + "<meta name='viewport' content='width=device-width, initial-scale=1.0'>"
-                + "<style>"
-                + "  body {font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0;}"
-                + "  .email-wrapper {width: 100%; background-color: #f4f4f4; padding: 40px 0;}"
-                + "  .email-content {max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); overflow: hidden;}"
-                + "  .header {padding: 30px 20px; text-align: center; border-bottom: 1px solid #eeeeee;}"
-                + "  .logo-text {font-size: 28px; font-weight: 800; margin: 0; letter-spacing: -0.5px;"
-                + "    background: linear-gradient(90deg, #e53935, #d32f2f);" // Red gradient for warning
-                + "    -webkit-background-clip: text;"
-                + "    -webkit-text-fill-color: transparent;"
-                + "    color: #d32f2f; display: inline-block;}"
-                + "  .header-sub {font-size: 14px; color: #888888; margin-top: 5px; text-transform: uppercase; letter-spacing: 1px;}"
-                + "  .body-content {padding: 40px 30px; text-align: center; color: #333333;}"
-                + "  .greeting {font-size: 18px; margin-bottom: 20px; color: #444444;}"
-                + "  .message {font-size: 16px; line-height: 1.6; color: #666666; margin-bottom: 30px;}"
-                + "  .alert-box {background-color: #ffebee; border: 1px solid #ffcdd2; color: #b71c1c; padding: 15px; border-radius: 8px; margin: 20px 0; font-weight: 600;}"
-                + "  .footer {background-color: #f9f9f9; padding: 20px; text-align: center; font-size: 12px; color: #999999; border-top: 1px solid #eeeeee;}"
-                + "</style>"
-                + "</head>"
-                + "<body>"
-                + "  <div class='email-wrapper'>"
-                + "    <div class='email-content'>"
-                + "      <div class='header'>"
-                + "        <h1 class='logo-text'>SECURITY ALERT</h1>"
-                + "        <div class='header-sub'>ConvertFile Account</div>"
+
+        String contentBody = "      <p class='greeting'>Security Alert</p>"
+                + "      <p class='message'>The password for your ConvertFile account was recently changed.</p>"
+                + "      <div class='alert-box'>"
+                + "        <strong>Warning:</strong> If you did not make this change, please contact support immediately."
                 + "      </div>"
-                + "      <div class='body-content'>"
-                + "        <p class='greeting'>Hello,</p>"
-                + "        <p class='message'>The password for your ConvertFile account was recently changed.</p>"
-                + "        <div class='alert-box'>"
-                + "          If you did not make this change, please contact support immediately."
-                + "        </div>"
-                + "        <p class='message'>If you made this change, you can safely ignore this email.</p>"
-                + "      </div>"
-                + "      <div class='footer'>"
-                + "        <p>&copy; 2025 CONVERTFILE DUT. All rights reserved.</p>"
-                + "        <p>Automated security message, please do not reply.</p>"
-                + "      </div>"
-                + "    </div>"
-                + "  </div>"
-                + "</body>"
-                + "</html>";
+                + "      <p class='message'>If you made this change, you can safely ignore this email.</p>";
+
+        String messageHTML = createEmailTemplate("Security Alert", "Account Protection", contentBody);
 
         sendEmail(email, subject, messageHTML);
     }
