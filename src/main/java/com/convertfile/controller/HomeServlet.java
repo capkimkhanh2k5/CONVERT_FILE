@@ -34,8 +34,7 @@ public class HomeServlet extends HttpServlet {
 
         // CLEANUP: Always try to remove Google's g_state cookie
         // We do this unconditionally because if the cookie is malformed (JSON),
-        // Tomcat might filter it out from request.getCookies(), so we can't "find" it
-        // to delete it.
+        // Tomcat might filter it out from request.getCookies(), so we can't "find" it to delete it.
         // Sending this header ensures the browser clears it.
         Cookie killCookie = new Cookie("g_state", "");
         killCookie.setMaxAge(0);

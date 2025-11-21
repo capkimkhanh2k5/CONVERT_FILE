@@ -127,7 +127,7 @@ public class GoogleLoginServlet extends HttpServlet {
                 // Tạo session cho user
                 HttpSession session = req.getSession(true);
 
-                // CRITICAL FIX: Use database user_id, not Google's sub ID
+                //Use database user_id, not Google's sub ID
                 session.setAttribute("userId", user.getId()); // Database primary key
                 session.setAttribute("googleSubId", googleSubId); // Google unique ID (optional)
                 session.setAttribute("useremail", userEmail);

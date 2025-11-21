@@ -1,7 +1,7 @@
 package com.convertfile.service;
 
 import jakarta.servlet.http.HttpSession;
-import javax.mail.MessagingException;
+import jakarta.mail.MessagingException;
 import java.util.HashMap;
 import java.util.Map;
 
