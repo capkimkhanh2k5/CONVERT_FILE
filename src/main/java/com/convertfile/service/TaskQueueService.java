@@ -17,6 +17,14 @@ public class TaskQueueService {
         job.setWorker_id("");
         job.setAttempt_count(0);
 
-        taskDAO.insertTask(job);
+        long taskId = taskDAO.insertTask(job);
+
+        if (taskId > 0) {
+            System.out.println("✅ Task created with ID: " + taskId);
+            // Gửi message vào RabbitMQ
+            com.convertfile.service.RabbitMQService.RabbitMQService.sendFileToQueue(taskId, fileID, jobType);
+        } else {
+            System.err.println("❌ Failed to create task in DB");
+        }
     }
 }

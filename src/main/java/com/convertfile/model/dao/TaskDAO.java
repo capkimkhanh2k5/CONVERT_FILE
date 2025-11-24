@@ -11,14 +11,14 @@ import com.convertfile.model.bean.EnumStatus.TaskStatus;
 import com.convertfile.model.bean.EnumStatus.TaskType;
 
 public class TaskDAO {
-    public boolean insertTask(Tasks job) {
+    public long insertTask(Tasks job) {
         String sql = """
                 INSERT INTO tasks (file_id, task_type, status, message, worker_id, attempt_count, created_at, started_at, completed_at)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """;
 
         try (Connection conn = ConnectDB.getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS)) {
 
             ps.setString(1, job.getFileId());
             ps.setString(2, job.getTask_type().name());
@@ -30,10 +30,18 @@ public class TaskDAO {
             ps.setTimestamp(8, job.getStarted_at() == null ? null : Timestamp.valueOf(job.getStarted_at()));
             ps.setTimestamp(9, job.getCompleted_at() == null ? null : Timestamp.valueOf(job.getCompleted_at()));
 
-            return ps.executeUpdate() > 0;
+            int affectedRows = ps.executeUpdate();
+            if (affectedRows > 0) {
+                try (ResultSet generatedKeys = ps.getGeneratedKeys()) {
+                    if (generatedKeys.next()) {
+                        return generatedKeys.getLong(1);
+                    }
+                }
+            }
+            return 0;
         } catch (SQLException e) {
             e.printStackTrace();
-            return false;
+            return 0;
         }
     }
 

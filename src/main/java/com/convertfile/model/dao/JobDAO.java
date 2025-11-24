@@ -22,9 +22,6 @@ public class JobDAO {
                 "file_path, public_id, input_format, current_status) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'UPLOADED')";
 
-        String sqlTask = "INSERT INTO tasks (file_id, task_type, status, progress_percent) " +
-                "VALUES (?, ?, 'WAITING', 0)";
-
         try {
             conn = ConnectDB.getConnection();
             if (conn == null)
@@ -54,12 +51,6 @@ public class JobDAO {
             psFile.setString(8, inputFormat);
 
             psFile.executeUpdate();
-
-            // Thêm vào bảng TASKS
-            PreparedStatement psTask = conn.prepareStatement(sqlTask);
-            psTask.setString(1, fileId);
-            psTask.setString(2, taskType);
-            psTask.executeUpdate();
 
             conn.commit();
             return fileId;
