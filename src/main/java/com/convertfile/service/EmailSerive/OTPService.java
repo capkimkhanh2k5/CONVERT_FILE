@@ -99,7 +99,7 @@ public class OTPService {
             EmailService.sendEmail(email, subject, htmlContent);
 
             // Hash OTP before storing in session (Security improvement)
-            String hashedOtp = passwordService.hassPassword(otp);
+            String hashedOtp = passwordService.hashPassword(otp);
 
             // Store hashed OTP in session
             String otpKey = getOTPKey(type);

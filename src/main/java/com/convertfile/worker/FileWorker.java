@@ -6,7 +6,7 @@ import com.convertfile.model.bean.Files;
 import com.convertfile.model.bean.Tasks;
 import com.convertfile.model.bean.EnumStatus.TaskStatus;
 import com.convertfile.model.bean.EnumStatus.TaskType;
-import com.convertfile.service.PdfTool;
+import com.convertfile.service.ConvertService.PdfTool;
 import com.convertfile.service.CloudService.CloudUploadService;
 import com.convertfile.service.ConvertService.docx_to_pdf_service;
 import com.convertfile.service.ConvertService.csv_to_json_service;
