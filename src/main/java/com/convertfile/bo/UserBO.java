@@ -15,7 +15,7 @@ public class UserBO {
         //User login with GoogleAuthentication, set default password
         String password = user.getPassword();
         if(password == null || password.isEmpty()){
-            user.setPassword(passwordService.hassPassword("GoogleAuthentication2"));
+            user.setPassword(passwordService.hashPassword("GoogleAuthentication2"));
         }
         
         return userDAO.insertUser(user);

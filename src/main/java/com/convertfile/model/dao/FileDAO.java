@@ -80,7 +80,7 @@ public class FileDAO {
 
     public boolean updateStatus(String fileID, String status) {
 
-        String sql = "UPDATE files SET current_status = ? AND updated_at = ? WHERE file_id = ?";
+        String sql = "UPDATE files SET current_status = ?, updated_at = ? WHERE file_id = ?";
         try (Connection conn = ConnectDB.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
 
@@ -107,6 +107,7 @@ public class FileDAO {
         f.setSaved_name(rs.getString("saved_name"));
         f.setFile_size(rs.getLong("file_size"));
         f.setFile_path(rs.getString("file_path"));
+        f.setPublic_id(rs.getString("public_id")); // ✅ ĐỌC PUBLIC_ID TỪ DATABASE
         f.setInput_format(rs.getString("input_format"));
         f.setOutput_format(rs.getString("output_format"));
 

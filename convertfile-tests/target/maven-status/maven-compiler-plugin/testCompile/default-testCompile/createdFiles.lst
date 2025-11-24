@@ -1,0 +1,15 @@
+com\convertfile\service\MarkdownToHtmlServiceTest.class
+com\convertfile\service\PdfToolTest.class
+com\convertfile\service\XmlToDocxServiceTest.class
+com\convertfile\service\DocxMergeServiceTest.class
+com\convertfile\service\XlsxToCsvServiceTest.class
+com\convertfile\service\CsvToJsonServiceTest.class
+com\convertfile\service\DocxToPdfServiceTest.class
+com\convertfile\service\PptxToPdfServiceTest.class
+com\convertfile\service\DocxToMarkdownServiceTest.class
+com\convertfile\service\HtmlToMarkdownServiceTest.class
+com\convertfile\service\ImageToPdfServiceTest.class
+com\convertfile\service\ImageFormatServiceTest.class
+com\convertfile\service\DocxToHtmlServiceTest.class
+com\convertfile\service\DocxToTxtServiceTest.class
+com\convertfile\service\DocxToXmlServiceTest.class

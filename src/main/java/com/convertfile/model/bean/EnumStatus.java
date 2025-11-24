@@ -17,11 +17,19 @@ public class EnumStatus {
         CANCELED,
     }
 
-    // TODO: Chưa hoàn thiện, bổ sung khi làm đủ
     public enum TaskType {
-        CONVERT_PDF_TO_DOCX,
-        CONVERT_DOCX_TO_PDF,
-        CONVERT_JPG_TO_PNG,
-        CONVERT_PNG_TO_JPG
+        DOCX_TO_PDF,
+        PDF_TO_DOCX,
+        CSV_TO_JSON,
+        DOCX_TO_XML,
+        XML_TO_DOCX,
+        DOCX_TO_HTML,
+        DOCX_TO_TXT,
+        DOCX_TO_MARKDOWN,
+        IMAGE_TO_PDF,
+        PDF_TO_IMAGE,
+        XLSX_TO_CSV,
+        DOCX_MERGE,
+        UNKNOWN
     }
 }

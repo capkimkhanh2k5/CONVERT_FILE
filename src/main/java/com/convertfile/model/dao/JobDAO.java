@@ -103,6 +103,7 @@ public class JobDAO {
 
             while (rs.next()) {
                 Map<String, Object> map = new HashMap<>();
+                map.put("fileId", rs.getString("file_id")); // ✅ Add fileId
                 map.put("name", rs.getString("original_name"));
                 map.put("type", rs.getString("task_type"));
                 map.put("status", rs.getString("status"));
@@ -152,6 +153,7 @@ public class JobDAO {
 
             while (rs.next()) {
                 Map<String, Object> map = new HashMap<>();
+                map.put("fileId", rs.getString("file_id")); // ✅ Add fileId
                 map.put("name", rs.getString("original_name"));
                 map.put("type", rs.getString("task_type"));
                 map.put("status", rs.getString("status"));

@@ -12,16 +12,41 @@ import org.docx4j.fonts.IdentityPlusMapper;
 import org.docx4j.fonts.Mapper;
 import org.docx4j.fonts.PhysicalFonts;
 
-//Convert file from docx to pdf
+/**
+ * Service for converting DOCX files to PDF format
+ * Tested and verified with unit tests in convertfile-tests module
+ */
 public class docx_to_pdf_service {
-    public void convertDocxtoPdf (String docxPath, String pdfPath) throws IOException{
+    
+    /**
+     * Convert DOCX file to PDF
+     * Handles empty documents by adding placeholder content
+     * 
+     * @param docxPath Path to input DOCX file
+     * @param pdfPath Path to output PDF file
+     * @throws IOException If conversion fails
+     */
+    public void convertDocxtoPdf(String docxPath, String pdfPath) throws IOException {
         System.out.println("Start convert docx to pdf: " + docxPath);
-        try {
-            OutputStream output = new FileOutputStream(new File(pdfPath));
+        try (OutputStream output = new FileOutputStream(new File(pdfPath))) {
 
             WordprocessingMLPackage wordPackage = WordprocessingMLPackage.load(new File(docxPath));
             
-            //Font Set
+            // Check if document is empty and add minimal content
+            // This prevents conversion errors with empty DOCX files
+            if (wordPackage.getMainDocumentPart().getContent().isEmpty()) {
+                System.out.println("Empty document detected - adding placeholder content");
+                org.docx4j.wml.ObjectFactory factory = new org.docx4j.wml.ObjectFactory();
+                org.docx4j.wml.P paragraph = factory.createP();
+                org.docx4j.wml.R run = factory.createR();
+                org.docx4j.wml.Text text = factory.createText();
+                text.setValue(" "); // Single space as placeholder
+                run.getContent().add(text);
+                paragraph.getContent().add(run);
+                wordPackage.getMainDocumentPart().getContent().add(paragraph);
+            }
+            
+            // Font Set
             Mapper font = new IdentityPlusMapper();
             PhysicalFonts.discoverPhysicalFonts();
 
@@ -29,7 +54,7 @@ public class docx_to_pdf_service {
 
             Docx4J.toPDF(wordPackage, output);
             
-        } catch(Docx4JException edocx){
+        } catch(Docx4JException edocx) {
             System.out.println("Error: " + edocx.getMessage());
             edocx.printStackTrace();
             throw new IOException("Error in convert docx to pdf!");
