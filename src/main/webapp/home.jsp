@@ -1,44 +1,49 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib uri="jakarta.tags.core" prefix="c" %>
 
-<!DOCTYPE html>
-<html lang="vi">
+                        <!DOCTYPE html>
+                        <html lang="vi">
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - ConvertFile</title>
+                        <head>
+                            <meta charset="UTF-8">
+                            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                            <title>Dashboard - ConvertFile</title>
 
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
-        rel="stylesheet">
+                            <script>
+                                // Xóa cookie g_state bị lỗi nếu có
+                                document.cookie = "g_state=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+                            </script>
 
-    <style>
-        :root {
-            --primary: #6366f1;
-            --primary-dark: #4f46e5;
-            --secondary: #ec4899;
-            --accent: #8b5cf6;
-            --text-main: #1e293b;
-            --text-light: #64748b;
-            --bg-glass: rgba(255, 255, 255, 0.7);
-            --bg-glass-strong: rgba(255, 255, 255, 0.9);
-            --shadow-glass: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
-            --border-glass: 1px solid rgba(255, 255, 255, 0.18);
-            --success: #10b981;
-            --warning: #f59e0b;
-            --error: #ef4444;
-        }
+                            <!-- Fonts -->
+                            <link rel="preconnect" href="https://fonts.googleapis.com">
+                            <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+                            <link
+                                href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+                                rel="stylesheet">
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Outfit', sans-serif;
-        }
+                            <style>
+                                :root {
+                                    --primary: #6366f1;
+                                    --primary-dark: #4f46e5;
+                                    --secondary: #ec4899;
+                                    --accent: #8b5cf6;
+                                    --text-main: #1e293b;
+                                    --text-light: #64748b;
+                                    --bg-glass: rgba(255, 255, 255, 0.7);
+                                    --bg-glass-strong: rgba(255, 255, 255, 0.9);
+                                    --shadow-glass: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+                                    --border-glass: 1px solid rgba(255, 255, 255, 0.18);
+                                    --success: #10b981;
+                                    --warning: #f59e0b;
+                                    --error: #ef4444;
+                                }
+
+                                * {
+                                    margin: 0;
+                                    padding: 0;
+                                    box-sizing: border-box;
+                                    font-family: 'Outfit', sans-serif;
+                                }
 
         body {
             min-height: 100vh;
@@ -48,68 +53,68 @@
             position: relative;
         }
 
-        /* Animated Background */
-        .bg-animation {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            overflow: hidden;
-            background: linear-gradient(45deg, #f3f4f6, #e5e7eb);
-        }
+                                /* Animated Background */
+                                .bg-animation {
+                                    position: fixed;
+                                    top: 0;
+                                    left: 0;
+                                    width: 100%;
+                                    height: 100%;
+                                    z-index: -1;
+                                    overflow: hidden;
+                                    background: linear-gradient(45deg, #f3f4f6, #e5e7eb);
+                                }
 
-        .orb {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(80px);
-            opacity: 0.5;
-            animation: float 20s infinite ease-in-out;
-        }
+                                .orb {
+                                    position: absolute;
+                                    border-radius: 50%;
+                                    filter: blur(80px);
+                                    opacity: 0.5;
+                                    animation: float 20s infinite ease-in-out;
+                                }
 
-        .orb-1 {
-            width: 500px;
-            height: 500px;
-            background: var(--primary);
-            top: -10%;
-            left: -10%;
-            animation-delay: 0s;
-        }
+                                .orb-1 {
+                                    width: 500px;
+                                    height: 500px;
+                                    background: var(--primary);
+                                    top: -10%;
+                                    left: -10%;
+                                    animation-delay: 0s;
+                                }
 
-        .orb-2 {
-            width: 400px;
-            height: 400px;
-            background: var(--secondary);
-            bottom: -10%;
-            right: -10%;
-            animation-delay: -5s;
-        }
+                                .orb-2 {
+                                    width: 400px;
+                                    height: 400px;
+                                    background: var(--secondary);
+                                    bottom: -10%;
+                                    right: -10%;
+                                    animation-delay: -5s;
+                                }
 
-        .orb-3 {
-            width: 300px;
-            height: 300px;
-            background: var(--accent);
-            top: 40%;
-            left: 40%;
-            animation-delay: -10s;
-        }
+                                .orb-3 {
+                                    width: 300px;
+                                    height: 300px;
+                                    background: var(--accent);
+                                    top: 40%;
+                                    left: 40%;
+                                    animation-delay: -10s;
+                                }
 
-        @keyframes float {
+                                @keyframes float {
 
-            0%,
-            100% {
-                transform: translate(0, 0) scale(1);
-            }
+                                    0%,
+                                    100% {
+                                        transform: translate(0, 0) scale(1);
+                                    }
 
-            33% {
-                transform: translate(30px, -50px) scale(1.1);
-            }
+                                    33% {
+                                        transform: translate(30px, -50px) scale(1.1);
+                                    }
 
-            66% {
-                transform: translate(-20px, 20px) scale(0.9);
-            }
-        }
+                                    66% {
+                                        transform: translate(-20px, 20px) scale(0.9);
+                                    }
+                                }
 
         /* Main Layout */
         .app-layout {
@@ -122,103 +127,103 @@
             transition: grid-template-columns 0.3s ease;
         }
 
-        .app-layout.show-history {
-            grid-template-columns: 260px 1fr 320px;
-        }
+                                .app-layout.show-history {
+                                    grid-template-columns: 260px 1fr 320px;
+                                }
 
-        /* Glass Panel Common */
-        .glass-panel {
-            background: var(--bg-glass);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-radius: 24px;
-            border: var(--border-glass);
-            box-shadow: var(--shadow-glass);
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
+                                /* Glass Panel Common */
+                                .glass-panel {
+                                    background: var(--bg-glass);
+                                    backdrop-filter: blur(20px);
+                                    -webkit-backdrop-filter: blur(20px);
+                                    border-radius: 24px;
+                                    border: var(--border-glass);
+                                    box-shadow: var(--shadow-glass);
+                                    display: flex;
+                                    flex-direction: column;
+                                    overflow: hidden;
+                                }
 
-        /* Sidebar */
-        .sidebar {
-            padding: 24px;
-        }
+                                /* Sidebar */
+                                .sidebar {
+                                    padding: 24px;
+                                }
 
-        .brand {
-            font-size: 24px;
-            font-weight: 800;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 40px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+                                .brand {
+                                    font-size: 24px;
+                                    font-weight: 800;
+                                    background: linear-gradient(135deg, var(--primary), var(--secondary));
+                                    -webkit-background-clip: text;
+                                    -webkit-text-fill-color: transparent;
+                                    margin-bottom: 40px;
+                                    display: flex;
+                                    align-items: center;
+                                    gap: 10px;
+                                }
 
-        .nav-menu {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
+                                .nav-menu {
+                                    flex: 1;
+                                    display: flex;
+                                    flex-direction: column;
+                                    gap: 8px;
+                                }
 
-        .nav-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px 16px;
-            border-radius: 12px;
-            color: var(--text-light);
-            text-decoration: none;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
+                                .nav-item {
+                                    display: flex;
+                                    align-items: center;
+                                    gap: 12px;
+                                    padding: 12px 16px;
+                                    border-radius: 12px;
+                                    color: var(--text-light);
+                                    text-decoration: none;
+                                    font-weight: 500;
+                                    transition: all 0.3s ease;
+                                    cursor: pointer;
+                                }
 
-        .nav-item:hover,
-        .nav-item.active {
-            background: rgba(255, 255, 255, 0.5);
-            color: var(--primary);
-            transform: translateX(5px);
-        }
+                                .nav-item:hover,
+                                .nav-item.active {
+                                    background: rgba(255, 255, 255, 0.5);
+                                    color: var(--primary);
+                                    transform: translateX(5px);
+                                }
 
-        .nav-item.active {
-            background: white;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-        }
+                                .nav-item.active {
+                                    background: white;
+                                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+                                }
 
-        .user-profile {
-            margin-top: auto;
-            padding-top: 20px;
-            border-top: 1px solid rgba(0, 0, 0, 0.05);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
+                                .user-profile {
+                                    margin-top: auto;
+                                    padding-top: 20px;
+                                    border-top: 1px solid rgba(0, 0, 0, 0.05);
+                                    display: flex;
+                                    align-items: center;
+                                    gap: 12px;
+                                }
 
-        .avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--primary), var(--accent));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 700;
-            font-size: 16px;
-        }
+                                .avatar {
+                                    width: 40px;
+                                    height: 40px;
+                                    border-radius: 50%;
+                                    background: linear-gradient(135deg, var(--primary), var(--accent));
+                                    display: flex;
+                                    align-items: center;
+                                    justify-content: center;
+                                    color: white;
+                                    font-weight: 700;
+                                    font-size: 16px;
+                                }
 
-        .user-info h4 {
-            font-size: 14px;
-            color: var(--text-main);
-        }
+                                .user-info h4 {
+                                    font-size: 14px;
+                                    color: var(--text-main);
+                                }
 
-        .user-info p {
-            font-size: 12px;
-            color: var(--text-light);
-        }
+                                .user-info p {
+                                    font-size: 12px;
+                                    color: var(--text-light);
+                                }
 
         /* Main Content */
         .main-content {
@@ -226,19 +231,19 @@
             overflow-x: hidden;
         }
 
-        .header {
-            margin-bottom: 32px;
-        }
+                                .header {
+                                    margin-bottom: 32px;
+                                }
 
-        .header h1 {
-            font-size: 28px;
-            color: var(--text-main);
-            margin-bottom: 8px;
-        }
+                                .header h1 {
+                                    font-size: 28px;
+                                    color: var(--text-main);
+                                    margin-bottom: 8px;
+                                }
 
-        .header p {
-            color: var(--text-light);
-        }
+                                .header p {
+                                    color: var(--text-light);
+                                }
 
         /* Upload Area */
         .upload-zone {
@@ -260,12 +265,12 @@
             flex-shrink: 0;
         }
 
-        .upload-zone:hover,
-        .upload-zone.dragover {
-            border-color: var(--primary);
-            background: rgba(99, 102, 241, 0.05);
-            transform: scale(1.01);
-        }
+                                .upload-zone:hover,
+                                .upload-zone.dragover {
+                                    border-color: var(--primary);
+                                    background: rgba(99, 102, 241, 0.05);
+                                    transform: scale(1.01);
+                                }
 
         .upload-icon {
             width: 90px;
@@ -357,57 +362,57 @@
             border-radius: 10px;
         }
 
-        .file-item {
-            background: white;
-            padding: 16px;
-            border-radius: 16px;
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
-            transition: all 0.3s ease;
-            animation: slideIn 0.3s ease;
-        }
+                                .file-item {
+                                    background: white;
+                                    padding: 16px;
+                                    border-radius: 16px;
+                                    display: flex;
+                                    align-items: center;
+                                    gap: 16px;
+                                    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+                                    transition: all 0.3s ease;
+                                    animation: slideIn 0.3s ease;
+                                }
 
-        .file-item:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.05);
-        }
+                                .file-item:hover {
+                                    transform: translateY(-2px);
+                                    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.05);
+                                }
 
-        .file-icon {
-            width: 48px;
-            height: 48px;
-            background: #f1f5f9;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-        }
+                                .file-icon {
+                                    width: 48px;
+                                    height: 48px;
+                                    background: #f1f5f9;
+                                    border-radius: 12px;
+                                    display: flex;
+                                    align-items: center;
+                                    justify-content: center;
+                                    font-size: 24px;
+                                }
 
-        .file-details {
-            flex: 1;
-        }
+                                .file-details {
+                                    flex: 1;
+                                }
 
-        .file-name {
-            font-weight: 600;
-            color: var(--text-main);
-            font-size: 14px;
-            margin-bottom: 4px;
-        }
+                                .file-name {
+                                    font-weight: 600;
+                                    color: var(--text-main);
+                                    font-size: 14px;
+                                    margin-bottom: 4px;
+                                }
 
-        .file-meta {
-            font-size: 12px;
-            color: var(--text-light);
-            display: flex;
-            gap: 12px;
-        }
+                                .file-meta {
+                                    font-size: 12px;
+                                    color: var(--text-light);
+                                    display: flex;
+                                    gap: 12px;
+                                }
 
-        .file-actions {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
+                                .file-actions {
+                                    display: flex;
+                                    align-items: center;
+                                    gap: 12px;
+                                }
 
         .format-select {
             padding: 8px 12px;
@@ -452,23 +457,23 @@
             transform: none;
         }
 
-        .remove-btn {
-            width: 32px;
-            height: 32px;
-            border-radius: 8px;
-            border: none;
-            background: #fee2e2;
-            color: #ef4444;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
+                                .remove-btn {
+                                    width: 32px;
+                                    height: 32px;
+                                    border-radius: 8px;
+                                    border: none;
+                                    background: #fee2e2;
+                                    color: #ef4444;
+                                    display: flex;
+                                    align-items: center;
+                                    justify-content: center;
+                                    cursor: pointer;
+                                    transition: all 0.2s;
+                                }
 
-        .remove-btn:hover {
-            background: #fecaca;
-        }
+                                .remove-btn:hover {
+                                    background: #fecaca;
+                                }
 
         /* Convert Button */
         .convert-all-btn {
@@ -490,79 +495,79 @@
             backdrop-filter: blur(10px);
         }
 
-        .convert-all-btn.show {
-            display: block;
-        }
+                                .convert-all-btn.show {
+                                    display: block;
+                                }
 
-        .convert-all-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 28px rgba(236, 72, 153, 0.4);
-        }
+                                .convert-all-btn:hover {
+                                    transform: translateY(-2px);
+                                    box-shadow: 0 12px 28px rgba(236, 72, 153, 0.4);
+                                }
 
-        .convert-all-btn:disabled {
-            opacity: 0.7;
-            cursor: wait;
-        }
+                                .convert-all-btn:disabled {
+                                    opacity: 0.7;
+                                    cursor: wait;
+                                }
 
-        /* Right Panel - History */
-        .history-panel {
-            padding: 24px;
-            overflow-y: auto;
-            display: none;
-            /* Hidden by default */
-        }
+                                /* Right Panel - History */
+                                .history-panel {
+                                    padding: 24px;
+                                    overflow-y: auto;
+                                    display: none;
+                                    /* Hidden by default */
+                                }
 
-        .history-panel.show {
-            display: flex;
-        }
+                                .history-panel.show {
+                                    display: flex !important;
+                                }
 
-        .history-list {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
+                                .history-list {
+                                    display: flex;
+                                    flex-direction: column;
+                                    gap: 12px;
+                                }
 
-        .history-item {
-            background: rgba(255, 255, 255, 0.6);
-            padding: 12px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            transition: all 0.2s;
-        }
+                                .history-item {
+                                    background: rgba(255, 255, 255, 0.6);
+                                    padding: 12px;
+                                    border-radius: 12px;
+                                    display: flex;
+                                    align-items: center;
+                                    gap: 12px;
+                                    transition: all 0.2s;
+                                }
 
-        .history-item:hover {
-            background: white;
-        }
+                                .history-item:hover {
+                                    background: white;
+                                }
 
-        .status-badge {
-            padding: 4px 8px;
-            border-radius: 6px;
-            font-size: 10px;
-            font-weight: 700;
-            text-transform: uppercase;
-        }
+                                .status-badge {
+                                    padding: 4px 8px;
+                                    border-radius: 6px;
+                                    font-size: 10px;
+                                    font-weight: 700;
+                                    text-transform: uppercase;
+                                }
 
-        .status-pending {
-            background: #fef3c7;
-            color: #d97706;
-        }
+                                .status-pending {
+                                    background: #fef3c7;
+                                    color: #d97706;
+                                }
 
-        .status-processing {
-            background: #dbeafe;
-            color: #2563eb;
-        }
+                                .status-processing {
+                                    background: #dbeafe;
+                                    color: #2563eb;
+                                }
 
-        .status-done {
-            background: #d1fae5;
-            color: #059669;
-        }
+                                .status-done {
+                                    background: #d1fae5;
+                                    color: #059669;
+                                }
 
-        .status-error {
-            background: #fee2e2;
-            color: #dc2626;
-        }
+                                .status-error {
+                                    background: #fee2e2;
+                                    color: #dc2626;
+                                }
 
         .download-btn {
             padding: 8px 16px;
@@ -623,142 +628,157 @@
             100% { transform: translateX(100%); }
         }
 
-        /* Animations */
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
+                                /* Animations */
+                                @keyframes slideIn {
+                                    from {
+                                        opacity: 0;
+                                        transform: translateY(10px);
+                                    }
 
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
+                                    to {
+                                        opacity: 1;
+                                        transform: translateY(0);
+                                    }
+                                }
 
-        /* Responsive */
-        @media (max-width: 1200px) {
-            .app-layout {
-                grid-template-columns: 240px 1fr;
-            }
+                                /* Responsive */
+                                @media (max-width: 1200px) {
+                                    .app-layout {
+                                        grid-template-columns: 240px 1fr;
+                                    }
 
-            .history-panel {
-                display: none;
-            }
+                                    .history-panel {
+                                        display: none;
+                                    }
 
-            /* Hide history on smaller screens for now or make it a modal */
-        }
+                                    .history-panel.show {
+                                        display: flex !important;
+                                        position: fixed;
+                                        top: 20px;
+                                        right: 20px;
+                                        bottom: 20px;
+                                        width: 320px;
+                                        z-index: 1000;
+                                        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+                                        background: rgba(255, 255, 255, 0.95);
+                                        /* More opaque for overlay */
+                                    }
+                                }
 
-        @media (max-width: 768px) {
-            .app-layout {
-                grid-template-columns: 1fr;
-                padding: 10px;
-            }
+                                @media (max-width: 768px) {
+                                    .app-layout {
+                                        grid-template-columns: 1fr;
+                                        padding: 10px;
+                                    }
 
-            .sidebar {
-                display: none;
-            }
+                                    .sidebar {
+                                        display: none;
+                                    }
 
-            /* Mobile menu needed */
-            .main-content {
-                padding: 20px;
-            }
-        }
-    </style>
-</head>
+                                    /* Mobile menu needed */
+                                    .main-content {
+                                        padding: 20px;
+                                    }
+                                }
+                            </style>
+                        </head>
 
-<body>
+                        <body>
 
-    <!-- Background Animation -->
-    <div class="bg-animation">
-        <div class="orb orb-1"></div>
-        <div class="orb orb-2"></div>
-        <div class="orb orb-3"></div>
-    </div>
+                            <!-- Background Animation -->
+                            <div class="bg-animation">
+                                <div class="orb orb-1"></div>
+                                <div class="orb orb-2"></div>
+                                <div class="orb orb-3"></div>
+                            </div>
 
-    <div class="app-layout">
-        <!-- Sidebar -->
-        <aside class="glass-panel sidebar">
-            <div class="brand">
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                    stroke-linejoin="round">
-                    <path
-                        d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
-                    <polyline points="14 2 14 8 20 8" />
-                </svg>
-                ConvertFile
-            </div>
+                            <div class="app-layout">
+                                <!-- Sidebar -->
+                                <aside class="glass-panel sidebar">
+                                    <div class="brand">
+                                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                            stroke-linejoin="round">
+                                            <path
+                                                d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
+                                            <polyline points="14 2 14 8 20 8" />
+                                        </svg>
+                                        ConvertFile
+                                    </div>
 
-            <nav class="nav-menu">
-                <a href="#" class="nav-item active" id="navDashboard">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="2">
-                        <rect x="3" y="3" width="7" height="7"></rect>
-                        <rect x="14" y="3" width="7" height="7"></rect>
-                        <rect x="14" y="14" width="7" height="7"></rect>
-                        <rect x="3" y="14" width="7" height="7"></rect>
-                    </svg>
-                    Dashboard
-                </a>
-                <a href="#" class="nav-item" id="navMyFiles">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="2">
-                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z">
-                        </path>
-                        <polyline points="14 2 14 8 20 8"></polyline>
-                        <line x1="16" y1="13" x2="8" y2="13"></line>
-                        <line x1="16" y1="17" x2="8" y2="17"></line>
-                        <polyline points="10 9 9 9 8 9"></polyline>
-                    </svg>
-                    My Files
-                </a>
-                <a href="#" class="nav-item">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="2">
-                        <circle cx="12" cy="12" r="3"></circle>
-                        <path
-                            d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z">
-                        </path>
-                    </svg>
-                    Settings
-                </a>
-            </nav>
+                                    <nav class="nav-menu">
+                                        <a href="#" class="nav-item active" id="navDashboard">
+                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+                                                stroke="currentColor" stroke-width="2">
+                                                <rect x="3" y="3" width="7" height="7"></rect>
+                                                <rect x="14" y="3" width="7" height="7"></rect>
+                                                <rect x="14" y="14" width="7" height="7"></rect>
+                                                <rect x="3" y="14" width="7" height="7"></rect>
+                                            </svg>
+                                            Dashboard
+                                        </a>
+                                        <a href="#" class="nav-item" id="navMyFiles">
+                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+                                                stroke="currentColor" stroke-width="2">
+                                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z">
+                                                </path>
+                                                <polyline points="14 2 14 8 20 8"></polyline>
+                                                <line x1="16" y1="13" x2="8" y2="13"></line>
+                                                <line x1="16" y1="17" x2="8" y2="17"></line>
+                                                <polyline points="10 9 9 9 8 9"></polyline>
+                                            </svg>
+                                            My Files
+                                        </a>
+                                        <a href="#" class="nav-item">
+                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+                                                stroke="currentColor" stroke-width="2">
+                                                <circle cx="12" cy="12" r="3"></circle>
+                                                <path
+                                                    d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z">
+                                                </path>
+                                            </svg>
+                                            Settings
+                                        </a>
+                                    </nav>
 
-            <div class="user-profile">
-                <div class="avatar">
-                    <c:choose>
-                        <c:when test="${not empty sessionScope.username}">
-                            ${sessionScope.username.substring(0, 1).toUpperCase()}
-                        </c:when>
-                        <c:otherwise>G</c:otherwise>
-                    </c:choose>
-                </div>
-                <div class="user-info">
-                    <h4>${not empty sessionScope.username ? sessionScope.username : "Guest"}
-                    </h4>
-                    <p>${not empty sessionScope.email ? sessionScope.email : "Sign in to save"}
-                    </p>
-                </div>
-                <a href="<c:url value='/logout'/>" title="Logout"
-                    style="margin-left: auto; color: var(--text-light);">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="2">
-                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                        <polyline points="16 17 21 12 16 7"></polyline>
-                        <line x1="21" y1="12" x2="9" y2="12"></line>
-                    </svg>
-                </a>
-            </div>
-        </aside>
+                                    <div class="user-profile">
+                                        <div class="avatar">
+                                            <c:choose>
+                                                <c:when test="${not empty sessionScope.userpicture}">
+                                                    <img src="${sessionScope.userpicture}" alt="Avatar"
+                                                        style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+                                                </c:when>
+                                                <c:when test="${not empty sessionScope.username}">
+                                                    ${sessionScope.username.substring(0, 1).toUpperCase()}
+                                                </c:when>
+                                                <c:otherwise>G</c:otherwise>
+                                            </c:choose>
+                                        </div>
+                                        <div class="user-info">
+                                            <h4>${not empty sessionScope.username ? sessionScope.username : "Guest"}
+                                            </h4>
+                                            <p>${not empty sessionScope.email ? sessionScope.email : "Sign in to save"}
+                                            </p>
+                                        </div>
+                                        <a href="<c:url value='/logout'/>" title="Logout"
+                                            style="margin-left: auto; color: var(--text-light);">
+                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+                                                stroke="currentColor" stroke-width="2">
+                                                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                                                <polyline points="16 17 21 12 16 7"></polyline>
+                                                <line x1="21" y1="12" x2="9" y2="12"></line>
+                                            </svg>
+                                        </a>
+                                    </div>
+                                </aside>
 
-        <!-- Main Content -->
-        <main class="glass-panel main-content">
-            <div class="header">
-                <h1>Welcome back, ${not empty sessionScope.username ? sessionScope.username :
-                    "Guest"}! 👋</h1>
-                <p>Ready to convert some files? Drag and drop them below.</p>
-            </div>
+                                <!-- Main Content -->
+                                <main class="glass-panel main-content">
+                                    <div class="header">
+                                        <h1>Welcome back, ${not empty sessionScope.username ? sessionScope.username :
+                                            "Guest"}! 👋</h1>
+                                        <p>Ready to convert some files? Drag and drop them below.</p>
+                                    </div>
 
             <!-- Upload Zone -->
             <div class="upload-zone" id="dropZone">
@@ -777,37 +797,37 @@
                 <input type="file" id="fileInput" multiple accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.gif,.bmp,.csv,.xlsx,.xls,.xml,.html,.htm,.txt,.md" hidden>
             </div>
 
-            <!-- Selected Files List -->
-            <div id="selectedFilesSection" style="display: none;">
-                <div class="section-title">
-                    <span>Selected Files</span>
-                    <span class="file-count" id="fileCount">0 files</span>
-                </div>
-                <div class="file-list" id="fileList">
-                    <!-- Files will be added here -->
-                </div>
-                <button class="convert-all-btn" id="uploadAllBtn">
-                    Convert All Files 🚀
-                </button>
-            </div>
+                                    <!-- Selected Files List -->
+                                    <div id="selectedFilesSection" style="display: none;">
+                                        <div class="section-title">
+                                            <span>Selected Files</span>
+                                            <span class="file-count" id="fileCount">0 files</span>
+                                        </div>
+                                        <div class="file-list" id="fileList">
+                                            <!-- Files will be added here -->
+                                        </div>
+                                        <button class="convert-all-btn" id="uploadAllBtn">
+                                            Convert All Files 🚀
+                                        </button>
+                                    </div>
 
-            <!-- Recent Jobs (Mobile/Tablet view mostly, or main list) -->
-            <div class="section-title" style="margin-top: 40px;">
-                <span>Recent Conversions</span>
-            </div>
-            <div class="file-list" id="jobListMain">
-                <!-- Jobs will be rendered here -->
-            </div>
-        </main>
+                                    <!-- Recent Jobs (Mobile/Tablet view mostly, or main list) -->
+                                    <div class="section-title" style="margin-top: 40px;">
+                                        <span>Recent Uploads</span>
+                                    </div>
+                                    <div class="file-list" id="jobListMain">
+                                        <!-- Jobs will be rendered here -->
+                                    </div>
+                                </main>
 
-        <!-- Right Panel (History) -->
-        <aside class="glass-panel history-panel">
-            <div class="section-title">History</div>
-            <div class="history-list" id="historyList">
-                <!-- History items will be rendered here -->
-            </div>
-        </aside>
-    </div>
+                                <!-- Right Panel (History) -->
+                                <aside class="glass-panel history-panel">
+                                    <div class="section-title">History</div>
+                                    <div class="history-list" id="historyList">
+                                        <!-- History items will be rendered here -->
+                                    </div>
+                                </aside>
+                            </div>
 
     <script>
         console.log("🎬 Script started loading...");
@@ -831,50 +851,67 @@
         console.log("  uploadAllBtn:", uploadAllBtn ? "✅" : "❌");
         console.log("  jobListMain:", jobListMain ? "✅" : "❌");
 
-        // Navigation elements
-        const navDashboard = document.getElementById('navDashboard');
-        const navMyFiles = document.getElementById('navMyFiles');
-        const historyPanel = document.querySelector('.history-panel');
-        const appLayout = document.querySelector('.app-layout');
+                                    // Navigation elements
+                                    const navDashboard = document.getElementById('navDashboard');
+                                    const navMyFiles = document.getElementById('navMyFiles');
+                                    const historyPanel = document.querySelector('.history-panel');
+                                    const appLayout = document.querySelector('.app-layout');
 
-        let selectedFiles = []; // Array to store File objects
+                                    let selectedFiles = []; // Array to store File objects
 
-        // --- Navigation Toggle ---
-        navDashboard.addEventListener('click', function (e) {
-            e.preventDefault();
-            navDashboard.classList.add('active');
-            navMyFiles.classList.remove('active');
-            historyPanel.classList.remove('show');
-            appLayout.classList.remove('show-history');
-        });
+                                    // --- Navigation Toggle ---
+                                    if (navDashboard && navMyFiles && historyPanel && appLayout) {
+                                        navDashboard.addEventListener('click', function (e) {
+                                            e.preventDefault();
+                                            console.log("Dashboard clicked");
+                                            navDashboard.classList.add('active');
+                                            navMyFiles.classList.remove('active');
+                                            historyPanel.classList.remove('show');
+                                            appLayout.classList.remove('show-history');
+                                            historyPanel.style.display = '';
+                                        });
 
-        navMyFiles.addEventListener('click', function (e) {
-            e.preventDefault();
-            navMyFiles.classList.add('active');
-            navDashboard.classList.remove('active');
-            historyPanel.classList.add('show');
-            appLayout.classList.add('show-history');
-        });
+                                        navMyFiles.addEventListener('click', function (e) {
+                                            e.preventDefault();
+                                            console.log("My Files clicked - Toggling History Panel");
+                                            navMyFiles.classList.add('active');
+                                            navDashboard.classList.remove('active');
+                                            historyPanel.classList.add('show');
+                                            appLayout.classList.add('show-history');
 
-        // --- Drag & Drop Logic ---
-        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-            dropZone.addEventListener(eventName, preventDefaults, false);
-        });
+                                            // Force display flex if class doesn't work for some reason
+                                            historyPanel.style.display = 'flex';
+                                        });
+                                    } else {
+                                        console.error("One or more navigation elements not found:", {
+                                            navDashboard: !!navDashboard,
+                                            navMyFiles: !!navMyFiles,
+                                            historyPanel: !!historyPanel,
+                                            appLayout: !!appLayout
+                                        });
+                                    }
 
-        function preventDefaults(e) {
-            e.preventDefault();
-            e.stopPropagation();
-        }
+                                    // --- Drag & Drop Logic ---
+                                    if (dropZone) {
+                                        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                                            dropZone.addEventListener(eventName, preventDefaults, false);
+                                        });
 
-        ['dragenter', 'dragover'].forEach(eventName => {
-            dropZone.addEventListener(eventName, () => dropZone.classList.add('dragover'), false);
-        });
+                                        function preventDefaults(e) {
+                                            e.preventDefault();
+                                            e.stopPropagation();
+                                        }
 
-        ['dragleave', 'drop'].forEach(eventName => {
-            dropZone.addEventListener(eventName, () => dropZone.classList.remove('dragover'), false);
-        });
+                                        ['dragenter', 'dragover'].forEach(eventName => {
+                                            dropZone.addEventListener(eventName, () => dropZone.classList.add('dragover'), false);
+                                        });
 
-        dropZone.addEventListener('drop', handleDrop, false);
+                                        ['dragleave', 'drop'].forEach(eventName => {
+                                            dropZone.addEventListener(eventName, () => dropZone.classList.remove('dragover'), false);
+                                        });
+
+                                        dropZone.addEventListener('drop', handleDrop, false);
+                                    }
 
         function handleDrop(e) {
             console.log("📥 Drop event triggered");
@@ -980,18 +1017,18 @@
             return conversionOptions[extension] || [];
         }
 
-        // --- Render Selected Files ---
-        function renderSelectedFiles() {
-            fileList.innerHTML = '';
+                                    // --- Render Selected Files ---
+                                    function renderSelectedFiles() {
+                                        fileList.innerHTML = '';
 
-            if (selectedFiles.length > 0) {
-                selectedFilesSection.style.display = 'block';
-                uploadAllBtn.classList.add('show');
-                fileCount.textContent = selectedFiles.length + ' files';
-            } else {
-                selectedFilesSection.style.display = 'none';
-                uploadAllBtn.classList.remove('show');
-            }
+                                        if (selectedFiles.length > 0) {
+                                            selectedFilesSection.style.display = 'block';
+                                            uploadAllBtn.classList.add('show');
+                                            fileCount.textContent = selectedFiles.length + ' files';
+                                        } else {
+                                            selectedFilesSection.style.display = 'none';
+                                            uploadAllBtn.classList.remove('show');
+                                        }
 
             selectedFiles.forEach((file, index) => {
                 const item = document.createElement('div');
@@ -1010,7 +1047,7 @@
                 else if (file.name.endsWith('.txt')) icon = '📃';
                 else if (file.name.endsWith('.md')) icon = '📝';
 
-                const size = (file.size / 1024 / 1024).toFixed(2) + ' MB';
+                                            const size = (file.size / 1024 / 1024).toFixed(2) + ' MB';
 
                 let htmlContent = '<div class="file-icon">' + icon + '</div>' +
                     '<div class="file-details">' +
@@ -1133,8 +1170,8 @@
                 return;
             }
 
-            uploadAllBtn.disabled = true;
-            uploadAllBtn.textContent = 'Uploading & Converting... ⏳';
+                                        uploadAllBtn.disabled = true;
+                                        uploadAllBtn.textContent = 'Uploading & Converting... ⏳';
 
             const uploadPromises = selectedFiles.map((file, index) => {
                 // Tìm select element bằng data-file-index
@@ -1247,26 +1284,26 @@
                 });
         }
 
-        function renderJobs(jobs) {
-            // Render Main List (Detailed)
-            jobListMain.innerHTML = '';
-            // Render History List (Compact)
-            historyList.innerHTML = '';
+                                    function renderJobs(jobs) {
+                                        // Render Main List (Detailed)
+                                        jobListMain.innerHTML = '';
+                                        // Render History List (Compact)
+                                        historyList.innerHTML = '';
 
-            if (jobs.length === 0) {
-                jobListMain.innerHTML = '<div style="text-align:center; color:var(--text-light); padding:20px;">No recent conversions found.</div>';
-                historyList.innerHTML = '<div style="text-align:center; color:var(--text-light); padding:20px; font-size: 14px;">No history yet.</div>';
-                return;
-            }
+                                        if (jobs.length === 0) {
+                                            jobListMain.innerHTML = '<div style="text-align:center; color:var(--text-light); padding:20px;">No recent conversions found.</div>';
+                                            historyList.innerHTML = '<div style="text-align:center; color:var(--text-light); padding:20px; font-size: 14px;">No history yet.</div>';
+                                            return;
+                                        }
 
-            jobs.forEach(job => {
-                // --- Main List Item ---
-                const mainItem = document.createElement('div');
-                mainItem.className = 'file-item';
+                                        jobs.forEach(job => {
+                                            // --- Main List Item ---
+                                            const mainItem = document.createElement('div');
+                                            mainItem.className = 'file-item';
 
-                let statusClass = 'status-pending';
-                let statusText = job.status;
-                let actionHtml = '';
+                                            let statusClass = 'status-pending';
+                                            let statusText = job.status;
+                                            let actionHtml = '';
 
                 if (job.status === 'COMPLETED' || job.status === 'DONE') {
                     statusClass = 'status-done';
@@ -1345,4 +1382,4 @@
     </script>
 </body>
 
-</html>
+                        </html>

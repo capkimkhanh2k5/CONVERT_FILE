@@ -9,6 +9,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Welcome to ConvertFile</title>
 
+    <script>
+        // Xóa cookie g_state bị lỗi nếu có
+        document.cookie = "g_state=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    </script>
+
     <!-- Google Sign-In Library -->
     <script src="https://accounts.google.com/gsi/client" async defer></script>
 
@@ -413,6 +418,131 @@
             color: var(--primary);
         }
 
+        /* Verify Email Button */
+        .verify-btn {
+            width: 100%;
+            padding: 12px 16px;
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .verify-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+        }
+
+        .verify-btn:disabled {
+            background: #d1d5db;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        /* OTP Input Group */
+        .otp-group {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+            align-items: center;
+        }
+
+        .otp-input {
+            flex: 1;
+            padding: 12px;
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 16px;
+            text-align: center;
+            font-weight: 600;
+            letter-spacing: 4px;
+            color: var(--text-main);
+            transition: all 0.3s ease;
+        }
+
+        .otp-input:focus {
+            outline: none;
+            background: white;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+        }
+
+        .verify-otp-btn {
+            padding: 12px 24px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .verify-otp-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        /* Resend OTP Button */
+        .resend-otp-btn {
+            background: none;
+            border: none;
+            color: var(--primary-color);
+            font-size: 13px;
+            cursor: pointer;
+            padding: 8px;
+            text-decoration: underline;
+            transition: opacity 0.3s ease;
+        }
+
+        .resend-otp-btn:disabled {
+            color: #9ca3af;
+            cursor: not-allowed;
+            text-decoration: none;
+        }
+
+        .resend-otp-btn:hover:not(:disabled) {
+            opacity: 0.8;
+        }
+
+        /* Verified Badge */
+        .verified-badge {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 10px 16px;
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            animation: slideDown 0.3s ease;
+        }
+
+        .verified-badge svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        /* Hidden class */
+        .hidden {
+            display: none !important;
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             .auth-container {
@@ -443,6 +573,14 @@
             .form-wrapper.active {
                 display: flex;
             }
+
+            .otp-group {
+                flex-direction: column;
+            }
+
+            .verify-otp-btn {
+                width: 100%;
+            }
         }
     </style>
 </head>
@@ -456,7 +594,7 @@
         <div class="orb orb-3"></div>
     </div>
 
-    <a href="<c:url value='/home'/>" class="back-btn">
+    <a href="<c:url value='/index.jsp'/>" class="back-btn">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
             stroke-linecap="round" stroke-linejoin="round">
             <path d="M19 12H5M12 19l-7-7 7-7" />
@@ -510,64 +648,81 @@
                                 </div>
                                 <% } %>
 
-                                    <form action="login" method="post" id="loginForm">
-                                        <input type="hidden" name="csrfToken" value="${sessionScope.csrfToken}">
-
-                                        <div class="input-group">
-                                            <input type="text" name="username" id="loginUsername"
-                                                class="input-field" placeholder=" " required>
-                                            <label for="loginUsername" class="input-label">Username</label>
+                                    <% if ("reset".equals(request.getParameter("success"))) { %>
+                                        <div class="message success">
+                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+                                                stroke="currentColor" stroke-width="2">
+                                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                                            </svg>
+                                            Change password successfully, please login again
                                         </div>
+                                        <% } %>
 
-                                        <div class="input-group">
-                                            <input type="password" name="password" id="loginPassword"
-                                                class="input-field" placeholder=" " required>
-                                            <label for="loginPassword" class="input-label">Password</label>
-                                            <span class="password-toggle"
-                                                onclick="togglePassword('loginPassword')">
-                                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
-                                                    stroke="currentColor" stroke-width="2"
-                                                    stroke-linecap="round" stroke-linejoin="round">
-                                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z">
-                                                    </path>
-                                                    <circle cx="12" cy="12" r="3"></circle>
-                                                </svg>
-                                            </span>
-                                        </div>
+                                            <form action="login" method="post" id="loginForm">
+                                                <input type="hidden" name="csrfToken"
+                                                    value="${sessionScope.csrfToken}">
 
-                                        <div
-                                            style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; font-size: 14px;">
-                                            <label
-                                                style="display: flex; align-items: center; gap: 8px; color: var(--text-light); cursor: pointer;">
-                                                <input type="checkbox" name="remember"
-                                                    style="accent-color: var(--primary);"> Remember me
-                                            </label>
-                                            <a href="<c:url value='/forgot-password'/>"
-                                                style="color: var(--primary); text-decoration: none; font-weight: 500;">Forgot
-                                                Password?</a>
-                                        </div>
+                                                <div class="input-group">
+                                                    <input type="text" name="username" id="loginUsername"
+                                                        class="input-field" placeholder=" " required>
+                                                    <label for="loginUsername"
+                                                        class="input-label">Username</label>
+                                                </div>
 
-                                        <button type="submit" class="submit-btn" name="action"
-                                            value="loginBtn">Sign In</button>
-                                    </form>
+                                                <div class="input-group">
+                                                    <input type="password" name="password" id="loginPassword"
+                                                        class="input-field" placeholder=" " required>
+                                                    <label for="loginPassword"
+                                                        class="input-label">Password</label>
+                                                    <span class="password-toggle"
+                                                        onclick="togglePassword('loginPassword')">
+                                                        <svg width="20" height="20" viewBox="0 0 24 24"
+                                                            fill="none" stroke="currentColor" stroke-width="2"
+                                                            stroke-linecap="round" stroke-linejoin="round">
+                                                            <path
+                                                                d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z">
+                                                            </path>
+                                                            <circle cx="12" cy="12" r="3"></circle>
+                                                        </svg>
+                                                    </span>
+                                                </div>
 
-                                    <div class="divider"><span>or continue with</span></div>
+                                                <div
+                                                    style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; font-size: 14px;">
+                                                    <label
+                                                        style="display: flex; align-items: center; gap: 8px; color: var(--text-light); cursor: pointer;">
+                                                        <input type="checkbox" name="remember"
+                                                            style="accent-color: var(--primary);"> Remember me
+                                                    </label>
+                                                    <a href="<c:url value='/forgot-password'/>"
+                                                        style="color: var(--primary); text-decoration: none; font-weight: 500;">Forgot
+                                                        Password?</a>
+                                                </div>
 
-                                    <div class="social-btn">
-                                        <div id="g_id_onload" data-client_id="${googleClientId}"
-                                            data-context="signin" data-ux_mode="popup"
-                                            data-callback="handleCredentialResponse" data-auto_prompt="false">
-                                        </div>
-                                        <div class="g_id_signin" data-type="standard" data-shape="rectangular"
-                                            data-theme="outline" data-text="signin_with" data-size="large"
-                                            data-logo_alignment="center" data-width="100%">
-                                        </div>
-                                    </div>
+                                                <button type="submit" class="submit-btn" name="action"
+                                                    value="loginBtn">Sign In</button>
+                                            </form>
 
-                                    <div class="switch-text">
-                                        Don't have an account? <span class="switch-link"
-                                            onclick="switchMode('register')">Sign up now</span>
-                                    </div>
+                                            <div class="divider"><span>or continue with</span></div>
+
+                                            <div class="social-btn">
+                                                <div id="g_id_onload" data-client_id="${googleClientId}"
+                                                    data-context="signin" data-ux_mode="popup"
+                                                    data-callback="handleCredentialResponse"
+                                                    data-auto_prompt="false">
+                                                </div>
+                                                <div class="g_id_signin" data-type="standard"
+                                                    data-shape="rectangular" data-theme="outline"
+                                                    data-text="signin_with" data-size="large"
+                                                    data-logo_alignment="center" data-width="100%">
+                                                </div>
+                                            </div>
+
+                                            <div class="switch-text">
+                                                Don't have an account? <span class="switch-link"
+                                                    onclick="switchMode('register')">Sign up now</span>
+                                            </div>
                 </div>
 
                 <!-- REGISTER FORM -->
@@ -600,6 +755,8 @@
 
                                     <form action="register" method="post" id="registerForm">
                                         <input type="hidden" name="csrfToken" value="${sessionScope.csrfToken}">
+                                        <input type="hidden" name="emailVerified" id="emailVerified"
+                                            value="false">
 
                                         <div class="input-group">
                                             <input type="text" name="username" id="regUsername"
@@ -613,26 +770,75 @@
                                             <label for="regEmail" class="input-label">Email Address</label>
                                         </div>
 
-                                        <div class="input-group">
-                                            <input type="password" name="password" id="regPassword"
-                                                class="input-field" placeholder=" " required minlength="6">
-                                            <label for="regPassword" class="input-label">Password</label>
-                                            <span class="password-toggle"
-                                                onclick="togglePassword('regPassword')">
+                                        <!-- Verify Email Button (Hidden by default) -->
+                                        <div id="verifyEmailSection"
+                                            style="margin-bottom: 20px; display: none;">
+                                            <button type="button" class="verify-btn" id="verifyEmailBtn">
                                                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
-                                                    stroke="currentColor" stroke-width="2"
-                                                    stroke-linecap="round" stroke-linejoin="round">
-                                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z">
-                                                    </path>
-                                                    <circle cx="12" cy="12" r="3"></circle>
+                                                    stroke="currentColor" stroke-width="2">
+                                                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
                                                 </svg>
-                                            </span>
+                                                Verify Email
+                                            </button>
                                         </div>
 
-                                        <div class="input-group">
-                                            <input type="password" name="confirmPassword" id="regConfirm"
-                                                class="input-field" placeholder=" " required minlength="6">
-                                            <label for="regConfirm" class="input-label">Confirm Password</label>
+                                        <!-- OTP Input (Hidden initially) -->
+                                        <div id="otpSection" class="hidden" style="margin-bottom: 20px;">
+                                            <div class="otp-group">
+                                                <input type="text" id="otpInput" class="otp-input"
+                                                    placeholder="000000" maxlength="6" pattern="[0-9]{6}"
+                                                    inputmode="numeric">
+                                                <button type="button" class="verify-otp-btn" id="verifyOtpBtn">
+                                                    Confirm
+                                                </button>
+                                            </div>
+                                            <p
+                                                style="font-size: 13px; color: var(--text-light); text-align: center;">
+                                                Enter the 6-digit OTP sent to your email
+                                            </p>
+                                            <div style="text-align: center; margin-top: 8px;">
+                                                <button type="button" id="resendOtpBtn" class="resend-otp-btn"
+                                                    disabled>
+                                                    Resend OTP (<span id="countdown">60</span>s)
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <!-- Verified Badge (Hidden initially) -->
+                                        <div id="verifiedBadge" class="verified-badge hidden">
+                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+                                                stroke="currentColor" stroke-width="2.5">
+                                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                                            </svg>
+                                            Email verified
+                                        </div>
+
+                                        <!-- Password Fields (Hidden until email verified) -->
+                                        <div id="passwordSection" class="hidden">
+                                            <div class="input-group">
+                                                <input type="password" name="password" id="regPassword"
+                                                    class="input-field" placeholder=" " minlength="6">
+                                                <label for="regPassword" class="input-label">Password</label>
+                                                <span class="password-toggle"
+                                                    onclick="togglePassword('regPassword')">
+                                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+                                                        stroke="currentColor" stroke-width="2"
+                                                        stroke-linecap="round" stroke-linejoin="round">
+                                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z">
+                                                        </path>
+                                                        <circle cx="12" cy="12" r="3"></circle>
+                                                    </svg>
+                                                </span>
+                                            </div>
+
+                                            <div class="input-group">
+                                                <input type="password" name="confirmPassword" id="regConfirm"
+                                                    class="input-field" placeholder=" " minlength="6">
+                                                <label for="regConfirm" class="input-label">Confirm
+                                                    Password</label>
+                                            </div>
                                         </div>
 
                                         <button type="submit" class="submit-btn">Create Account</button>
@@ -696,6 +902,15 @@
 
             // Form Validation
             document.getElementById('registerForm').addEventListener('submit', function (e) {
+                const emailVerified = document.getElementById('emailVerified').value;
+
+                // Check if email is verified
+                if (emailVerified !== 'true') {
+                    e.preventDefault();
+                    alert('Please verify your email before registering!');
+                    return;
+                }
+
                 const pass = document.getElementById('regPassword').value;
                 const confirm = document.getElementById('regConfirm').value;
 
@@ -704,6 +919,217 @@
                     alert('Passwords do not match!');
                 }
             });
+
+            // Email Verification Logic
+            const verifyEmailBtn = document.getElementById('verifyEmailBtn');
+            const verifyEmailSection = document.getElementById('verifyEmailSection');
+            const otpSection = document.getElementById('otpSection');
+            const verifyOtpBtn = document.getElementById('verifyOtpBtn');
+            const otpInput = document.getElementById('otpInput');
+            const verifiedBadge = document.getElementById('verifiedBadge');
+            const passwordSection = document.getElementById('passwordSection');
+            const emailInput = document.getElementById('regEmail');
+            const emailVerifiedField = document.getElementById('emailVerified');
+
+            // Click Verify Email Button
+            verifyEmailBtn.addEventListener('click', function () {
+                const email = emailInput.value.trim();
+
+                if (!email) {
+                    alert('Please enter your email!');
+                    emailInput.focus();
+                    return;
+                }
+
+                // Validate email format
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(email)) {
+                    alert('Invalid email format!');
+                    emailInput.focus();
+                    return;
+                }
+
+                // Send OTP to email via backend
+                console.log('Sending OTP to:', email);
+
+                // Show loading state
+                verifyEmailBtn.disabled = true;
+                verifyEmailBtn.textContent = 'Sending OTP...';
+
+                fetch('send-otp', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: 'email=' + encodeURIComponent(email)
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            verifyEmailSection.classList.add('hidden');
+                            otpSection.classList.remove('hidden');
+                            otpInput.focus();
+                            alert('OTP sent successfully! Please check your email.');
+                        } else {
+                            alert(data.message || 'Failed to send OTP. Please try again.');
+                            verifyEmailBtn.disabled = false;
+                            verifyEmailBtn.innerHTML = `
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                </svg>
+                Verify Email
+            `;
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('An error occurred while sending OTP.');
+                        verifyEmailBtn.disabled = false;
+                        verifyEmailBtn.innerHTML = `
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+            </svg>
+            Verify Email
+        `;
+                    });
+            });
+
+            // Verify OTP Button
+            verifyOtpBtn.addEventListener('click', function () {
+                const otp = otpInput.value.trim();
+
+                if (!otp || otp.length !== 6) {
+                    alert('Please enter the 6-digit OTP!');
+                    otpInput.focus();
+                    return;
+                }
+
+                // Verify OTP with backend
+                fetch('verify-otp', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: 'otp=' + encodeURIComponent(otp)
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Mark as verified
+                            emailVerifiedField.value = 'true';
+                            otpSection.classList.add('hidden');
+                            verifiedBadge.classList.remove('hidden');
+                            setTimeout(() => {
+                                passwordSection.classList.remove('hidden');
+                                document.getElementById('regPassword').required = true;
+                                document.getElementById('regConfirm').required = true;
+                            }, 300);
+                            emailInput.disabled = true;
+                            emailInput.style.background = '#f1f5f9';
+                        } else {
+                            alert(data.message || 'Invalid OTP! Please try again.');
+                            otpInput.value = '';
+                            otpInput.focus();
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('An error occurred during verification.');
+                    });
+            });
+
+            // Auto-submit OTP when 6 digits entered
+            otpInput.addEventListener('input', function (e) {
+                // Only allow numbers
+                this.value = this.value.replace(/[^0-9]/g, '');
+
+                // Auto verify when 6 digits entered
+                if (this.value.length === 6) {
+                    setTimeout(() => {
+                        verifyOtpBtn.click();
+                    }, 200);
+                }
+            });
+
+            // Countdown timer for Resend OTP button
+            let countdownInterval = null;
+            const resendOtpBtn = document.getElementById('resendOtpBtn');
+            const countdownSpan = document.getElementById('countdown');
+
+            function startCountdown() {
+                let remainingSeconds = 60;
+                resendOtpBtn.disabled = true;
+                resendOtpBtn.textContent = 'Resend OTP (' + remainingSeconds + 's)';
+
+                // Clear any existing countdown
+                if (countdownInterval) {
+                    clearInterval(countdownInterval);
+                }
+
+                countdownInterval = setInterval(function () {
+                    remainingSeconds--;
+                    if (countdownSpan) { // Check if countdownSpan exists
+                        countdownSpan.textContent = remainingSeconds;
+                    }
+
+                    if (remainingSeconds <= 0) {
+                        clearInterval(countdownInterval);
+                        resendOtpBtn.disabled = false;
+                        resendOtpBtn.textContent = 'Resend OTP';
+                    }
+                }, 1000);
+            }
+
+            // Resend OTP button click handler
+            if (resendOtpBtn) { // Check if resendOtpBtn exists
+                resendOtpBtn.addEventListener('click', function () {
+                    const email = emailInput.value.trim();
+
+                    if (!email) {
+                        alert('Email not found. Please refresh and try again.');
+                        return;
+                    }
+
+                    // Show loading state
+                    resendOtpBtn.disabled = true;
+                    resendOtpBtn.textContent = 'Sending...';
+
+                    fetch('send-otp', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: 'email=' + encodeURIComponent(email)
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                alert('New OTP sent successfully! Please check your email.');
+                                otpInput.value = '';
+                                otpInput.focus();
+                                startCountdown();
+                            } else {
+                                alert(data.message || 'Failed to resend OTP. Please try again.');
+                                resendOtpBtn.disabled = false;
+                                resendOtpBtn.textContent = 'Resend OTP';
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert('An error occurred while resending OTP.');
+                            resendOtpBtn.disabled = false;
+                            resendOtpBtn.textContent = 'Resend OTP';
+                        });
+                });
+            }
+
+            // Trigger countdown when OTP section is shown
+            const observer = new MutationObserver((mutationsList) => {
+                for (const mutation of mutationsList) {
+                    if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+                        if (!otpSection.classList.contains('hidden')) {
+                            startCountdown();
+                        }
+                    }
+                }
+            });
+            observer.observe(otpSection, { attributes: true });
 
             // Google Sign-In Handler
             function handleCredentialResponse(response) {
@@ -729,6 +1155,21 @@
                         console.error(err);
                         alert('Network error');
                     });
+            }
+        </script>
+        <script>
+            // --- Dynamic Verify Button Logic ---
+            const dynamicEmailInput = document.getElementById('regEmail');
+            const dynamicVerifySection = document.getElementById('verifyEmailSection');
+
+            if (dynamicEmailInput && dynamicVerifySection) {
+                dynamicEmailInput.addEventListener('input', function () {
+                    if (this.value.trim().length > 0) {
+                        dynamicVerifySection.style.display = 'block';
+                    } else {
+                        dynamicVerifySection.style.display = 'none';
+                    }
+                });
             }
         </script>
 </body>

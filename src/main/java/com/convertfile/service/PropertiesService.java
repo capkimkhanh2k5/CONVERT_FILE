@@ -6,12 +6,12 @@ import java.util.Properties;
 
 public class PropertiesService {
     private static Properties properties = new Properties();
-    
+
     static {
         try (InputStream input = PropertiesService.class
                 .getClassLoader()
                 .getResourceAsStream("application.properties")) {
-            
+
             if (input == null) {
                 System.out.println("Sorry, unable to find application.properties");
             } else {
@@ -21,15 +21,15 @@ public class PropertiesService {
             ex.printStackTrace();
         }
     }
-    
+
     public static String getProperty(String key) {
         return properties.getProperty(key);
     }
-    
+
     public static String getGoogleClientId() {
         return properties.getProperty("google.client.id");
     }
-    
+
     public static String getGoogleClientSecret() {
         return properties.getProperty("google.client.secret");
     }
@@ -49,7 +49,7 @@ public class PropertiesService {
     public static String getDatabaseUsername() {
         return properties.getProperty("database.username");
     }
-    
+
     public static String getDatabasePassword() {
         return properties.getProperty("database.password");
     }
@@ -68,5 +68,33 @@ public class PropertiesService {
 
     public static boolean getCloudinaryUrlSecure() {
         return Boolean.parseBoolean(properties.getProperty("cloudinary.url.secure", "true"));
+    }
+
+    public static String getRabbitMQUrl() {
+        return properties.getProperty("rabbitmq.url");
+    }
+
+    public static String getRabbitMQUsername() {
+        return properties.getProperty("rabbitmq.username");
+    }
+
+    public static String getRabbitMQPassword() {
+        return properties.getProperty("rabbitmq.password");
+    }
+
+    public static String getRabbitMQQueue() {
+        return properties.getProperty("rabbitmq.queue");
+    }
+
+    public static Integer getRabbitMQConnectionTimeout() {
+        return Integer.parseInt(properties.getProperty("rabbitmq.connectionTimeout"));
+    }
+
+    public static Integer getRabbitMQRequestedHeartbeat() {
+        return Integer.parseInt(properties.getProperty("rabbitmq.requestedHeartbeat"));
+    }
+
+    public static String getRabbitMQVirtualHost() {
+        return properties.getProperty("rabbitmq.virtualHost");
     }
 }
