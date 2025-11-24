@@ -7,11 +7,11 @@ import org.json.JSONObject;
 
 public class RabbitMQService {
 
-    public static void sendFileToQueue(int jobId, String filePath, String convertType) {
+    public static void sendFileToQueue(long jobId, String fileId, String convertType) {
         // 1. Tạo nội dung JSON
         JSONObject json = new JSONObject();
         json.put("id", jobId);
-        json.put("path", filePath);
+        json.put("fileId", fileId);
         json.put("type", convertType);
         String message = json.toString();
 
@@ -38,7 +38,10 @@ public class RabbitMQService {
         } catch (Exception e) {
             System.err.println("Lỗi gửi RabbitMQ: " + e.getMessage());
             e.printStackTrace();
-            // TODO: Cập nhật DB status = ERROR ở đây để user biết
+            // Cập nhật DB status = FAILED để user biết
+            com.convertfile.model.dao.TaskDAO taskDAO = new com.convertfile.model.dao.TaskDAO();
+            taskDAO.updateStatus(jobId, com.convertfile.model.bean.EnumStatus.TaskStatus.FAILED, 0,
+                    "RabbitMQ Error: " + e.getMessage());
         }
     }
 }

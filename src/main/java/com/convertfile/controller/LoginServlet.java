@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.UUID;
 
 import com.convertfile.bo.UserBO;
-import com.convertfile.model.dao.UserDAO;
 import com.convertfile.service.PropertiesService;
 
 import jakarta.servlet.ServletException;
@@ -25,19 +24,19 @@ public class LoginServlet extends HttpServlet {
             throws ServletException, IOException {
 
         HttpSession session = request.getSession();
-        
-        // Lấy token từ form 
+
+        // Lấy token từ form
         String submittedToken = request.getParameter("csrfToken");
-        
+
         // Lấy token từ session
         String sessionToken = (String) session.getAttribute("csrfToken");
-        
+
         if (submittedToken == null || !submittedToken.equals(sessionToken)) {
             response.sendError(HttpServletResponse.SC_FORBIDDEN, "Invalid CSRF token");
             return;
         }
 
-        // Xóa token 
+        // Xóa token
         session.removeAttribute("csrfToken");
 
         String username = request.getParameter("username");
@@ -83,7 +82,7 @@ public class LoginServlet extends HttpServlet {
 
         HttpSession session = request.getSession();
 
-        //Lấy lỗi từ session và đặt vào request ---
+        // Lấy lỗi từ session và đặt vào request ---
         String errorMessage = (String) session.getAttribute("errorMessage");
         if (errorMessage != null) {
             request.setAttribute("errorMessage", errorMessage);

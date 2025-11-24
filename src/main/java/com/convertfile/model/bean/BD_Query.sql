@@ -49,7 +49,21 @@ CREATE INDEX `idx_public_id` ON `files` (`public_id`);
 CREATE TABLE IF NOT EXISTS `tasks` (
     `task_id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     `file_id` VARCHAR(36) NOT NULL,
-    `task_type` ENUM('DOCX_TO_PDF', 'PDF_TO_DOCX', 'DOCX_TO_XML', 'XML_TO_DOCX', 'DOCX_TO_HTML', 'DOCX_MERGE', 'UNKNOWN') NOT NULL,
+    `task_type` ENUM(
+        'DOCX_TO_PDF', 
+        'PDF_TO_DOCX', 
+        'CSV_TO_JSON',
+        'DOCX_TO_XML', 
+        'XML_TO_DOCX', 
+        'DOCX_TO_HTML',
+        'DOCX_TO_TXT',
+        'DOCX_TO_MARKDOWN',
+        'IMAGE_TO_PDF',
+        'PDF_TO_IMAGE',
+        'XLSX_TO_CSV',
+        'DOCX_MERGE', 
+        'UNKNOWN'
+        ) NOT NULL,
     `status` ENUM('WAITING', 'PROCESSING', 'COMPLETED', 'FAILED', 'CANCELED') NOT NULL DEFAULT 'WAITING',
     
     `progress_percent` INT DEFAULT 0, 

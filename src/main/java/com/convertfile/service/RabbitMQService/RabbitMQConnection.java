@@ -11,7 +11,7 @@ public class RabbitMQConnection {
     // Biến tĩnh để lưu kết nối duy nhất
     private static Connection connection = null;
 
-    // Thêm synchronized để an toàn khi nhiều luồng cùng gọi lúc khởi động
+    // Synchronized để an toàn khi nhiều luồng cùng gọi lúc khởi động
     public static synchronized Connection getConnection() throws Exception {
         // Nếu chưa có kết nối hoặc kết nối bị đứt thì mới tạo mới
         if (connection == null || !connection.isOpen()) {
@@ -19,8 +19,7 @@ public class RabbitMQConnection {
             ConnectionFactory factory = new ConnectionFactory();
 
             String cloudUrl = PropertiesService.getRabbitMQUrl();
-            // Nên có giá trị mặc định trong PropertiesService để tránh null,
-            // nhưng check ở đây cũng tốt.
+
             if (cloudUrl == null || cloudUrl.isEmpty()) {
                 throw new Exception("RabbitMQ URL is not configured inside application.properties");
             }
