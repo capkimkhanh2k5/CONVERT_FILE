@@ -27,6 +27,17 @@ public class docx_to_markdown_service {
         try {
             WordprocessingMLPackage wordMLPackage = WordprocessingMLPackage.load(new File(inPath));
 
+            // Check if document is empty
+            if (wordMLPackage.getMainDocumentPart() == null || 
+                wordMLPackage.getMainDocumentPart().getContent().isEmpty()) {
+                // Create empty markdown file
+                try (OutputStream os = new FileOutputStream(new File(outMdPath))) {
+                    os.write("".getBytes(StandardCharsets.UTF_8));
+                }
+                System.out.println("End convert docx to markdown: " + outMdPath);
+                return;
+            }
+
             // Prepare images folder next to output .md
             String outParent = new File(outMdPath).getParent();
             if (outParent == null) {

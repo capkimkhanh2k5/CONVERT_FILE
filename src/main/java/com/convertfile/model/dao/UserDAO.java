@@ -16,7 +16,7 @@ public class UserDAO {
             PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, user.getUsername());
-            ps.setString(2, passwordService.hassPassword(user.getPassword()));
+            ps.setString(2, user.getPassword());
             ps.setString(3, user.getEmail());
             ps.setString(4, user.getPicture_url());
             ps.setTimestamp(5, Timestamp.valueOf(user.getCreated_at()));
@@ -135,7 +135,7 @@ public class UserDAO {
         try (Connection conn = ConnectDB.getConnection();
             PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ps.setString(1, passwordService.hassPassword(newPassword));
+            ps.setString(1, passwordService.hashPassword(newPassword));
             ps.setString(2, email);
 
             return ps.executeUpdate() > 0;

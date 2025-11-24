@@ -20,6 +20,17 @@ public class docx_to_html_service {
         try{
             WordprocessingMLPackage wordMLPackage = WordprocessingMLPackage.load(new File(inPath));
 
+            // Check if document is empty
+            if (wordMLPackage.getMainDocumentPart() == null || 
+                wordMLPackage.getMainDocumentPart().getContent().isEmpty()) {
+                // Create empty HTML file
+                try (OutputStream os = new FileOutputStream(new File(outPath))) {
+                    os.write("<html><body></body></html>".getBytes("UTF-8"));
+                }
+                System.out.println("End convert docx to html: " + outPath);
+                return;
+            }
+
             String imageFolderPath = new File(outPath).getParent() + File.separator + "images"; // Tạo thư mục chứa ảnh
 
             File imageDir = new File(imageFolderPath);
@@ -33,12 +44,10 @@ public class docx_to_html_service {
             htmlSettings.setImageDirPath(imageFolderPath);
             htmlSettings.setImageTargetUri("images");
 
-            OutputStream os = new FileOutputStream(new File(outPath));
-            
-            HtmlExporterNG2 htmlExporter = new HtmlExporterNG2();
-            htmlExporter.html(wordMLPackage, new StreamResult(os), htmlSettings);
-
-            
+            try (OutputStream os = new FileOutputStream(new File(outPath))) {
+                HtmlExporterNG2 htmlExporter = new HtmlExporterNG2();
+                htmlExporter.html(wordMLPackage, new StreamResult(os), htmlSettings);
+            }
 
         } catch(Docx4JException edocx){
             System.out.println("Error: " + edocx.getMessage());

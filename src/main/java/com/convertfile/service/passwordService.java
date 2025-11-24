@@ -4,7 +4,7 @@ import org.mindrot.jbcrypt.BCrypt;
 
 public class passwordService {
     //Hash password
-    public static String hassPassword(String plainPassword){
+    public static String hashPassword(String plainPassword){
         return BCrypt.hashpw(plainPassword, BCrypt.gensalt(12));
     }
 

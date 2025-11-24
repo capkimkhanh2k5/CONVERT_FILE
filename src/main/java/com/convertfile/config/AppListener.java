@@ -12,8 +12,18 @@ public class AppListener implements ServletContextListener {
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
-        // Khởi tạo luồng chạy ngầm
+        // Load MySQL driver trước khi start worker thread
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            System.out.println("✅ MySQL Driver loaded successfully");
+        } catch (ClassNotFoundException e) {
+            System.err.println("❌ MySQL Driver not found!");
+            e.printStackTrace();
+        }
+        
+        // Khởi tạo luồng chạy ngầm với context classloader
         workerThread = new Thread(new FileWorker());
+        workerThread.setContextClassLoader(this.getClass().getClassLoader());
         workerThread.start();
         System.out.println("🚀 APP LISTENER: Đã bật Background Worker!");
     }

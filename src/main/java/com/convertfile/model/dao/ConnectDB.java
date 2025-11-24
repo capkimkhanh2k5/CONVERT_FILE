@@ -17,26 +17,11 @@ public class ConnectDB {
             USER = PropertiesService.getDatabaseUsername();
             PASS = PropertiesService.getDatabasePassword();
 
-            // Fix cho Worker Thread: Set context classloader
-            Thread currentThread = Thread.currentThread();
-            ClassLoader originalClassLoader = currentThread.getContextClassLoader();
-
-            try {
-                // Đặt classloader thành classloader của ConnectDB class
-                currentThread.setContextClassLoader(ConnectDB.class.getClassLoader());
-
-                // 1. Nạp Driver thủ công (Để Worker Thread nhìn thấy)
-                Class.forName("com.mysql.cj.jdbc.Driver");
-
-                // 2. Mở kết nối
-                return DriverManager.getConnection(DB_URL, USER, PASS);
-
-            } finally {
-                // Khôi phục lại classloader ban đầu
-                currentThread.setContextClassLoader(originalClassLoader);
-            }
+            // Driver đã được load ở AppListener, chỉ cần tạo connection
+            return DriverManager.getConnection(DB_URL, USER, PASS);
 
         } catch (Exception e) {
+            System.err.println("❌ Database connection error: " + e.getMessage());
             e.printStackTrace();
             return null;
         }

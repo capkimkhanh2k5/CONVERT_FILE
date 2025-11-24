@@ -1,15 +1,5 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-    <%@ taglib uri="jakarta.tags.core" prefix="c" %>
-        <%@ page import="java.util.List" %>
-            <%@ page import="java.util.Map" %>
-                <%@ page import="com.convertfile.model.dao.JobDAO" %>
-
-
-                    <% // Lấy userId từ Session 
-                    Object uidObj=session.getAttribute("userId"); 
-                    long currentUserId=0;
-                    if(uidObj !=null) { currentUserId=(Long) uidObj; } 
-                    %>
+<%@ taglib uri="jakarta.tags.core" prefix="c" %>
 
                         <!DOCTYPE html>
                         <html lang="vi">
@@ -55,13 +45,13 @@
                                     font-family: 'Outfit', sans-serif;
                                 }
 
-                                body {
-                                    min-height: 100vh;
-                                    background: #f0f2f5;
-                                    overflow: hidden;
-                                    /* Prevent body scroll, use inner scroll */
-                                    position: relative;
-                                }
+        body {
+            min-height: 100vh;
+            background: #f0f2f5;
+            overflow-x: hidden;
+            overflow-y: auto;
+            position: relative;
+        }
 
                                 /* Animated Background */
                                 .bg-animation {
@@ -126,16 +116,16 @@
                                     }
                                 }
 
-                                /* Main Layout */
-                                .app-layout {
-                                    display: grid;
-                                    grid-template-columns: 260px 1fr;
-                                    height: 100vh;
-                                    width: 100vw;
-                                    gap: 20px;
-                                    padding: 20px;
-                                    transition: grid-template-columns 0.3s ease;
-                                }
+        /* Main Layout */
+        .app-layout {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            min-height: 100vh;
+            width: 100vw;
+            gap: 20px;
+            padding: 20px;
+            transition: grid-template-columns 0.3s ease;
+        }
 
                                 .app-layout.show-history {
                                     grid-template-columns: 260px 1fr 320px;
@@ -235,11 +225,11 @@
                                     color: var(--text-light);
                                 }
 
-                                /* Main Content */
-                                .main-content {
-                                    padding: 32px;
-                                    overflow-y: auto;
-                                }
+        /* Main Content */
+        .main-content {
+            padding: 32px;
+            overflow-x: hidden;
+        }
 
                                 .header {
                                     margin-bottom: 32px;
@@ -255,19 +245,25 @@
                                     color: var(--text-light);
                                 }
 
-                                /* Upload Area */
-                                .upload-zone {
-                                    background: rgba(255, 255, 255, 0.5);
-                                    border: 2px dashed #cbd5e1;
-                                    border-radius: 20px;
-                                    padding: 60px;
-                                    text-align: center;
-                                    transition: all 0.3s ease;
-                                    cursor: pointer;
-                                    margin-bottom: 32px;
-                                    position: relative;
-                                    overflow: hidden;
-                                }
+        /* Upload Area */
+        .upload-zone {
+            background: rgba(255, 255, 255, 0.5);
+            border: 2px dashed #cbd5e1;
+            border-radius: 20px;
+            padding: 50px 40px;
+            height: 320px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            margin-bottom: 32px;
+            position: relative;
+            overflow: visible;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
 
                                 .upload-zone:hover,
                                 .upload-zone.dragover {
@@ -276,67 +272,95 @@
                                     transform: scale(1.01);
                                 }
 
-                                .upload-icon {
-                                    width: 80px;
-                                    height: 80px;
-                                    background: white;
-                                    border-radius: 50%;
-                                    display: flex;
-                                    align-items: center;
-                                    justify-content: center;
-                                    margin: 0 auto 20px;
-                                    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
-                                    color: var(--primary);
-                                    font-size: 32px;
-                                }
+        .upload-icon {
+            width: 90px;
+            height: 90px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+            color: var(--primary);
+            font-size: 36px;
+            flex-shrink: 0;
+        }
 
-                                .upload-title {
-                                    font-size: 18px;
-                                    font-weight: 600;
-                                    color: var(--text-main);
-                                    margin-bottom: 8px;
-                                }
+        .upload-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-main);
+            margin-bottom: 12px;
+        }
 
-                                .upload-desc {
-                                    color: var(--text-light);
-                                    font-size: 14px;
-                                    margin-bottom: 24px;
-                                }
+        .upload-desc {
+            color: var(--text-light);
+            font-size: 15px;
+            margin-bottom: 28px;
+        }
 
-                                .browse-btn {
-                                    padding: 12px 32px;
-                                    background: linear-gradient(135deg, var(--primary), var(--accent));
-                                    color: white;
-                                    border: none;
-                                    border-radius: 12px;
-                                    font-weight: 600;
-                                    cursor: pointer;
-                                    transition: all 0.3s ease;
-                                    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
-                                }
+        .browse-btn {
+            padding: 14px 40px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+            margin-top: 8px;
+        }
 
-                                .browse-btn:hover {
-                                    transform: translateY(-2px);
-                                    box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4);
-                                }
+        .browse-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4);
+        }
+        
+        .browse-btn:active {
+            transform: translateY(0);
+        }
 
-                                /* Selected Files */
-                                .section-title {
-                                    font-size: 18px;
-                                    font-weight: 600;
-                                    color: var(--text-main);
-                                    margin-bottom: 16px;
-                                    display: flex;
-                                    justify-content: space-between;
-                                    align-items: center;
-                                }
+        /* Selected Files */
+        #selectedFilesSection {
+            margin-bottom: 40px;
+        }
 
-                                .file-list {
-                                    display: flex;
-                                    flex-direction: column;
-                                    gap: 12px;
-                                    margin-bottom: 32px;
-                                }
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-main);
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .file-list {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            margin-bottom: 24px;
+            max-height: 400px;
+            overflow-y: auto;
+            padding-right: 8px;
+        }
+
+        .file-list::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .file-list::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: 10px;
+        }
+
+        .file-list::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 10px;
+        }
 
                                 .file-item {
                                     background: white;
@@ -390,16 +414,48 @@
                                     gap: 12px;
                                 }
 
-                                .format-select {
-                                    padding: 8px 12px;
-                                    border-radius: 8px;
-                                    border: 1px solid #e2e8f0;
-                                    background: #f8fafc;
-                                    font-size: 13px;
-                                    color: var(--text-main);
-                                    outline: none;
-                                    cursor: pointer;
-                                }
+        .format-select {
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            background: #f8fafc;
+            font-size: 13px;
+            color: var(--text-main);
+            outline: none;
+            cursor: pointer;
+            width: 180px;
+            min-width: 180px;
+        }
+
+        .convert-single-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            border: none;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+        }
+
+        .convert-single-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+        }
+
+        .convert-single-btn:active {
+            transform: translateY(0);
+        }
+
+        .convert-single-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
 
                                 .remove-btn {
                                     width: 32px;
@@ -419,22 +475,25 @@
                                     background: #fecaca;
                                 }
 
-                                /* Convert Button */
-                                .convert-all-btn {
-                                    width: 100%;
-                                    padding: 16px;
-                                    background: linear-gradient(135deg, var(--secondary), var(--primary));
-                                    color: white;
-                                    border: none;
-                                    border-radius: 16px;
-                                    font-size: 16px;
-                                    font-weight: 700;
-                                    cursor: pointer;
-                                    transition: all 0.3s ease;
-                                    box-shadow: 0 8px 20px rgba(236, 72, 153, 0.3);
-                                    display: none;
-                                    /* Hidden by default */
-                                }
+        /* Convert Button */
+        .convert-all-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, var(--secondary), var(--primary));
+            color: white;
+            border: none;
+            border-radius: 16px;
+            font-size: 17px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 20px rgba(236, 72, 153, 0.3);
+            display: none;
+            position: sticky;
+            bottom: 0;
+            z-index: 10;
+            backdrop-filter: blur(10px);
+        }
 
                                 .convert-all-btn.show {
                                     display: block;
@@ -510,23 +569,64 @@
                                     color: #dc2626;
                                 }
 
-                                .download-btn {
-                                    padding: 6px 12px;
-                                    background: white;
-                                    border: 1px solid #e2e8f0;
-                                    border-radius: 6px;
-                                    color: var(--primary);
-                                    font-size: 12px;
-                                    font-weight: 600;
-                                    text-decoration: none;
-                                    transition: all 0.2s;
-                                }
+        .download-btn {
+            padding: 8px 16px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 13px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s;
+            box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
 
-                                .download-btn:hover {
-                                    background: var(--primary);
-                                    color: white;
-                                    border-color: var(--primary);
-                                }
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+        }
+
+        .download-btn:active {
+            transform: translateY(0);
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            width: 100%;
+            height: 6px;
+            background: #f1f5f9;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-radius: 10px;
+            transition: width 0.3s ease;
+            position: relative;
+        }
+
+        .progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: shimmer 1.5s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
 
                                 /* Animations */
                                 @keyframes slideIn {
@@ -680,22 +780,22 @@
                                         <p>Ready to convert some files? Drag and drop them below.</p>
                                     </div>
 
-                                    <!-- Upload Zone -->
-                                    <div class="upload-zone" id="dropZone">
-                                        <div class="upload-icon">
-                                            <svg width="40" height="40" viewBox="0 0 24 24" fill="none"
-                                                stroke="currentColor" stroke-width="2">
-                                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                                                <polyline points="17 8 12 3 7 8"></polyline>
-                                                <line x1="12" y1="3" x2="12" y2="15"></line>
-                                            </svg>
-                                        </div>
-                                        <h3 class="upload-title">Drag & Drop files here</h3>
-                                        <p class="upload-desc">or click to browse from your computer</p>
-                                        <button class="browse-btn"
-                                            onclick="document.getElementById('fileInput').click()">Browse Files</button>
-                                        <input type="file" id="fileInput" multiple hidden>
-                                    </div>
+            <!-- Upload Zone -->
+            <div class="upload-zone" id="dropZone">
+                <div class="upload-icon">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="17 8 12 3 7 8"></polyline>
+                        <line x1="12" y1="3" x2="12" y2="15"></line>
+                    </svg>
+                </div>
+                <h3 class="upload-title">Drag & Drop files here</h3>
+                <p class="upload-desc">or click to browse multiple files from your computer</p>
+                <button class="browse-btn"
+                    onclick="document.getElementById('fileInput').click()">Browse Files</button>
+                <input type="file" id="fileInput" multiple accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.gif,.bmp,.csv,.xlsx,.xls,.xml,.html,.htm,.txt,.md" hidden>
+            </div>
 
                                     <!-- Selected Files List -->
                                     <div id="selectedFilesSection" style="display: none;">
@@ -729,22 +829,27 @@
                                 </aside>
                             </div>
 
-                            <script>
-                                // Clean up Google g_state cookie to prevent Tomcat warnings
-                                document.cookie = "g_state=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    <script>
+        console.log("🎬 Script started loading...");
+        
+        // Clean up Google g_state cookie to prevent Tomcat warnings
+        document.cookie = "g_state=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
 
-                                document.addEventListener('DOMContentLoaded', function () {
-                                    console.log("DOM fully loaded and parsed");
-
-                                    // --- Variables ---
-                                    const dropZone = document.getElementById('dropZone');
-                                    const fileInput = document.getElementById('fileInput');
-                                    const fileList = document.getElementById('fileList');
-                                    const selectedFilesSection = document.getElementById('selectedFilesSection');
-                                    const uploadAllBtn = document.getElementById('uploadAllBtn');
-                                    const fileCount = document.getElementById('fileCount');
-                                    const historyList = document.getElementById('historyList');
-                                    const jobListMain = document.getElementById('jobListMain');
+        // --- Variables ---
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const fileList = document.getElementById('fileList');
+        const selectedFilesSection = document.getElementById('selectedFilesSection');
+        const uploadAllBtn = document.getElementById('uploadAllBtn');
+        const fileCount = document.getElementById('fileCount');
+        const historyList = document.getElementById('historyList');
+        const jobListMain = document.getElementById('jobListMain');
+        
+        console.log("🔍 Element check:");
+        console.log("  dropZone:", dropZone ? "✅" : "❌");
+        console.log("  fileInput:", fileInput ? "✅" : "❌");
+        console.log("  uploadAllBtn:", uploadAllBtn ? "✅" : "❌");
+        console.log("  jobListMain:", jobListMain ? "✅" : "❌");
 
                                     // Navigation elements
                                     const navDashboard = document.getElementById('navDashboard');
@@ -808,28 +913,109 @@
                                         dropZone.addEventListener('drop', handleDrop, false);
                                     }
 
-                                    function handleDrop(e) {
-                                        const dt = e.dataTransfer;
-                                        const files = dt.files;
-                                        handleFiles(files);
-                                    }
+        function handleDrop(e) {
+            console.log("📥 Drop event triggered");
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            console.log("📦 Dropped files count:", files.length);
+            handleFiles(files);
+        }
 
-                                    if (fileInput) {
-                                        fileInput.addEventListener('change', function () {
-                                            handleFiles(this.files);
-                                        });
-                                    }
+        fileInput.addEventListener('change', function () {
+            console.log("📁 File input changed");
+            console.log("📦 Selected files count:", this.files.length);
+            handleFiles(this.files);
+        });
 
-                                    function handleFiles(files) {
-                                        if (!files.length) return;
+        function handleFiles(files) {
+            console.log("🔄 handleFiles called with", files.length, "files");
+            if (!files.length) {
+                console.warn("⚠️ No files to handle");
+                return;
+            }
 
-                                        // Convert FileList to Array and add to selectedFiles
-                                        const newFiles = Array.from(files);
-                                        selectedFiles = [...selectedFiles, ...newFiles];
+            // Convert FileList to Array and add to selectedFiles
+            const newFiles = Array.from(files);
+            selectedFiles = [...selectedFiles, ...newFiles];
+            console.log("✅ Total selected files:", selectedFiles.length);
 
-                                        renderSelectedFiles();
-                                    }
+            renderSelectedFiles();
+        }
 
+        // --- Conversion Options Map ---
+        const conversionOptions = {
+            'pdf': [
+                { value: 'PDF_TO_DOCX', text: 'PDF → Word' },
+                { value: 'PDF_TO_IMAGE', text: 'PDF → Image' }
+            ],
+            'doc': [
+                { value: 'DOCX_TO_PDF', text: 'Word → PDF' },
+                { value: 'DOCX_TO_HTML', text: 'Word → HTML' },
+                { value: 'DOCX_TO_TXT', text: 'Word → TXT' },
+                { value: 'DOCX_TO_XML', text: 'Word → XML' },
+                { value: 'DOCX_TO_MARKDOWN', text: 'Word → Markdown' }
+            ],
+            'docx': [
+                { value: 'DOCX_TO_PDF', text: 'Word → PDF' },
+                { value: 'DOCX_TO_HTML', text: 'Word → HTML' },
+                { value: 'DOCX_TO_TXT', text: 'Word → TXT' },
+                { value: 'DOCX_TO_XML', text: 'Word → XML' },
+                { value: 'DOCX_TO_MARKDOWN', text: 'Word → Markdown' }
+            ],
+            'csv': [
+                { value: 'CSV_TO_JSON', text: 'CSV → JSON' }
+            ],
+            'xlsx': [
+                { value: 'XLSX_TO_CSV', text: 'Excel → CSV' }
+            ],
+            'xls': [
+                { value: 'XLSX_TO_CSV', text: 'Excel → CSV' }
+            ],
+            'jpg': [
+                { value: 'IMAGE_TO_PDF', text: 'Image → PDF' },
+                { value: 'IMG_FORMAT', text: 'Image Format' }
+            ],
+            'jpeg': [
+                { value: 'IMAGE_TO_PDF', text: 'Image → PDF' },
+                { value: 'IMG_FORMAT', text: 'Image Format' }
+            ],
+            'png': [
+                { value: 'IMAGE_TO_PDF', text: 'Image → PDF' },
+                { value: 'IMG_FORMAT', text: 'Image Format' }
+            ],
+            'gif': [
+                { value: 'IMAGE_TO_PDF', text: 'Image → PDF' },
+                { value: 'IMG_FORMAT', text: 'Image Format' }
+            ],
+            'bmp': [
+                { value: 'IMAGE_TO_PDF', text: 'Image → PDF' },
+                { value: 'IMG_FORMAT', text: 'Image Format' }
+            ],
+            'html': [
+                { value: 'HTML_TO_MARKDOWN', text: 'HTML → Markdown' }
+            ],
+            'md': [
+                { value: 'MARKDOWN_TO_HTML', text: 'Markdown → HTML' }
+            ],
+            'markdown': [
+                { value: 'MARKDOWN_TO_HTML', text: 'Markdown → HTML' }
+            ],
+            'pptx': [
+                { value: 'PPTX_TO_PDF', text: 'PowerPoint → PDF' }
+            ],
+            'ppt': [
+                { value: 'PPTX_TO_PDF', text: 'PowerPoint → PDF' }
+            ],
+            'xml': [
+                { value: 'XML_TO_DOCX', text: 'XML → Word' }
+            ]
+        };
+
+        // Get conversion options for file extension
+        function getConversionOptions(fileName) {
+            const extension = fileName.split('.').pop().toLowerCase();
+            return conversionOptions[extension] || [];
+        }
 
                                     // --- Render Selected Files ---
                                     function renderSelectedFiles() {
@@ -844,115 +1030,259 @@
                                             uploadAllBtn.classList.remove('show');
                                         }
 
-                                        selectedFiles.forEach((file, index) => {
-                                            const item = document.createElement('div');
-                                            item.className = 'file-item';
+            selectedFiles.forEach((file, index) => {
+                const item = document.createElement('div');
+                item.className = 'file-item';
+                item.dataset.fileIndex = index; // Store index in data attribute
 
-                                            // Determine icon based on type
-                                            let icon = '📄';
-                                            if (file.type.includes('pdf')) icon = '📕';
-                                            else if (file.type.includes('image')) icon = '🖼️';
-                                            else if (file.type.includes('word')) icon = '📝';
+                // Determine icon based on type
+                let icon = '📄';
+                if (file.type.includes('pdf')) icon = '📕';
+                else if (file.type.includes('image')) icon = '🖼️';
+                else if (file.type.includes('word') || file.name.endsWith('.docx') || file.name.endsWith('.doc')) icon = '📝';
+                else if (file.name.endsWith('.csv')) icon = '📊';
+                else if (file.name.endsWith('.xlsx') || file.name.endsWith('.xls')) icon = '📊';
+                else if (file.name.endsWith('.xml')) icon = '📋';
+                else if (file.name.endsWith('.html') || file.name.endsWith('.htm')) icon = '🌐';
+                else if (file.name.endsWith('.txt')) icon = '📃';
+                else if (file.name.endsWith('.md')) icon = '📝';
 
                                             const size = (file.size / 1024 / 1024).toFixed(2) + ' MB';
 
-                                            item.innerHTML = `
-                    <div class="file-icon">${icon}</div>
-                    <div class="file-details">
-                    <div class="file-name">${file.name}</div>
-                    <div class="file-meta">${size}</div>
-                    </div>
-                    <div class="file-actions">
-                    <select class="format-select" id="taskType-${index}">
-                    <option value="PDF_TO_DOCX">PDF to Word</option>
-                    <option value="IMG_TO_PDF">Image to PDF</option>
-                    <option value="PDF_TO_IMG">PDF to Image</option>
-                    </select>
-                    <button class="remove-btn" onclick="removeFile(${index})">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                    </button>
-                    </div>
-                    `;
-                                            fileList.appendChild(item);
-                                        });
-                                    }
+                let htmlContent = '<div class="file-icon">' + icon + '</div>' +
+                    '<div class="file-details">' +
+                    '<div class="file-name">' + file.name + '</div>' +
+                    '<div class="file-meta">' + size + '</div>' +
+                    '</div>' +
+                    '<div class="file-actions">' +
+                    '<select class="format-select" data-file-index="' + index + '">';
+                
+                // Get conversion options for this file type
+                const options = getConversionOptions(file.name);
+                if (options.length > 0) {
+                    options.forEach(opt => {
+                        htmlContent += '<option value="' + opt.value + '">' + opt.text + '</option>';
+                    });
+                } else {
+                    htmlContent += '<option value="">No conversion available</option>';
+                }
+                
+                htmlContent += '</select>' +
+                    '<button class="convert-single-btn" data-file-index="' + index + '" title="Convert this file">' +
+                    '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' +
+                    '<polyline points="16 3 21 3 21 8"></polyline>' +
+                    '<line x1="4" y1="20" x2="21" y2="3"></line>' +
+                    '<polyline points="21 16 21 21 16 21"></polyline>' +
+                    '<line x1="15" y1="15" x2="21" y2="21"></line>' +
+                    '<line x1="4" y1="4" x2="9" y2="9"></line>' +
+                    '</svg>' +
+                    '</button>' +
+                    '<button class="remove-btn" onclick="removeFile(' + index + ')">' +
+                    '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>' +
+                    '</button>' +
+                    '</div>';
+                
+                item.innerHTML = htmlContent;
+                fileList.appendChild(item);
+            });
+        }
 
-                                    window.removeFile = function (index) {
-                                        selectedFiles.splice(index, 1);
-                                        renderSelectedFiles();
-                                    };
+        window.removeFile = function (index) {
+            selectedFiles.splice(index, 1);
+            renderSelectedFiles();
+        };
 
-                                    // --- Upload Logic ---
-                                    uploadAllBtn.addEventListener('click', async () => {
-                                        if (selectedFiles.length === 0) return;
+        // --- Single File Upload ---
+        async function uploadSingleFile(index) {
+            const file = selectedFiles[index];
+            const selectElement = document.querySelector('.format-select[data-file-index="' + index + '"]');
+            const convertBtn = document.querySelector('.convert-single-btn[data-file-index="' + index + '"]');
+            
+            if (!file || !selectElement || !convertBtn) {
+                console.error('File, select or button not found for index:', index);
+                return;
+            }
+
+            const taskType = selectElement.value;
+            convertBtn.disabled = true;
+            convertBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle></svg>';
+            
+            console.log('🚀 Uploading single file:', file.name, '-> TaskType:', taskType);
+
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('taskType', taskType);
+
+            try {
+                const response = await fetch('upload', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    throw new Error('HTTP Error: ' + response.status);
+                }
+
+                const data = await response.json();
+                
+                if (data.status === 'error') {
+                    console.error('❌ Upload failed:', data.message);
+                    alert('Upload failed: ' + data.message);
+                    convertBtn.disabled = false;
+                    convertBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line><polyline points="21 16 21 21 16 21"></polyline><line x1="15" y1="15" x2="21" y2="21"></line><line x1="4" y1="4" x2="9" y2="9"></line></svg>';
+                } else {
+                    console.log('✅ Upload successful:', file.name);
+                    // Remove file from selected list
+                    selectedFiles.splice(index, 1);
+                    renderSelectedFiles();
+                    // Refresh job list
+                    fetchJobs();
+                }
+            } catch (error) {
+                console.error('❌ Exception:', error);
+                alert('Upload failed: ' + error.message);
+                convertBtn.disabled = false;
+                convertBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line><polyline points="21 16 21 21 16 21"></polyline><line x1="15" y1="15" x2="21" y2="21"></line><line x1="4" y1="4" x2="9" y2="9"></line></svg>';
+            }
+        }
+
+        // Attach event listeners to convert buttons
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('.convert-single-btn')) {
+                const btn = e.target.closest('.convert-single-btn');
+                const index = parseInt(btn.dataset.fileIndex);
+                uploadSingleFile(index);
+            }
+        });
+
+        // --- Upload Logic ---
+        console.log("📌 Attaching click listener to uploadAllBtn...");
+        
+        if (!uploadAllBtn) {
+            console.error("❌ FATAL: uploadAllBtn not found!");
+        } else {
+            uploadAllBtn.addEventListener('click', async () => {
+                console.log("🚀 Bắt đầu quá trình Upload..."); 
+                console.log("📂 Số file được chọn:", selectedFiles.length);
+
+            if (selectedFiles.length === 0) {
+                console.log("⚠️ Không có file nào để upload.");
+                return;
+            }
 
                                         uploadAllBtn.disabled = true;
                                         uploadAllBtn.textContent = 'Uploading & Converting... ⏳';
 
-                                        const uploadPromises = selectedFiles.map((file, index) => {
-                                            const taskType = document.getElementById(`taskType-${index}`).value;
-                                            const formData = new FormData();
-                                            formData.append('file', file);
-                                            formData.append('taskType', taskType);
+            const uploadPromises = selectedFiles.map((file, index) => {
+                // Tìm select element bằng data-file-index
+                const selectElement = document.querySelector('.format-select[data-file-index="' + index + '"]');
+                
+                let taskType = "PDF_TO_DOCX"; // Giá trị mặc định
+                
+                if (selectElement) {
+                    taskType = selectElement.value;
+                    console.log('📋 File ' + index + ': ' + file.name + ' -> TaskType: ' + taskType);
+                } else {
+                    console.warn('⚠️ Không tìm thấy select box cho file index ' + index + ' (' + file.name + '), dùng mặc định: ' + taskType);
+                }
 
-                                            return fetch('upload', {
-                                                method: 'POST',
-                                                body: formData
-                                            })
-                                                .then(response => response.json())
-                                                .then(data => {
-                                                    if (data.status === 'error') {
-                                                        console.error('Error uploading ' + file.name + ': ' + data.message);
-                                                        return { success: false, file: file.name, error: data.message };
-                                                    }
-                                                    return { success: true, file: file.name };
-                                                })
-                                                .catch(error => {
-                                                    console.error('Network error:', error);
-                                                    return { success: false, file: file.name, error: 'Network error' };
-                                                });
-                                        });
+                console.log('📤 [' + (index + 1) + '/' + selectedFiles.length + '] Đang gửi: ' + file.name + ' (' + (file.size / 1024).toFixed(2) + ' KB)');
 
-                                        try {
-                                            const results = await Promise.all(uploadPromises);
+                const formData = new FormData();
+                formData.append('file', file);
+                formData.append('taskType', taskType);
 
-                                            // Check results
-                                            const errors = results.filter(r => !r.success);
-                                            if (errors.length > 0) {
-                                                alert('Some files failed to upload:\n' + errors.map(e => e.file + ': ' + e.error).join('\n'));
-                                            } else {
-                                                // Success animation/notification could go here
-                                            }
+                return fetch('upload', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => {
+                    console.log('✅ Response từ server cho ' + file.name + ': Status ' + response.status);
+                    if (!response.ok) {
+                         throw new Error('HTTP Error: ' + response.status);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('📦 Response data cho ' + file.name + ':', data);
+                    if (data.status === 'error') {
+                        console.error('❌ Backend error cho ' + file.name + ':', data.message);
+                        return { success: false, file: file.name, error: data.message };
+                    }
+                    console.log('✨ Upload thành công: ' + file.name);
+                    return { success: true, file: file.name };
+                })
+                .catch(error => {
+                    console.error('❌ Exception khi upload ' + file.name + ':', error);
+                    return { success: false, file: file.name, error: error.toString() };
+                });
+            });
 
-                                            // Clear selection and refresh jobs
-                                            selectedFiles = [];
-                                            renderSelectedFiles();
-                                            fetchJobs(); // Start polling immediately
+            try {
+                const results = await Promise.all(uploadPromises);
+                console.log("🏁 Kết quả cuối cùng:", results);
 
-                                        } catch (err) {
-                                            console.error('Upload process failed:', err);
-                                            alert('Critical error during upload process.');
-                                        } finally {
-                                            uploadAllBtn.disabled = false;
-                                            uploadAllBtn.textContent = 'Convert All Files 🚀';
-                                        }
-                                    });
+                const errors = results.filter(r => !r.success);
+                const successes = results.filter(r => r.success);
 
-                                    // --- Job Polling Logic ---
-                                    function fetchJobs() {
-                                        fetch('jobs')
-                                            .then(response => response.json())
-                                            .then(jobs => {
-                                                renderJobs(jobs);
+                console.log('✅ Thành công: ' + successes.length + '/' + selectedFiles.length);
+                console.log('❌ Lỗi: ' + errors.length + '/' + selectedFiles.length);
 
-                                                // If any job is still processing, poll again
-                                                const hasProcessing = jobs.some(job => job.status === 'PENDING' || job.status === 'IN_PROGRESS');
-                                                if (hasProcessing) {
-                                                    setTimeout(fetchJobs, 2000); // Poll every 2s
-                                                }
-                                            })
-                                            .catch(err => console.error('Error fetching jobs:', err));
-                                    }
+                if (errors.length > 0) {
+                    console.error('Một số file gặp lỗi:', errors);
+                } else {
+                    console.log("🎉 Tất cả file đã upload thành công!");
+                }
+
+                // Clear selected files và refresh UI
+                selectedFiles = [];
+                renderSelectedFiles();
+                
+                // Refresh job list
+                console.log("🔄 Đang tải lại danh sách jobs...");
+                fetchJobs(); 
+
+            } catch (err) {
+                console.error('💥 Lỗi nghiêm trọng trong quá trình upload:', err);
+            } finally {
+                uploadAllBtn.disabled = false;
+                uploadAllBtn.textContent = 'Convert All Files 🚀';
+                console.log("🔚 Hoàn tất quá trình upload.");
+            }
+        });
+        console.log("✅ Upload listener attached successfully!");
+    }
+
+        // --- Job Polling Logic ---
+        function fetchJobs() {
+            console.log("🔄 Fetching jobs from server...");
+            fetch('jobs', {
+                method: 'GET',
+                credentials: 'same-origin' // ✅ Send cookies with request
+            })
+                .then(response => {
+                    console.log("📡 Jobs response status:", response.status);
+                    if (!response.ok) {
+                        throw new Error('HTTP Error: ' + response.status);
+                    }
+                    return response.json();
+                })
+                .then(jobs => {
+                    console.log("📋 Jobs received:", jobs.length, "items");
+                    console.log("Jobs data:", jobs);
+                    renderJobs(jobs);
+
+                    // If any job is still processing, poll again
+                    const hasProcessing = jobs.some(job => job.status === 'PENDING' || job.status === 'IN_PROGRESS' || job.status === 'WAITING' || job.status === 'PROCESSING');
+                    if (hasProcessing) {
+                        console.log("⏳ Has processing jobs, will poll again in 2s");
+                        setTimeout(fetchJobs, 2000); // Poll every 2s
+                    }
+                })
+                .catch(err => {
+                    console.error('❌ Error fetching jobs:', err);
+                });
+        }
 
                                     function renderJobs(jobs) {
                                         // Render Main List (Detailed)
@@ -975,52 +1305,81 @@
                                             let statusText = job.status;
                                             let actionHtml = '';
 
-                                            if (job.status === 'DONE') {
-                                                statusClass = 'status-done';
-                                                actionHtml = `<a href="download?file=${encodeURIComponent(job.name)}" class="download-btn">Download</a>`;
-                                            } else if (job.status === 'ERROR') {
-                                                statusClass = 'status-error';
-                                                actionHtml = `<span style="color:var(--error); font-size:12px;">Failed</span>`;
-                                            } else {
-                                                statusClass = 'status-processing';
-                                                actionHtml = `<span style="color:var(--primary); font-size:12px;">${job.progress}%</span>`;
-                                            }
+                if (job.status === 'COMPLETED' || job.status === 'DONE') {
+                    statusClass = 'status-done';
+                    statusText = 'COMPLETED';
+                    actionHtml = '<a href="download?fileId=' + encodeURIComponent(job.fileId) + '" class="download-btn" style="display:inline-block;">📥 Download</a>';
+                } else if (job.status === 'FAILED' || job.status === 'ERROR') {
+                    statusClass = 'status-error';
+                    statusText = 'FAILED';
+                    actionHtml = '<span style="color:var(--error); font-size:12px;">❌ Failed</span>';
+                } else if (job.status === 'WAITING' || job.status === 'PENDING') {
+                    statusClass = 'status-pending';
+                    statusText = 'WAITING';
+                    actionHtml = '<span style="color:var(--warning); font-size:12px;">⏳ Waiting...</span>';
+                } else if (job.status === 'PROCESSING' || job.status === 'IN_PROGRESS') {
+                    statusClass = 'status-processing';
+                    statusText = 'PROCESSING';
+                    actionHtml = '<span style="color:var(--primary); font-size:12px;">⚙️ ' + job.progress + '%</span>';
+                } else {
+                    statusClass = 'status-processing';
+                    actionHtml = '<span style="color:var(--primary); font-size:12px;">⏳ ' + job.progress + '%</span>';
+                }
 
-                                            mainItem.innerHTML = `
-                    <div class="file-icon">📄</div>
-                    <div class="file-details">
-                    <div class="file-name">${job.name}</div>
-                    <div class="file-meta">
-                    <span class="status-badge ${statusClass}">${statusText}</span>
-                    <span>${job.type}</span>
-                    </div>
-                    </div>
-                    <div class="file-actions">
-                    ${actionHtml}
-                    </div>
-                    `;
-                                            jobListMain.appendChild(mainItem);
+                // Add progress bar for processing jobs
+                let progressHtml = '';
+                if (job.status !== 'COMPLETED' && job.status !== 'FAILED' && job.status !== 'DONE' && job.status !== 'ERROR') {
+                    progressHtml = '<div class="progress-container">' +
+                        '<div class="progress-bar" style="width: ' + job.progress + '%"></div>' +
+                        '</div>';
+                }
 
-                                            // --- History List Item ---
-                                            const historyItem = document.createElement('div');
-                                            historyItem.className = 'history-item';
-                                            historyItem.innerHTML = `
-                    <div class="file-icon" style="width:32px; height:32px; font-size:16px;">📄</div>
-                    <div class="file-details">
-                    <div class="file-name" style="font-size:13px;">${job.name}</div>
-                    <span class="status-badge ${statusClass}" style="font-size:9px;">${statusText}</span>
-                    </div>
-                    `;
-                                            historyList.appendChild(historyItem);
-                                        });
-                                    }
+                mainItem.innerHTML = '<div class="file-icon">📄</div>' +
+                    '<div class="file-details">' +
+                    '<div class="file-name">' + job.name + '</div>' +
+                    '<div class="file-meta">' +
+                    '<span class="status-badge ' + statusClass + '">' + statusText + '</span>' +
+                    '<span>' + job.type + '</span>' +
+                    '</div>' +
+                    progressHtml +
+                    '</div>' +
+                    '<div class="file-actions">' +
+                    actionHtml +
+                    '</div>';
+                jobListMain.appendChild(mainItem);
 
-                                    // Initial load
-                                    fetchJobs();
-                                    // Poll periodically even if idle to catch updates
-                                    setInterval(fetchJobs, 5000);
-                                });
-                            </script>
-                        </body>
+                // --- History List Item ---
+                const historyItem = document.createElement('div');
+                historyItem.className = 'history-item';
+                historyItem.innerHTML = '<div class="file-icon" style="width:32px; height:32px; font-size:16px;">📄</div>' +
+                    '<div class="file-details">' +
+                    '<div class="file-name" style="font-size:13px;">' + job.name + '</div>' +
+                    '<span class="status-badge ' + statusClass + '" style="font-size:9px;">' + statusText + '</span>' +
+                    '</div>';
+                historyList.appendChild(historyItem);
+            });
+        }
+
+        // Initial load
+        console.log("🔄 Initial fetchJobs...");
+        fetchJobs();
+        
+        // Poll periodically even if idle to catch updates
+        setInterval(fetchJobs, 5000);
+        
+        console.log("✅ Script loaded successfully!");
+
+        // Fetch and display version info
+        fetch('version')
+            .then(response => response.json())
+            .then(data => {
+                console.log('📦 App Version:', data.version);
+                console.log('🔨 Build Time:', data.buildTime);
+                console.log('🚀 Deploy Time:', data.deployTime);
+            })
+            .catch(error => console.error('Version fetch error:', error));
+
+    </script>
+</body>
 
                         </html>

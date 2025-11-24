@@ -7,12 +7,10 @@
 
     <display-name>CONVERT_FILE</display-name>
 
-    <!-- Trang mặc định -->
     <welcome-file-list>
-        <welcome-file>index.jsp</welcome-file>
+        <welcome-file>login</welcome-file> <!-- Sửa thành login để vào trang đăng nhập trước -->
     </welcome-file-list>
 
-    <!-- GLOBAL UPLOAD PATH CONFIG -->
     <context-param>
         <param-name>UPLOAD_INPUT_PATH</param-name>
         <param-value>resources/inputSRC</param-value>
@@ -23,22 +21,11 @@
         <param-value>resources/outputSRC</param-value>
     </context-param>
 
-    <!-- Servlet upload -->
-    <servlet>
-        <servlet-name>UploadServlet</servlet-name>
-        <servlet-class>com.convertfile.controller.UploadServlet</servlet-class>
-        <multipart-config>
-            <location>${catalina.base}/temp</location>
-            <max-file-size>52428800</max-file-size>       <!-- 50MB -->
-            <max-request-size>104857600</max-request-size><!-- 100MB -->
-            <file-size-threshold>1048576</file-size-threshold>
-        </multipart-config>
-    </servlet>
-
     <session-config>
         <cookie-config>
             <http-only>true</http-only>
-            <secure>true</secure>
+            <!-- Đổi thành FALSE nếu bạn chạy localhost (http), nếu để TRUE thì login sẽ không được -->
+            <secure>false</secure> 
             <same-site>Strict</same-site>
         </cookie-config>
     </session-config>
