@@ -1,354 +1,166 @@
-# 📁 CONVERT_FILE
+# 📂 CONVERT_FILE - Professional File Conversion System
 
-Web application chuyển đổi file với Java Servlet, JSP, MySQL và Cloudinary.
+![Java](https://img.shields.io/badge/Java-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)
+![MySQL](https://img.shields.io/badge/MySQL-00000F?style=for-the-badge&logo=mysql&logoColor=white)
+![RabbitMQ](https://img.shields.io/badge/RabbitMQ-FF6600?style=for-the-badge&logo=rabbitmq&logoColor=white)
+![Redis](https://img.shields.io/badge/redis-%23DD0031.svg?style=for-the-badge&logo=redis&logoColor=white)
+![Tomcat](https://img.shields.io/badge/Apache%20Tomcat-F8DC75?style=for-the-badge&logo=apache-tomcat&logoColor=black)
+![Cloudinary](https://img.shields.io/badge/Cloudinary-3448C5?style=for-the-badge&logo=cloudinary&logoColor=white)
 
----
-
-## 🚀 Tính năng
-
-- ✅ **PDF ↔ DOCX** - Chuyển đổi qua lại giữa PDF và Word
-- ✅ **Image → PDF** - Chuyển ảnh (JPG, PNG) thành PDF  
-- ✅ **CSV → JSON** - Chuyển đổi dữ liệu CSV sang JSON
-- ✅ **Cloud Storage** - Upload file lên Cloudinary tự động
-- ✅ **Lịch sử** - Theo dõi các file đã chuyển đổi
-- ✅ **Background Processing** - Xử lý bất đồng bộ không block UI
+> **A robust, scalable, and secure web application for converting files between various formats.**  
+> *Built with Java Servlet, RabbitMQ, and Cloudinary.*
 
 ---
 
-## 📋 Yêu cầu
-
-- **Java JDK**: 21+
-- **Maven**: 3.6+
-- **MySQL Server**: 9.3/9.5
-- **Apache Tomcat**: 10.1.49
-- **Windows OS**
+## 📖 Table of Contents
+- [✨ Introduction](#-introduction)
+- [📸 Application Screenshots](#-application-screenshots)
+- [🚀 Key Features](#-key-features)
+- [🛠️ Technology Stack](#-technology-stack)
+- [⚙️ System Architecture](#-system-architecture)
+- [📥 Installation & Setup](#-installation--setup)
+- [🤝 Contributing](#-contributing)
 
 ---
 
-## ⚙️ Hướng dẫn Cài đặt
+## ✨ Introduction
 
-### Bước 1: Cài đặt MySQL Server
+**CONVERT_FILE** is an enterprise-grade file conversion platform designed to handle high-volume document processing. It leverages a microservices-inspired architecture where the web frontend is decoupled from the heavy processing workers via **RabbitMQ** and **Redis**.
 
-1. Download từ: https://dev.mysql.com/downloads/mysql/
-2. Cài đặt với service name: `MySQL95`
-3. Đặt password cho root
-4. Thêm MySQL vào PATH:
+Whether you need to convert **PDF to Word**, **Images to PDF**, or **Excel to CSV**, CONVERT_FILE provides a seamless and fast experience with real-time progress updates.
 
-```powershell
-[Environment]::SetEnvironmentVariable("Path", $env:Path + ";C:\Program Files\MySQL\MySQL Server 9.5\bin", "User")
+---
+
+## 📸 Application Screenshots
+
+### 🔐 Authentication & Security
+Secure user access with OTP verification and password recovery.
+
+| **Login** | **Registration** |
+|:---:|:---:|
+| ![Login](Image/Login.png) | ![Signup](Image/Signup.png) |
+
+| **OTP Verification** | **Forgot Password Flow** |
+|:---:|:---:|
+| ![OTP](Image/OTPVerify.png) | ![Forgot Password](Image/forgot1.png) |
+
+### 🖥️ Main Interface
+A clean, modern dashboard for managing your files and conversions.
+
+| **Dashboard Overview** | **File Management** |
+|:---:|:---:|
+| ![Overview](Image/TongQuan.png) | ![Home](Image/home.png) |
+
+| **Conversion Interface** | **Process Flow** |
+|:---:|:---:|
+| ![Index](Image/index1.png) | ![Index](Image/index2.png) |
+
+---
+
+## 🚀 Key Features
+
+-   **🔄 Multi-Format Conversion**: Support for PDF, DOCX, XLSX, CSV, XML, JSON, and Image formats.
+-   **⚡ Asynchronous Processing**: Heavy tasks are offloaded to background workers via **RabbitMQ**, ensuring the UI remains responsive.
+-   **📡 Real-Time Updates**: **Redis Pub/Sub** and **WebSockets** provide live progress bars and status notifications.
+-   **☁️ Cloud Storage**: Secure file storage and delivery using **Cloudinary**.
+-   **🛡️ Security**:
+    -   BCrypt password hashing.
+    -   OTP-based email verification (Registration & Password Reset).
+    -   Session management and XSS protection.
+-   **🧹 Auto-Cleanup**: Automated scheduling to clean up old files and temporary data.
+
+---
+
+## 🛠️ Technology Stack
+
+| Component | Technology |
+| :--- | :--- |
+| **Backend Core** | Java Servlet, JSP, JSTL |
+| **Database** | MySQL (HikariCP Connection Pool) |
+| **Message Queue** | RabbitMQ (AMQP) |
+| **Caching/PubSub** | Redis (Jedis) |
+| **Storage** | Cloudinary API |
+| **Frontend** | HTML5, CSS3, JavaScript, Bootstrap |
+| **Build Tool** | Apache Maven |
+| **Server** | Apache Tomcat 10+ |
+
+---
+
+## ⚙️ System Architecture
+
+1.  **Web Server (Tomcat)**: Handles HTTP requests, authentication, and file uploads.
+2.  **Producer**: Pushes conversion tasks to a **RabbitMQ** queue.
+3.  **Worker Pool**: Consumes tasks from the queue, performs the conversion (using libraries like PDFBox, POI), and uploads results to Cloudinary.
+4.  **Notifier**: Updates task status in **MySQL** and publishes progress to **Redis**.
+5.  **Client**: Receives real-time updates via WebSockets subscribed to Redis channels.
+
+---
+
+## 📥 Installation & Setup
+
+### Prerequisites
+-   Java JDK 21+
+-   MySQL 8.0+
+-   RabbitMQ Server
+-   Redis Server
+-   Apache Maven
+
+### 1. Database Setup
+Execute the initialization script to create the schema and default users:
+```sql
+source src/main/java/com/convertfile/model/bean/BD_Query.sql
 ```
 
-### Bước 2: Cài đặt Apache Tomcat
-
-1. Download từ: https://tomcat.apache.org/download-10.cgi
-2. Giải nén vào: `C:\Program Files\apache-tomcat-10.1.49`
-3. Thiết lập biến môi trường:
-
-```powershell
-[Environment]::SetEnvironmentVariable("CATALINA_HOME", "C:\Program Files\apache-tomcat-10.1.49", "User")
-[Environment]::SetEnvironmentVariable("Path", $env:Path + ";C:\Program Files\apache-tomcat-10.1.49\bin", "User")
-```
-
-**⚠️ Lưu ý:** Sau khi set biến môi trường, đóng và mở lại terminal mới.
-
-### Bước 3: Khởi động MySQL
-
-```cmd
-mysql_start.bat
-```
-
-### Bước 4: Tạo Database
-
-```cmd
-setup_database.bat
-```
-
-Nhập password MySQL khi được hỏi (3 lần).
-
-### Bước 5: Cấu hình Application
-
-Mở file `src/main/resources/application.properties` và cập nhật:
-
+### 2. Configuration
+Update `src/main/resources/application.properties` with your credentials:
 ```properties
+# Database
+database.url=jdbc:mysql://127.0.0.1:3306/file_converter
+database.username=your_user
+database.password=your_password
+
+# RabbitMQ
+rabbitmq.host=localhost
+rabbitmq.username=guest
+rabbitmq.password=guest
+
 # Cloudinary
-cloudinary.cloud_name=davtsqowt
-cloudinary.api_key=YOUR_API_KEY
-cloudinary.api_secret=YOUR_API_SECRET
+cloudinary.cloud.name=your_cloud_name
+cloudinary.api.key=your_api_key
+cloudinary.api.secret=your_api_secret
 
-# MySQL
-spring.datasource.url=jdbc:mysql://localhost:3306/file_converter
-spring.datasource.username=root
-spring.datasource.password=YOUR_MYSQL_PASSWORD
+# Email Service
+email.username=your_email@gmail.com
+email.password=your_app_password
 ```
 
-### Bước 6: Deploy Application
+### 3. Build & Run
+```bash
+# Build the WAR file
+mvn clean package
 
-**Standalone mode (khuyên dùng):**
-```cmd
-deploy_standalone.bat
+# Run with the provided script (Mac/Linux)
+./run.sh
 ```
 
-**XAMPP mode:**
-```cmd
-deploy.bat
-```
+### 4. Access
+Open your browser and navigate to:
+`http://localhost:8080/CONVERT_FILE/`
 
 ---
 
-## 🎯 Sử dụng
+## 🤝 Contributing
 
-### Khởi động server
-
-```cmd
-tomcat_start.bat
-```
-
-Truy cập: **http://localhost:8080/CONVERT_FILE/**
-
-### Dừng server
-
-```cmd
-tomcat_stop.bat
-mysql_stop.bat
-```
-
-### Xem logs
-
-```cmd
-view_logs.bat
-```
+We welcome contributions! Please follow these steps:
+1.  Fork the repository.
+2.  Create a feature branch (`git checkout -b feature/AmazingFeature`).
+3.  Commit your changes (`git commit -m 'Add some AmazingFeature'`).
+4.  Push to the branch (`git push origin feature/AmazingFeature`).
+5.  Open a Pull Request.
 
 ---
 
-## 📁 Cấu trúc Project
-
-```
-CONVERT_FILE/
-│
-├── src/main/
-│   ├── java/com/convertfile/
-│   │   ├── controller/          # Servlets (Upload, Auth, Jobs)
-│   │   ├── service/             # Business logic
-│   │   │   ├── ConvertService/  # Conversion services
-│   │   │   └── CloudService/    # Cloudinary integration
-│   │   ├── model/               # DAO, Entities, DB
-│   │   ├── worker/              # FileWorker (background thread)
-│   │   ├── config/              # Configuration
-│   │   └── bo/                  # Business Objects
-│   │
-│   ├── resources/
-│   │   └── application.properties
-│   │
-│   └── webapp/
-│       ├── index.jsp            # Landing page
-│       ├── home.jsp             # Dashboard
-│       ├── upload.jsp           # Upload form
-│       ├── jobs.jsp             # Job history
-│       ├── auth.jsp             # Login/Register
-│       └── WEB-INF/
-│           ├── web.xml
-│           └── META-INF/context.xml
-│
-├── convertfile-core/            # Core library (reusable)
-│   └── src/main/java/.../service/
-│       └── csv_to_json_service.java
-│
-├── convertfile-tests/           # Unit tests
-│   └── src/test/java/.../service/
-│       └── CsvToJsonServiceTest.java
-│
-├── target/                      # Build output
-│   └── CONVERT_FILE/            # WAR contents
-│
-├── pom.xml                      # Maven config
-│
-└── *.bat                        # Deployment scripts
-```
-
----
-
-## 🛠️ Scripts & Commands
-
-| Script | Chức năng |
-|--------|-----------|
-| `mysql_start.bat` | Khởi động MySQL service (MySQL95) |
-| `mysql_stop.bat` | Dừng MySQL service |
-| `setup_database.bat` | Tạo database `file_converter` và import schema |
-| `tomcat_start.bat` | Khởi động Tomcat server |
-| `tomcat_stop.bat` | Dừng Tomcat server |
-| `deploy_standalone.bat` | Build & deploy to standalone Tomcat |
-| `deploy.bat` | Deploy to XAMPP Tomcat |
-| `view_logs.bat` | Mở thư mục logs của Tomcat |
-
----
-
-## 🧪 Testing
-
-Chạy unit tests cho CSV to JSON service:
-
-```cmd
-cd convertfile-tests
-mvn test
-```
-
-Kết quả mong đợi:
-```
-[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0
-```
-
----
-
-## 🔧 Troubleshooting
-
-### ❌ MySQL không kết nối được
-
-```powershell
-# Kiểm tra service
-Get-Service MySQL95
-
-# Restart service
-net stop MySQL95
-net start MySQL95
-
-# Test connection
-mysql -u root -p -e "SELECT VERSION();"
-```
-
-### ❌ Tomcat lỗi "Port 8080 already in use"
-
-```cmd
-# Tìm process đang dùng port 8080
-netstat -ano | findstr :8080
-
-# Kill process (thay <PID> bằng số thực tế)
-taskkill /PID <PID> /F
-```
-
-### ❌ Session không lưu (Recent Conversions trống)
-
-Đã fix bằng cách đổi `sameSiteCookies="lax"` trong `context.xml`.
-
-### ❌ Build lỗi
-
-```cmd
-# Clean và rebuild
-mvn clean install
-
-# Skip tests nếu cần
-mvn clean install -DskipTests
-```
-
-### ❌ File không upload được
-
-- Kiểm tra Cloudinary credentials trong `application.properties`
-- Kiểm tra MySQL có chạy không
-- Xem logs: `view_logs.bat`
-
----
-
-## 📊 Database Schema
-
-### Bảng `users`
-- `user_id` - Primary key
-- `username`, `email` - Thông tin user
-- `password` - Hashed password
-- `picture_url` - Avatar URL
-
-### Bảng `files`
-- `file_id` - UUID primary key
-- `user_id` - Foreign key to users
-- `original_name`, `saved_name` - File names
-- `file_path` - Cloudinary URL
-- `public_id` - Cloudinary public_id
-- `input_format`, `output_format` - File types
-- `current_status` - UPLOADED, PROCESSING, CONVERTED, FAILED
-
-### Bảng `tasks`
-- `task_id` - Primary key
-- `file_id` - Foreign key to files
-- `task_type` - PDF_TO_DOCX, DOCX_TO_PDF, IMAGE_TO_PDF, CSV_TO_JSON
-- `status` - PENDING, PROCESSING, COMPLETED, FAILED
-- `error_message` - Error details if failed
-
----
-
-## 🌐 API Endpoints
-
-| Endpoint | Method | Mô tả |
-|----------|--------|-------|
-| `/` | GET | Landing page |
-| `/home` | GET | Dashboard với upload form |
-| `/upload` | POST | Upload file và tạo conversion task |
-| `/jobs` | GET | API trả về danh sách jobs (JSON) |
-| `/auth` | GET/POST | Đăng nhập/đăng ký |
-| `/forgotPW` | GET/POST | Quên mật khẩu |
-
----
-
-## 🔐 Security
-
-- ✅ Session cookies: `sameSiteCookies="lax"` cho HTTP localhost
-- ✅ Password hashing: BCrypt
-- ✅ SQL Injection protection: PreparedStatement
-- ✅ File validation: Kiểm tra extension và MIME type
-- ⚠️ HTTPS recommended cho production
-
----
-
-## 🚀 Deploy lên Production
-
-1. Đổi sang HTTPS
-2. Set `sameSiteCookies="strict"` trong context.xml
-3. Update Cloudinary credentials
-4. Cấu hình MySQL với password mạnh
-5. Enable Tomcat security manager
-6. Set Java heap size cho Tomcat:
-   ```
-   CATALINA_OPTS="-Xms512m -Xmx2048m"
-   ```
-
----
-
-## 📝 Changelog
-
-### Version 1.1 (Current)
-- ✅ Added CSV to JSON conversion
-- ✅ Fixed session cookie issues (sameSiteCookies)
-- ✅ Separated test project (convertfile-core + convertfile-tests)
-- ✅ Fixed resource leaks in CSV service
-- ✅ Removed alert() popups from UI
-- ✅ Standalone MySQL + Tomcat setup scripts
-
-### Version 1.0
-- ✅ PDF ↔ DOCX conversion
-- ✅ Image to PDF conversion
-- ✅ Cloudinary integration
-- ✅ Background file worker
-- ✅ User authentication
-
----
-
-## 👨‍💻 Contributors
-
-- **Author**: [@capkimkhanh2k5](https://github.com/capkimkhanh2k5)
-- **Tech Stack**: Java 21, Jakarta EE 10, MySQL 9.5, Tomcat 10.1.49
-
----
-
-## 📄 License
-
-Educational project - No specific license.
-
----
-
-## 💡 Tips
-
-- Sử dụng `deploy_standalone.bat` cho production-like environment
-- Chạy `mvn clean install` trước khi deploy nếu có lỗi
-- Check logs thường xuyên: `view_logs.bat`
-- Backup database trước khi update schema
-- Test trên local trước khi deploy production
-
----
-
-**Happy Coding! 🎉**
+<div align="center">
+  <b>Developed by Cap Kim Khanh & Team</b><br>
+  &copy; 2025 CONVERT_FILE. All rights reserved.
+</div>

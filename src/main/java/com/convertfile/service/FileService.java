@@ -9,23 +9,22 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Arrays;
 
-
 public class FileService {
     private FileDAO fileDAO = new FileDAO();
-    //TODO: Bổ sung khi có DATABASE
+
     private final List<String> typeFile = Arrays.asList("doc", "docx", "xml", "pdf", "txt");
 
     public boolean saveFileMetaData(Files file) throws SQLException {
         return fileDAO.insertFile(file);
     }
 
-    public boolean allowed_extension(String ext){
+    public boolean allowed_extension(String ext) {
         return typeFile.contains(ext);
     }
 
-
-    public boolean isSupportedConversion(String inputFormat, String outputFormat){
-        if (inputFormat == null || outputFormat == null) return false;
+    public boolean isSupportedConversion(String inputFormat, String outputFormat) {
+        if (inputFormat == null || outputFormat == null)
+            return false;
 
         String inF = inputFormat.trim().toLowerCase();
         String outF = outputFormat.trim().toLowerCase();
@@ -36,7 +35,7 @@ public class FileService {
         return inOk && outOk && !inF.equals(outF);
     }
 
-    //Check định dạng
+    // Check định dạng
     public void validateFile(String fileName, long size) throws IllegalArgumentException {
         if (fileName == null || fileName.isEmpty()) {
             throw new IllegalArgumentException("File nam invalid!");
@@ -53,11 +52,6 @@ public class FileService {
     public static String getFileExtension(String fileName) {
         int i = fileName.lastIndexOf('.');
         return (i > 0) ? fileName.substring(i + 1).toLowerCase() : "";
-    }
-
-    public void convertFile(String file_id) {
-        // TODO: sử dụng microService
-        throw new UnsupportedOperationException("Unimplemented method 'convertFile'");
     }
 
     public static String extractFileName(Part part) {

@@ -1,6 +1,5 @@
 package com.convertfile.service.ConvertService;
 
-import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
@@ -24,7 +23,7 @@ public class PdfTool {
      * @return Number of pages, or 0 if error
      */
     public static int getPageCount(String inputPath) {
-        try (PDDocument doc = Loader.loadPDF(new File(inputPath))) {
+        try (PDDocument doc = PDDocument.load(new File(inputPath))) {
             return doc.getNumberOfPages();
         } catch (IOException e) {
             e.printStackTrace();
@@ -45,7 +44,7 @@ public class PdfTool {
 
         // 1. Đọc nội dung từ PDF
         String pdfText = "";
-        try (PDDocument document = Loader.loadPDF(inputFile)) {
+        try (PDDocument document = PDDocument.load(inputFile)) {
             PDFTextStripper stripper = new PDFTextStripper();
             pdfText = stripper.getText(document);
         }
