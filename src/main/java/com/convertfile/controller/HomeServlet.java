@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -30,6 +31,15 @@ public class HomeServlet extends HttpServlet {
                 request.setAttribute("username", username);
             }
         }
+
+        // CLEANUP: Always try to remove Google's g_state cookie
+        // We do this unconditionally because if the cookie is malformed (JSON),
+        // Tomcat might filter it out from request.getCookies(), so we can't "find" it to delete it.
+        // Sending this header ensures the browser clears it.
+        Cookie killCookie = new Cookie("g_state", "");
+        killCookie.setMaxAge(0);
+        killCookie.setPath("/");
+        response.addCookie(killCookie);
 
         request.getRequestDispatcher("home.jsp").forward(request, response);
     }

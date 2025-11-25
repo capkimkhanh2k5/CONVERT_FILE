@@ -9,6 +9,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reset Password</title>
 
+    <script>
+        // Xóa cookie g_state bị lỗi nếu có
+        document.cookie = "g_state=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    </script>
+
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -584,7 +589,7 @@
         <div class="orb orb-3"></div>
     </div>
 
-    <a href="<c:url value='/home'/>" class="back-btn">
+    <a href="<c:url value='/index.jsp'/>" class="back-btn">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
             stroke-linecap="round" stroke-linejoin="round">
             <path d="M19 12H5M12 19l-7-7 7-7" />
@@ -764,10 +769,10 @@
         function showMessage(type, text) {
             const container = document.getElementById('messageContainer');
             container.innerHTML = `
-        <div class="message ${type} show">
-            <span>${text}</span>
-        </div>
-    `;
+<div class="message ${type} show">
+<span>${text}</span>
+</div>
+`;
 
             setTimeout(() => {
                 const msg = container.querySelector('.message');
@@ -970,7 +975,7 @@
 
                 if (data.success) {
                     showMessage('success', 'Password reset successfully! Redirecting...');
-                    setTimeout(() => window.location.href = '<c:url value="/login"/>', 2000);
+                    setTimeout(() => window.location.href = '<c:url value="/auth.jsp?form=login&success=reset"/>', 2000);
                 } else {
                     showMessage('error', data.error || 'Reset failed');
                     btn.disabled = false;
