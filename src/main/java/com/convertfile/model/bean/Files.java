@@ -12,6 +12,7 @@ public class Files {
     private long file_size;
     private String file_path;
     private String public_id;
+    private String input_public_id; // Public ID của file gốc (input)
     private String input_format;
     private String output_format;
     private FileStatus current_status;
@@ -28,6 +29,7 @@ public class Files {
         this.file_size = 0;
         this.file_path = "";
         this.public_id = "";
+        this.input_public_id = "";
         this.input_format = "";
         this.output_format = "";
         this.current_status = FileStatus.UPLOADED;
@@ -37,7 +39,7 @@ public class Files {
     }
 
     public Files(String file_id, long user_id, String original_name, String saved_name, long file_size,
-            String file_path, String public_id, String input_format, String output_format, FileStatus current_status,
+            String file_path, String public_id, String input_public_id, String input_format, String output_format, FileStatus current_status,
             String description, LocalDateTime created_at, LocalDateTime updated_at) {
         this.file_id = file_id;
         this.user_id = user_id;
@@ -46,6 +48,7 @@ public class Files {
         this.file_size = file_size;
         this.file_path = file_path;
         this.public_id = public_id;
+        this.input_public_id = input_public_id;
         this.input_format = input_format;
         this.output_format = output_format;
         this.current_status = current_status;
@@ -62,6 +65,7 @@ public class Files {
         this.file_size = info.getFile_size();
         this.file_path = info.getFile_path();
         this.public_id = info.getPublic_id();
+        this.input_public_id = info.getInput_public_id();
         this.input_format = info.getInput_format();
         this.output_format = info.getOutput_format();
         this.current_status = info.getCurrent_status();
@@ -125,6 +129,14 @@ public class Files {
 
     public void setPublic_id(String public_id) {
         this.public_id = public_id;
+    }
+
+    public String getInput_public_id() {
+        return input_public_id;
+    }
+
+    public void setInput_public_id(String input_public_id) {
+        this.input_public_id = input_public_id;
     }
 
     public String getInput_format() {

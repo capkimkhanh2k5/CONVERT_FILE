@@ -40,7 +40,15 @@ public class JobServlet extends HttpServlet {
             Object userIdObj = (session != null) ? session.getAttribute("userId") : null;
             long userId = 0;
             if (userIdObj != null) {
-                userId = (Long) userIdObj;
+                if (userIdObj instanceof Long) {
+                    userId = (Long) userIdObj;
+                } else if (userIdObj instanceof String) {
+                    try {
+                        userId = Long.parseLong((String) userIdObj);
+                    } catch (NumberFormatException e) {
+                        System.err.println("⚠️ Invalid userId format: " + userIdObj);
+                    }
+                }
             }
             
             System.out.println("👤 User ID: " + userId);

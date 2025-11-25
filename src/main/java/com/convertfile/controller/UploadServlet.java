@@ -5,6 +5,7 @@ import java.util.Map;
 
 import com.convertfile.model.dao.JobDAO;
 import com.convertfile.service.FileService;
+import com.convertfile.service.TaskQueueService;
 import com.convertfile.service.CloudService.CloudUploadService;
 
 import jakarta.servlet.ServletException;
@@ -61,7 +62,15 @@ public class UploadServlet extends HttpServlet {
             Object userIdObj = (session != null) ? session.getAttribute("userId") : null;
             long userId = 0;
             if (userIdObj != null) {
-                userId = (Long) userIdObj;
+                if (userIdObj instanceof Long) {
+                    userId = (Long) userIdObj;
+                } else if (userIdObj instanceof String) {
+                    try {
+                        userId = Long.parseLong((String) userIdObj);
+                    } catch (NumberFormatException e) {
+                        System.err.println("⚠️ Invalid userId format: " + userIdObj);
+                    }
+                }
             }
             System.out.println("👤 User ID from session: " + userId + " (0 = Guest)");
 
@@ -96,6 +105,18 @@ public class UploadServlet extends HttpServlet {
             System.out.println("📌 Database returned File ID: " + fileId);
 
             if (fileId != null) {
+                // ✅ PUBLISH TO RABBITMQ (Phase 3)
+                System.out.println("🐰 Publishing task to RabbitMQ...");
+                try {
+                    TaskQueueService taskQueueService = new TaskQueueService();
+                    taskQueueService.addNewTask(fileId, taskType);
+                    System.out.println("✅ Task published to RabbitMQ successfully!");
+                } catch (Exception rabbitmqEx) {
+                    System.err.println("❌ Failed to publish to RabbitMQ: " + rabbitmqEx.getMessage());
+                    rabbitmqEx.printStackTrace();
+                    // Continue - task still in DB, can be picked up by polling
+                }
+                
                 // Nếu là khách (userId == 0), lưu fileId vào session
                 if (userId == 0) {
                     HttpSession guestSession = (session != null) ? session : request.getSession(true);

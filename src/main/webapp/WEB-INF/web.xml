@@ -7,6 +7,11 @@
 
     <display-name>CONVERT_FILE</display-name>
 
+    <!-- App Listener for Worker Pool & Cleanup (Phase 2/3) -->
+    <listener>
+        <listener-class>com.convertfile.config.AppListener</listener-class>
+    </listener>
+
     <welcome-file-list>
         <welcome-file>login</welcome-file> <!-- Sửa thành login để vào trang đăng nhập trước -->
     </welcome-file-list>
@@ -22,6 +27,7 @@
     </context-param>
 
     <session-config>
+        <session-timeout>30</session-timeout> <!-- 30 minutes for production -->
         <cookie-config>
             <http-only>true</http-only>
             <!-- Đổi thành FALSE nếu bạn chạy localhost (http), nếu để TRUE thì login sẽ không được -->

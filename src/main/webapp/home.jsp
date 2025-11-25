@@ -1323,12 +1323,94 @@
             });
         }
 
+        // ========================================
+        // Phase 2: WebSocket Real-time Updates
+        // ========================================
+        let ws = null;
+        let wsReconnectAttempts = 0;
+        const WS_MAX_RECONNECT_ATTEMPTS = 5;
+        const WS_RECONNECT_DELAY = 3000;
+
+        function initWebSocket() {
+            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsUrl = protocol + '//' + window.location.host + '<%= request.getContextPath() %>/ws/jobs';
+            
+            console.log('🔌 Connecting to WebSocket:', wsUrl);
+            
+            try {
+                ws = new WebSocket(wsUrl);
+                
+                ws.onopen = function(event) {
+                    console.log('✅ WebSocket connected');
+                    wsReconnectAttempts = 0;
+                    
+                    // Send ping every 30 seconds to keep connection alive
+                    setInterval(() => {
+                        if (ws && ws.readyState === WebSocket.OPEN) {
+                            ws.send(JSON.stringify({ type: 'ping' }));
+                        }
+                    }, 30000);
+                };
+                
+                ws.onmessage = function(event) {
+                    console.log('📨 WebSocket message:', event.data);
+                    
+                    try {
+                        const data = JSON.parse(event.data);
+                        
+                        if (data.type === 'task_update') {
+                            // Real-time task update received
+                            console.log('🔥 Task update:', data.taskId, data.status, data.progress + '%');
+                            
+                            // Refresh job list to show update
+                            fetchJobs();
+                        } else if (data.type === 'connection') {
+                            console.log('💬 ' + data.message);
+                        } else if (data.type === 'pong') {
+                            console.log('🏓 Pong received');
+                        }
+                    } catch (e) {
+                        console.error('❌ Error parsing WebSocket message:', e);
+                    }
+                };
+                
+                ws.onerror = function(error) {
+                    console.error('❌ WebSocket error:', error);
+                };
+                
+                ws.onclose = function(event) {
+                    console.log('🔌 WebSocket disconnected (code: ' + event.code + ')');
+                    
+                    // Auto-reconnect with exponential backoff
+                    if (wsReconnectAttempts < WS_MAX_RECONNECT_ATTEMPTS) {
+                        wsReconnectAttempts++;
+                        const delay = WS_RECONNECT_DELAY * wsReconnectAttempts;
+                        console.log('🔄 Reconnecting in ' + (delay / 1000) + 's... (attempt ' + 
+                                   wsReconnectAttempts + '/' + WS_MAX_RECONNECT_ATTEMPTS + ')');
+                        setTimeout(initWebSocket, delay);
+                    } else {
+                        console.error('❌ Max reconnect attempts reached. Falling back to polling.');
+                        // Fallback to polling if WebSocket fails
+                        setInterval(fetchJobs, 5000);
+                    }
+                };
+                
+            } catch (e) {
+                console.error('❌ Failed to create WebSocket:', e);
+                // Fallback to polling
+                setInterval(fetchJobs, 5000);
+            }
+        }
+
         // Initial load
         console.log("🔄 Initial fetchJobs...");
         fetchJobs();
         
-        // Poll periodically even if idle to catch updates
-        setInterval(fetchJobs, 5000);
+        // Phase 2: Initialize WebSocket (replaces polling)
+        initWebSocket();
+        
+        // Fallback polling (only if WebSocket not available)
+        // Will be activated by WebSocket onclose if max reconnect attempts reached
         
         console.log("✅ Script loaded successfully!");
 

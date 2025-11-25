@@ -1,5 +1,7 @@
 package com.convertfile.model.dao;
 
+import com.convertfile.config.DBConnect;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -12,7 +14,7 @@ import com.convertfile.service.passwordService;
 public class UserDAO {
     public boolean insertUser(User user) {
         String sql = "INSERT INTO users (username, password, email, picture_url, created_at) VALUES (?, ?, ?, ?, ?)";
-        try (Connection conn = ConnectDB.getConnection();
+        try (Connection conn = DBConnect.getConnection();
             PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, user.getUsername());
@@ -36,7 +38,7 @@ public class UserDAO {
         ResultSet rs = null;
 
         try {
-            conn = ConnectDB.getConnection();
+            conn = DBConnect.getConnection();
             
             // --- THÊM ĐOẠN NÀY ĐỂ TRÁNH LỖI 500 ---
             if (conn == null) {
@@ -78,7 +80,7 @@ public class UserDAO {
 
     public static User getUserByEmail(String userEmail) {
         String sql = "SELECT * FROM users WHERE email = ?";
-        try (Connection conn = ConnectDB.getConnection();
+        try (Connection conn = DBConnect.getConnection();
             PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, userEmail);
@@ -99,7 +101,7 @@ public class UserDAO {
 
     public void updateUserInfo(User user) {
         String sql = "UPDATE users SET username = ?, picture_url = ? WHERE user_id = ?";
-        try (Connection conn = ConnectDB.getConnection();
+        try (Connection conn = DBConnect.getConnection();
             PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, user.getUsername());
@@ -114,7 +116,7 @@ public class UserDAO {
 
     public boolean checkEmailExist(String email) {
         String sql = "SELECT COUNT(*) FROM users WHERE email = ?";
-        try (Connection conn = ConnectDB.getConnection();
+        try (Connection conn = DBConnect.getConnection();
             PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, email);
@@ -132,7 +134,7 @@ public class UserDAO {
 
     public boolean updatePassword(String email, String newPassword) {
         String sql = "UPDATE users SET password = ? WHERE email = ?";
-        try (Connection conn = ConnectDB.getConnection();
+        try (Connection conn = DBConnect.getConnection();
             PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, passwordService.hashPassword(newPassword));
@@ -148,7 +150,7 @@ public class UserDAO {
     // Hàm lấy ID của user dựa trên username (Để dùng khi Upload)
     public long getUserIdByUsername(String username) {
         String sql = "SELECT user_id FROM users WHERE username = ?";
-        try (Connection conn = ConnectDB.getConnection();
+        try (Connection conn = DBConnect.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             
             ps.setString(1, username);
@@ -163,3 +165,4 @@ public class UserDAO {
         return 0; // Không tìm thấy hoặc lỗi
     }
 }
+
