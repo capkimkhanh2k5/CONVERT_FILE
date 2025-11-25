@@ -3,7 +3,6 @@ package com.convertfile.worker;
 import com.convertfile.model.dao.FileDAO;
 import com.convertfile.model.dao.TaskDAO;
 import com.convertfile.model.bean.Files;
-import com.convertfile.model.bean.Tasks;
 import com.convertfile.model.bean.EnumStatus.TaskStatus;
 import com.convertfile.model.bean.EnumStatus.TaskType;
 import com.convertfile.service.PdfTool;
@@ -113,7 +112,6 @@ public class FileWorker implements Runnable {
     private boolean processNextJob() {
         Path tempInput = null;
         Path tempOutput = null;
-        long taskId = 0;
 
         try {
             // 1. Lấy task từ hàng đợi
@@ -141,7 +139,7 @@ public class FileWorker implements Runnable {
                 return false;
             }
 
-            String publicId = file.getPublic_id(); // Lấy public_id từ DB
+            String publicId = file.getPublic_id();
             String savedName = file.getSaved_name();
             String originalName = file.getOriginal_name();
             
@@ -160,29 +158,21 @@ public class FileWorker implements Runnable {
             // 3. Mark Processing
             taskDAO.markTaskProcessing(taskId, workerId);
 
-            // 4. ✅ TẠO SIGNED URL (HẾT HẠN SAU 1 GIỜ)
-            System.out.println("   🔐 Getting download URL...");
-            
-            // 4. XÁC ĐỊNH URL ĐỂ DOWNLOAD
-            // ✅ LUÔN DÙNG file_path TỪ DATABASE (URL gốc từ Cloudinary)
+            // 3. XÁC ĐỊNH URL ĐỂ DOWNLOAD
             String filePath = file.getFile_path();
             String downloadUrl = null;
-            
+
             if (filePath != null && !filePath.trim().isEmpty() && filePath.startsWith("http")) {
-                // Dùng URL gốc từ database (chính xác nhất!)
                 downloadUrl = filePath;
                 System.out.println("   ✅ Using file_path from database");
-                System.out.println("   🔗 URL: " + downloadUrl);
             } else if (publicId != null && !publicId.trim().isEmpty()) {
-                // Fallback: Generate từ public_id nếu file_path không có
-                System.err.println("⚠️ WARNING: file_path is empty, trying public_id...");
                 downloadUrl = CloudUploadService.generateSignedUrl(publicId);
-                System.out.println("   🔗 Generated URL from public_id: " + downloadUrl);
+                System.out.println("   🔗 Generated URL from public_id");
             } else {
-                throw new Exception("Both file_path and public_id are invalid! filePath=" + filePath + ", publicId=" + publicId);
+                throw new Exception("Both file_path and public_id are invalid!");
             }
-            
-            // 5. DOWNLOAD FILE
+
+            // 4. DOWNLOAD FILE
             taskDAO.updateStatus(taskId, TaskStatus.PROCESSING, 20, "Downloading file...");
             System.out.println("   ⬇️ Downloading from URL...");
             tempInput = java.nio.file.Files.createTempFile("input_", inputExtension);
@@ -214,28 +204,18 @@ public class FileWorker implements Runnable {
             Thread.sleep(200);
             taskDAO.updateStatus(taskId, TaskStatus.PROCESSING, 30, "Preparing output...");
             String outputExt = getOutputExtension(typeEnum);
-            Thread.sleep(200);
-            taskDAO.updateStatus(taskId, TaskStatus.PROCESSING, 35, "Creating temp file...");
             tempOutput = java.nio.file.Files.createTempFile("output_", outputExt);
 
-            // 6. --- CORE CONVERT LOGIC (SWITCH-CASE) ---
-            Thread.sleep(300);
-            taskDAO.updateStatus(taskId, TaskStatus.PROCESSING, 40, "Starting conversion...");
-            Thread.sleep(200);
-            taskDAO.updateStatus(taskId, TaskStatus.PROCESSING, 45, "Converting file...");
+            // 6. CONVERT
+            taskDAO.updateStatus(taskId, TaskStatus.PROCESSING, 40, "Converting file...");
             System.out.println("   ⚙️ Converting (" + typeEnum + ")...");
-            Thread.sleep(300);
-            taskDAO.updateStatus(taskId, TaskStatus.PROCESSING, 55, "Processing conversion...");
-            
+
             switch (typeEnum) {
                 case PDF_TO_DOCX:
                     PdfTool.convertPdfToDocx(tempInput.toString(), tempOutput.toString());
                     break;
-
                 case DOCX_TO_PDF:
-                    // Gọi service DOCX -> PDF
-                    docx_to_pdf_service docxService = new docx_to_pdf_service();
-                    docxService.convertDocxtoPdf(tempInput.toString(), tempOutput.toString());
+                    new docx_to_pdf_service().convertDocxtoPdf(tempInput.toString(), tempOutput.toString());
                     break;
                 
                 case PPTX_TO_PDF:
@@ -313,51 +293,28 @@ public class FileWorker implements Runnable {
                     throw new UnsupportedOperationException("Chưa hỗ trợ kiểu convert: " + typeEnum);
             }
 
-            // Cập nhật tiến độ sau khi convert xong
-            Thread.sleep(300);
-            taskDAO.updateStatus(taskId, TaskStatus.PROCESSING, 60, "Conversion completed");
-            Thread.sleep(200);
-            taskDAO.updateStatus(taskId, TaskStatus.PROCESSING, 65, "Preparing upload...");
-            Thread.sleep(200);
             taskDAO.updateStatus(taskId, TaskStatus.PROCESSING, 70, "Uploading result...");
 
-            // 7. Upload Output lên Cloudinary
-            Thread.sleep(200);
-            taskDAO.updateStatus(taskId, TaskStatus.PROCESSING, 75, "Uploading to cloud...");
-            System.out.println("   ☁️ Uploading result...");
-            // Lưu vào folder theo loại task để dễ quản lý trên Cloud
+            // 7. Upload Output
             Map<String, Object> uploadResult = CloudUploadService.uploadFile(
                     tempOutput.toFile(),
-                    "result_" + savedName, // Tên file trên cloud
-                    typeEnum.name()        // Tên folder
-            );
-            Thread.sleep(300);
-            taskDAO.updateStatus(taskId, TaskStatus.PROCESSING, 85, "Upload completed");
+                    "result_" + savedName,
+                    typeEnum.name());
 
             String newPublicId = (String) uploadResult.get("public_id");
-            
-            // Lấy format từ Cloudinary, nếu null thì dùng extension từ task type
             String format = (String) uploadResult.get("format");
-            String originalBaseName = savedName.contains(".") ? savedName.substring(0, savedName.lastIndexOf('.')) : savedName;
-            
-            // Fix: Nếu Cloudinary trả về format null (như JSON), dùng extension từ output type
+
             if (format == null || "null".equals(format)) {
                 String ext = getOutputExtension(typeEnum);
                 format = ext.startsWith(".") ? ext.substring(1) : ext;
-                System.out.println("⚠️ Format null từ Cloudinary, dùng: " + format);
             }
-            
-            String newSavedName = originalBaseName + "." + format;
-            
+
+            String newSavedName = (savedName.contains(".") ? savedName.substring(0, savedName.lastIndexOf('.'))
+                    : savedName) + "." + format;
             long newSize = ((Number) uploadResult.get("bytes")).longValue();
 
-            // 8. ✅ Cập nhật DB - Lưu public_id vào file_path
-            Thread.sleep(200);
-            taskDAO.updateStatus(taskId, TaskStatus.PROCESSING, 90, "Saving to database...");
+            // 8. Cập nhật DB
             fileDAO.updateConvertedFile(fileId, newPublicId, newSavedName, newSize, newPublicId);
-            Thread.sleep(300);
-            taskDAO.updateStatus(taskId, TaskStatus.PROCESSING, 95, "Finalizing...");
-            Thread.sleep(200);
             taskDAO.updateStatus(taskId, TaskStatus.COMPLETED, 100, "Done");
 
             System.out.println("✅ Task " + taskId + " HOÀN THÀNH! Public ID: " + newPublicId);
@@ -375,7 +332,7 @@ public class FileWorker implements Runnable {
                 if (tempInput != null) java.nio.file.Files.deleteIfExists(tempInput);
                 if (tempOutput != null) java.nio.file.Files.deleteIfExists(tempOutput);
             } catch (Exception e) {
-                e.printStackTrace();
+                System.err.println("Failed to cleanup temp files: " + e.getMessage());
             }
         }
     }
@@ -563,30 +520,23 @@ public class FileWorker implements Runnable {
         }
     }
 
-    // Helper: Xác định đuôi file dựa trên loại Task
     private String getOutputExtension(TaskType type) {
         switch (type) {
             case DOCX_TO_PDF:
             case PPTX_TO_PDF:
             case IMAGE_TO_PDF:
                 return ".pdf";
-                
             case PDF_TO_DOCX:
             case XML_TO_DOCX:
                 return ".docx";
-            
             case CSV_TO_JSON:
                 return ".json";
-            
             case DOCX_TO_XML:
                 return ".xml";
-            
             case DOCX_TO_HTML:
                 return ".html";
-            
             case DOCX_TO_TXT:
                 return ".txt";
-            
             case DOCX_TO_MARKDOWN:
                 return ".md";
             
@@ -606,7 +556,7 @@ public class FileWorker implements Runnable {
                 return ".png"; // Default to PNG
 
             default:
-                return ".bin"; // Fallback
+                return ".bin";
         }
     }
     

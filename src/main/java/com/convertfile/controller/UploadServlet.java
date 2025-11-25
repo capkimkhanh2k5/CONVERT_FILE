@@ -18,11 +18,7 @@ import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.Part;
 
 @WebServlet("/upload")
-@MultipartConfig(
-    fileSizeThreshold = 1024 * 1024 * 2, 
-    maxFileSize = 1024 * 1024 * 50, 
-    maxRequestSize = 1024 * 1024 * 60
-    )
+@MultipartConfig(fileSizeThreshold = 1024 * 1024 * 2, maxFileSize = 1024 * 1024 * 50, maxRequestSize = 1024 * 1024 * 60)
 public class UploadServlet extends HttpServlet {
 
     @Override
@@ -39,19 +35,19 @@ public class UploadServlet extends HttpServlet {
         try {
             System.out.println("📦 Getting file part from request...");
             Part part = request.getPart("file");
-            
+
             if (part == null) {
                 System.out.println("❌ Part is NULL - No file uploaded!");
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 response.getWriter().write("{\"status\": \"error\", \"message\": \"No file part found\"}");
                 return;
             }
-            
+
             System.out.println("✅ Part received: " + part.getName() + ", Size: " + part.getSize() + " bytes");
-            
+
             String taskType = request.getParameter("taskType");
             System.out.println("📋 Task Type: " + taskType);
-            
+
             String fileName = FileService.extractFileName(part);
             System.out.println("📄 Extracted File Name: " + fileName);
 
@@ -89,7 +85,7 @@ public class UploadServlet extends HttpServlet {
 
             Object bytesObj = uploadResult.get("bytes");
             long fileSize = (bytesObj != null) ? ((Number) bytesObj).longValue() : part.getSize();
-            
+
             System.out.println("📊 Cloudinary Details:");
             System.out.println("   • URL: " + cloudinaryUrl);
             System.out.println("   • Public ID: " + publicId);
@@ -105,7 +101,7 @@ public class UploadServlet extends HttpServlet {
                     publicId,
                     fileSize,
                     userId);
-            
+
             System.out.println("📌 Database returned File ID: " + fileId);
 
             if (fileId != null) {
@@ -127,7 +123,7 @@ public class UploadServlet extends HttpServlet {
                     if (session == null) {
                         System.out.println("⚠️ No session existed, created new session for guest");
                     }
-                    
+
                     @SuppressWarnings("unchecked")
                     java.util.List<String> guestFileIds = (java.util.List<String>) guestSession
                             .getAttribute("guestFile_ids");
@@ -137,7 +133,20 @@ public class UploadServlet extends HttpServlet {
                         System.out.println("🆕 Created new guest file list in session");
                     }
                     guestFileIds.add(fileId);
-                    System.out.println("👻 Guest file added to session: " + fileId + " (Total: " + guestFileIds.size() + ")");
+                    System.out.println(
+                            "👻 Guest file added to session: " + fileId + " (Total: " + guestFileIds.size() + ")");
+                }
+
+                // ✅ CREATE TASK AND PUBLISH TO RABBITMQ
+                System.out.println("🐰 Publishing task to RabbitMQ...");
+                try {
+                    TaskQueueService taskQueueService = new TaskQueueService();
+                    taskQueueService.addNewTask(fileId, taskType);
+                    System.out.println("✅ Task published to RabbitMQ successfully!");
+                } catch (Exception e) {
+                    System.err.println("❌ Failed to publish to RabbitMQ: " + e.getMessage());
+                    e.printStackTrace();
+                    // Continue even if RabbitMQ fails - task is still in DB
                 }
 
                 System.out.println("✅ SUCCESS! File ID: " + fileId);
@@ -150,7 +159,8 @@ public class UploadServlet extends HttpServlet {
                 System.out.println("========================================\n");
                 response.setStatus(HttpServletResponse.SC_OK);
                 response.getWriter()
-                        .write("{\"status\": \"success\", \"message\": \"File uploaded successfully\", \"fileId\": \"" + fileId + "\"}");
+                        .write("{\"status\": \"success\", \"message\": \"File uploaded successfully\", \"fileId\": \""
+                                + fileId + "\"}");
             } else {
                 System.out.println("❌ FAILED! Database returned NULL fileId");
                 System.out.println("========================================\n");
@@ -167,9 +177,10 @@ public class UploadServlet extends HttpServlet {
             System.out.println("💥 ========================================");
             e.printStackTrace();
             System.out.println("========================================\n");
-            
+
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            response.getWriter().write("{\"status\": \"error\", \"message\": \"Server Error: " + e.getMessage().replace("\"", "'") + "\"}");
+            response.getWriter().write("{\"status\": \"error\", \"message\": \"Server Error: "
+                    + e.getMessage().replace("\"", "'") + "\"}");
         }
     }
 }

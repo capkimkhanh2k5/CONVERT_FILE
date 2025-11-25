@@ -7,7 +7,7 @@ import com.convertfile.model.dao.TaskDAO;
 public class TaskBO {
     private final TaskDAO taskDAO = new TaskDAO();
 
-    public boolean insertTask(Tasks job) {
+    public long insertTask(Tasks job) {
         return taskDAO.insertTask(job);
     }
 

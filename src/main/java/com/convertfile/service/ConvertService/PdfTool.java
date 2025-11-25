@@ -1,5 +1,6 @@
 package com.convertfile.service.ConvertService;
 
+import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
@@ -23,7 +24,7 @@ public class PdfTool {
      * @return Number of pages, or 0 if error
      */
     public static int getPageCount(String inputPath) {
-        try (PDDocument doc = PDDocument.load(new File(inputPath))) {
+        try (PDDocument doc = Loader.loadPDF(new File(inputPath))) {
             return doc.getNumberOfPages();
         } catch (IOException e) {
             e.printStackTrace();
@@ -35,16 +36,16 @@ public class PdfTool {
      * Convert PDF file to DOCX (Word) format
      * Extracts text from PDF and creates Word document with proper formatting
      * 
-     * @param inputPath Path to input PDF file
+     * @param inputPath  Path to input PDF file
      * @param outputPath Path to output DOCX file
      * @throws IOException If conversion fails
      */
     public static void convertPdfToDocx(String inputPath, String outputPath) throws IOException {
         File inputFile = new File(inputPath);
-        
+
         // 1. Đọc nội dung từ PDF
         String pdfText = "";
-        try (PDDocument document = PDDocument.load(inputFile)) {
+        try (PDDocument document = Loader.loadPDF(inputFile)) {
             PDFTextStripper stripper = new PDFTextStripper();
             pdfText = stripper.getText(document);
         }
@@ -54,7 +55,7 @@ public class PdfTool {
             // Create a paragraph
             XWPFParagraph paragraph = docx.createParagraph();
             XWPFRun run = paragraph.createRun();
-            
+
             // Xử lý xuống dòng (Word không hiểu \n như Text)
             String[] lines = pdfText.split("\n");
             for (String line : lines) {

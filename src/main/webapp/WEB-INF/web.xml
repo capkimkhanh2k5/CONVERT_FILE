@@ -13,7 +13,7 @@
     </listener>
 
     <welcome-file-list>
-        <welcome-file>login</welcome-file> <!-- Sửa thành login để vào trang đăng nhập trước -->
+        <welcome-file>index.jsp</welcome-file>
     </welcome-file-list>
 
     <context-param>
