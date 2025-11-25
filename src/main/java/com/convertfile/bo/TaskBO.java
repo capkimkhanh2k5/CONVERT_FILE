@@ -8,7 +8,10 @@ public class TaskBO {
     private final TaskDAO taskDAO = new TaskDAO();
 
     public long insertTask(Tasks job) {
-        return taskDAO.insertTask(job);
+        if (taskDAO.insertTask(job)) {
+            return job.getTask_id();
+        }
+        return 0;
     }
 
     public Tasks getNextWaitingTask() {

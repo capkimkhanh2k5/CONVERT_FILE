@@ -69,4 +69,16 @@ public class PropertiesService {
     public static boolean getCloudinaryUrlSecure() {
         return Boolean.parseBoolean(properties.getProperty("cloudinary.url.secure", "true"));
     }
+
+    public static int getRabbitMQConnectionTimeout() {
+        return Integer.parseInt(properties.getProperty("rabbitmq.connectionTimeout", "30000"));
+    }
+
+    public static int getRabbitMQRequestedHeartbeat() {
+        return Integer.parseInt(properties.getProperty("rabbitmq.requestedHeartbeat", "30"));
+    }
+
+    public static String getRabbitMQUrl() {
+        return properties.getProperty("rabbitmq.url");
+    }
 }

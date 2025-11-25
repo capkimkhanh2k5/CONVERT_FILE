@@ -1,6 +1,5 @@
 package com.convertfile.service.ConvertService;
 
-import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.rendering.PDFRenderer;
 import javax.imageio.ImageIO;
@@ -10,7 +9,7 @@ import java.io.IOException;
 
 public class pdf_to_image_service {
     public void convertPdfToImage(String pdfPath, String outputFolder) throws IOException {
-        PDDocument document = Loader.loadPDF(new File(pdfPath));
+        PDDocument document = PDDocument.load(new File(pdfPath));
         PDFRenderer renderer = new PDFRenderer(document);
 
         for (int i = 0; i < document.getNumberOfPages(); i++) {
