@@ -18,6 +18,35 @@ import org.docx4j.fonts.PhysicalFonts;
  */
 public class docx_to_pdf_service {
     
+    // Static initialization - discover fonts only once (huge performance boost)
+    private static volatile boolean fontsDiscovered = false;
+    private static final Object fontLock = new Object();
+    
+    static {
+        // Reduce docx4j logging noise
+        System.setProperty("org.docx4j.fonts.fop.fonts.autodetect.FontInfoFinder", "ERROR");
+    }
+    
+    private static void ensureFontsDiscovered() {
+        if (!fontsDiscovered) {
+            synchronized (fontLock) {
+                if (!fontsDiscovered) {
+                    try {
+                        System.out.println("🔤 Discovering system fonts (one-time operation)...");
+                        long start = System.currentTimeMillis();
+                        PhysicalFonts.discoverPhysicalFonts();
+                        long elapsed = System.currentTimeMillis() - start;
+                        System.out.println("✅ Fonts discovered in " + elapsed + "ms");
+                        fontsDiscovered = true;
+                    } catch (Exception e) {
+                        System.err.println("⚠️ Font discovery failed, using defaults: " + e.getMessage());
+                        fontsDiscovered = true; // Continue anyway
+                    }
+                }
+            }
+        }
+    }
+    
     /**
      * Convert DOCX file to PDF
      * Handles empty documents by adding placeholder content
@@ -27,15 +56,18 @@ public class docx_to_pdf_service {
      * @throws IOException If conversion fails
      */
     public void convertDocxtoPdf(String docxPath, String pdfPath) throws IOException {
-        System.out.println("Start convert docx to pdf: " + docxPath);
+        System.out.println("🔄 Converting DOCX to PDF: " + new File(docxPath).getName());
         try (OutputStream output = new FileOutputStream(new File(pdfPath))) {
 
+            // Ensure fonts are discovered (cached after first call)
+            ensureFontsDiscovered();
+            
             WordprocessingMLPackage wordPackage = WordprocessingMLPackage.load(new File(docxPath));
             
             // Check if document is empty and add minimal content
             // This prevents conversion errors with empty DOCX files
             if (wordPackage.getMainDocumentPart().getContent().isEmpty()) {
-                System.out.println("Empty document detected - adding placeholder content");
+                System.out.println("⚠️ Empty document detected - adding placeholder");
                 org.docx4j.wml.ObjectFactory factory = new org.docx4j.wml.ObjectFactory();
                 org.docx4j.wml.P paragraph = factory.createP();
                 org.docx4j.wml.R run = factory.createR();
@@ -46,24 +78,21 @@ public class docx_to_pdf_service {
                 wordPackage.getMainDocumentPart().getContent().add(paragraph);
             }
             
-            // Font Set
+            // Font mapper (fonts already discovered)
             Mapper font = new IdentityPlusMapper();
-            PhysicalFonts.discoverPhysicalFonts();
-
             wordPackage.setFontMapper(font);
 
+            System.out.println("📝 Rendering PDF...");
             Docx4J.toPDF(wordPackage, output);
+            System.out.println("✅ PDF conversion completed");
             
         } catch(Docx4JException edocx) {
-            System.out.println("Error: " + edocx.getMessage());
-            edocx.printStackTrace();
-            throw new IOException("Error in convert docx to pdf!");
+            System.err.println("❌ Docx4J error: " + edocx.getMessage());
+            throw new IOException("DOCX to PDF conversion failed: " + edocx.getMessage());
         } catch (Exception ex) {
-            System.out.println("Error in process!");
+            System.err.println("❌ Conversion error: " + ex.getMessage());
             ex.printStackTrace();
-            throw new IOException("Not found in Process!");
+            throw new IOException("PDF conversion error: " + ex.getMessage());
         }
-
-        System.out.println("End convert docx to pdf: " + pdfPath);
     }
 }

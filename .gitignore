@@ -21,7 +21,7 @@ database.properties
 src/main/resources/application.properties
 
 # JSON credentials (Google OAuth, Firebase, etc.)
-*-credentials.json
+*-credentials.jsongit commit -m "Add v2.0.0: 15 conversion services, dynamic UI, version tracking"
 service-account.json
 client_secret*.json
 src/main/java/com/convertfile/model/*.json

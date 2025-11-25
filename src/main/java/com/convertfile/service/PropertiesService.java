@@ -69,32 +69,4 @@ public class PropertiesService {
     public static boolean getCloudinaryUrlSecure() {
         return Boolean.parseBoolean(properties.getProperty("cloudinary.url.secure", "true"));
     }
-
-    public static String getRabbitMQUrl() {
-        return properties.getProperty("rabbitmq.url");
-    }
-
-    public static String getRabbitMQUsername() {
-        return properties.getProperty("rabbitmq.username");
-    }
-
-    public static String getRabbitMQPassword() {
-        return properties.getProperty("rabbitmq.password");
-    }
-
-    public static String getRabbitMQQueue() {
-        return properties.getProperty("rabbitmq.queue");
-    }
-
-    public static Integer getRabbitMQConnectionTimeout() {
-        return Integer.parseInt(properties.getProperty("rabbitmq.connectionTimeout"));
-    }
-
-    public static Integer getRabbitMQRequestedHeartbeat() {
-        return Integer.parseInt(properties.getProperty("rabbitmq.requestedHeartbeat"));
-    }
-
-    public static String getRabbitMQVirtualHost() {
-        return properties.getProperty("rabbitmq.virtualHost");
-    }
 }

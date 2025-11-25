@@ -1,5 +1,7 @@
 package com.convertfile.model.dao;
 
+import com.convertfile.config.DBConnect;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -19,11 +21,14 @@ public class JobDAO {
         String fileId = UUID.randomUUID().toString();
 
         String sqlFile = "INSERT INTO files (file_id, user_id, original_name, saved_name, file_size, " +
-                "file_path, public_id, input_format, current_status) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'UPLOADED')";
+                "file_path, public_id, input_public_id, input_format, current_status) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'UPLOADED')";
+
+        // ⚠️ Phase 3: Task creation moved to TaskQueueService (to support RabbitMQ publish)
+        // Task will be created by UploadServlet → TaskQueueService.addNewTask()
 
         try {
-            conn = ConnectDB.getConnection();
+            conn = DBConnect.getConnection();
             if (conn == null)
                 return null;
 
@@ -44,13 +49,17 @@ public class JobDAO {
             psFile.setString(4, savedName);
             psFile.setLong(5, fileSize);
             psFile.setString(6, cloudinaryUrl); // URL của Cloudinary
-            psFile.setString(7, publicId); // Public ID từ Cloudinary
+            psFile.setString(7, publicId); // Public ID của file output (sau khi convert)
+            psFile.setString(8, publicId); // Public ID của file input (ban đầu cũng là publicId)
 
             // Lấy định dạng file từ tên file (ví dụ: file.docx -> docx)
             String inputFormat = originalName.substring(originalName.lastIndexOf(".") + 1).toLowerCase();
-            psFile.setString(8, inputFormat);
+            psFile.setString(9, inputFormat);
 
             psFile.executeUpdate();
+
+            // ✅ Phase 3: Task creation handled by TaskQueueService (supports RabbitMQ publish)
+            // Task inserted by UploadServlet → TaskQueueService.addNewTask(fileId, taskType)
 
             conn.commit();
             return fileId;
@@ -80,7 +89,7 @@ public class JobDAO {
         List<Map<String, Object>> list = new ArrayList<>();
         Connection conn = null;
         try {
-            conn = ConnectDB.getConnection();
+            conn = DBConnect.getConnection();
             if (conn == null)
                 return list;
 
@@ -121,7 +130,7 @@ public class JobDAO {
 
         Connection conn = null;
         try {
-            conn = ConnectDB.getConnection();
+            conn = DBConnect.getConnection();
             if (conn == null)
                 return list;
 
@@ -163,3 +172,4 @@ public class JobDAO {
         return list;
     }
 }
+
