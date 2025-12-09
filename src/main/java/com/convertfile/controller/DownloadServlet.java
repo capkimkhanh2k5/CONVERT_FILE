@@ -30,28 +30,30 @@ public class DownloadServlet extends HttpServlet {
             // 2. Lấy file info từ DB
             FileDAO fileDAO = new FileDAO();
             Files file = fileDAO.getFileByID(fileId);
-            
+
             if (file == null) {
                 response.setStatus(HttpServletResponse.SC_NOT_FOUND);
                 response.getWriter().write("File not found");
                 return;
             }
-            
+
             // 3. ✅ TẠO PUBLIC URL TỪ PUBLIC_ID
             String publicId = file.getPublic_id();
             String publicUrl = CloudUploadService.generateSignedUrl(publicId);
-            
+
             System.out.println("📥 Downloading file: " + publicId);
-            
+
             // 4. DOWNLOAD VÀ STREAM FILE VỀ BROWSER
             try (java.io.InputStream in = new java.net.URI(publicUrl).toURL().openStream();
-                 java.io.OutputStream out = response.getOutputStream()) {
-                
+                    java.io.OutputStream out = response.getOutputStream()) {
+
                 // Set response headers để trigger download
                 response.setContentType("application/octet-stream");
                 String fileName = file.getSaved_name();
-                response.setHeader("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
-                
+                // ✅ SECURITY: Sanitize filename to prevent header injection
+                String safeFileName = fileName.replaceAll("[^a-zA-Z0-9._-]", "_");
+                response.setHeader("Content-Disposition", "attachment; filename=\"" + safeFileName + "\"");
+
                 // Stream file từ Cloudinary về browser
                 byte[] buffer = new byte[8192];
                 int bytesRead;
@@ -59,10 +61,10 @@ public class DownloadServlet extends HttpServlet {
                     out.write(buffer, 0, bytesRead);
                 }
                 out.flush();
-                
+
                 System.out.println("✅ File downloaded successfully: " + fileName);
             }
-            
+
         } catch (Exception e) {
             e.printStackTrace();
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);

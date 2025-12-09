@@ -116,7 +116,7 @@ public class UploadServlet extends HttpServlet {
                     rabbitmqEx.printStackTrace();
                     // Continue - task still in DB, can be picked up by polling
                 }
-                
+
                 // Nếu là khách (userId == 0), lưu fileId vào session
                 if (userId == 0) {
                     HttpSession guestSession = (session != null) ? session : request.getSession(true);
@@ -135,18 +135,6 @@ public class UploadServlet extends HttpServlet {
                     guestFileIds.add(fileId);
                     System.out.println(
                             "👻 Guest file added to session: " + fileId + " (Total: " + guestFileIds.size() + ")");
-                }
-
-                // ✅ CREATE TASK AND PUBLISH TO RABBITMQ
-                System.out.println("🐰 Publishing task to RabbitMQ...");
-                try {
-                    TaskQueueService taskQueueService = new TaskQueueService();
-                    taskQueueService.addNewTask(fileId, taskType);
-                    System.out.println("✅ Task published to RabbitMQ successfully!");
-                } catch (Exception e) {
-                    System.err.println("❌ Failed to publish to RabbitMQ: " + e.getMessage());
-                    e.printStackTrace();
-                    // Continue even if RabbitMQ fails - task is still in DB
                 }
 
                 System.out.println("✅ SUCCESS! File ID: " + fileId);
